@@ -2,7 +2,8 @@ export function getGoogleOAuthURL() {
   const rootUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
 
   const options = {
-    redirect_uri: process.env.NEXT_PUBLIC_GOOGLE_OAUTH_REDIRECT_URL as string,
+    // redirect_uri: process.env.NEXT_PUBLIC_GOOGLE_OAUTH_REDIRECT_URL as string,
+    redirect_uri: "http://localhost:3000",
     client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID as string,
     access_type: 'offline',
     response_type: 'code',

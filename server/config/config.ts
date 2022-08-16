@@ -12,10 +12,10 @@ export const config = {
 
   databaseURL: process.env.DATABASE_URL!,
 
-  accessTokenPrivateKey: process.env.ACCESS_TOKEN_PRIVATE_KEY,
-  accessTokenPublicKey: process.env.ACCESS_TOKEN_PUBLIC_KEY,
-  refreshTokenPrivateKey: process.env.REFRESH_PRIVATE_KEY,
-  refreshTokenPublicKey: process.env.REFRESH_PUBLIC_KEY,
+  publicKey: process.env.PUBLIC_KEY,
+  privateKey: process.env.PRIVATE_KEY,
+  accessTokenTtl: process.env.ACCESS_TOKEN_TTL,
+  refreshTokenTtl: process.env.REFRESH_TOKEN_TTL,
 
   googleClientID: process.env.GOOGLE_CLIENT_ID,
   googleClientSecret: process.env.GOOGLE_CLIENT_SECRET,

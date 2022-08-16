@@ -1,10 +1,30 @@
-import React, { useState } from 'react';
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
+import { useGoogleOauthHandlerMutation } from '../../../graphql/generated/graphql';
 import { getGoogleOAuthURL } from '../../../utils/getGoogleOAuthURL';
 import styles from './Login.module.css';
 
 interface LoginFormProps {}
 
 export const LoginForm: React.FC<LoginFormProps> = ({}) => {
+  const {
+    push,
+    query: { code },
+  } = useRouter();
+  const [codeParam, setCodeParam] = useState('');
+  const { mutate, isSuccess, isLoading } = useGoogleOauthHandlerMutation({
+    onSuccess: () => push('/'),
+  });
+
+  useEffect(() => {
+    setCodeParam(code as string);
+    if (code) {
+      mutate({ code: code as string });
+    }
+  }, [code]);
+
+  console.log('Code param', code);
+
   const [user, setUser] = useState({
     email: '',
     password: '',
@@ -31,6 +51,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({}) => {
       [name]: value,
     });
   }
+
+  function handleGoogleAuthLogin() {
+    console.log(getGoogleOAuthURL());
+  }
+
   return (
     <form onSubmit={onSubmit}>
       <div className="mt-4">
@@ -82,6 +107,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({}) => {
         <div className=" mt-5 flex-col flex space-y-4">
           <a
             href={getGoogleOAuthURL()}
+            // onClick={handleGoogleAuthLogin}
             className="w-full justify-center bg-white border shadow-md hover:bg-gray-100 px-4 py-3 font-semibold inline-flex items-center space-x-2 rounded"
           >
             <svg

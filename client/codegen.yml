@@ -1,0 +1,23 @@
+overwrite: true
+schema: 'http://localhost:5000/graphql'
+documents: 'graphql/**/*/*.graphql'
+generates:
+  graphql/generated/graphql.ts:
+    plugins:
+      - 'typescript'
+      - 'typescript-operations'
+      - 'typescript-react-query'
+    config:
+      fetcher:
+        endpoint: "http://localhost:5000/graphql"
+        fetchParams: >
+          {
+            headers: {
+              "Apollo-Require-Preflight": "true",
+              "Content-Type": "application/json"
+            }, 
+            credentials: 'include',
+          }
+  ./graphql.schema.json:
+    plugins:
+      - 'introspection'
