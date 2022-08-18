@@ -10,22 +10,24 @@ import {
   GetCurrentUserQuery,
   useGetCurrentUserQuery,
 } from '../graphql/generated/graphql';
+import { getDataFromDehydratedState } from '../utils/getDataFromDehydratedState';
 
 interface HomeProps {
   dehydratedState: any;
 }
 
 const Home: NextPage<HomeProps> = ({ dehydratedState }) => {
-  console.log('WHAT PROPS DO WE HAVE?: ', dehydratedState);
+  const { data, isLoading, isError, error } =
+    useGetCurrentUserQuery<GetCurrentUserQuery>(undefined, {
+      // Don't think I need this because the 'initialData' is already being set
+      // in getServerSideProps
+      // initialData: getDataFromDehydratedState('GetCurrentUser', dehydratedState),
+    });
 
-  const { data, isLoading, isError } =
-    useGetCurrentUserQuery<GetCurrentUserQuery>();
-  console.log('DO WE HAVE ANY DATA: ', data);
-
-  if (data?.getCurrentUser?.id) {
+  if (data?.getCurrentUser?.data?.id) {
     return (
       <div>
-        Welcome! <div>{data.getCurrentUser.username}</div>
+        Welcome! <div>{data.getCurrentUser.data.username}</div>
       </div>
     );
   }
@@ -44,7 +46,7 @@ const Home: NextPage<HomeProps> = ({ dehydratedState }) => {
       </Head>
 
       <main className="bg-white relative">
-        <div className="absolute bottom-0">
+        <div className="absolute bottom-0 z-0">
           <Wave />
         </div>
         <div className="absolute top-0">
@@ -55,19 +57,19 @@ const Home: NextPage<HomeProps> = ({ dehydratedState }) => {
             <h1 className="text-3xl font-bold text-gray-700">VitaTrack</h1>
           </div>
         </div>
-        <div className="flex justify-center h-screen">
+        <div className="flex justify-center h-screen z-10">
           <div className="hidden bg-cover lg:block lg:w-7/12">
-            <div className="flex items-center h-full pl-20">
+            <div className="flex items-center h-full pl-20 z-10">
               <Hero />
             </div>
           </div>
-          <div className="flex items-center w-full max-w-md pr-10 mx-auto lg:w-5/12">
+          <div className="flex items-center w-full max-w-md pr-10 mx-auto lg:w-5/12 z-10">
             <div className="flex-1 mr-6">
               <div className="text-center">
                 <h2 className="text-5xl font-bold text-center text-gray-700">
                   Log in
                 </h2>
-                <p className="mt-3 text-gray-500">
+                <p className="mt-4 text-gray-500">
                   Log in to access your account
                 </p>
                 <LoginForm />
@@ -95,12 +97,6 @@ const Home: NextPage<HomeProps> = ({ dehydratedState }) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  // const data = await fetcher(
-  //   `${process.env.NEXT_PUBLIC_SERVER_ENDPOINT}/api/me`,
-  //   context.req.headers
-  // );
-  console.log('Server headers: ', context.req.headers);
-
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery(
@@ -111,7 +107,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     )
   );
 
-  // return { props: { fallbackData: 'Perry' } };
   return {
     props: {
       dehydratedState: dehydrate(queryClient),

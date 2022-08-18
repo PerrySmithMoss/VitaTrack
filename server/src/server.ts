@@ -9,7 +9,6 @@ import {
 } from "apollo-server-core";
 import { buildSchema } from "type-graphql";
 import {
-  HelloResolver,
   SessionResolver,
   UserResolver,
 } from "./resolvers/index";
@@ -32,7 +31,7 @@ async function main() {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [HelloResolver, SessionResolver, UserResolver],
+      resolvers: [SessionResolver, UserResolver],
       // @TODO: For some reason this is running multiple times
       // globalMiddlewares: [deserializeUser],
     }),

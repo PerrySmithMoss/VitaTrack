@@ -31,7 +31,7 @@ const deserializeUser: MiddlewareFn<PrismaContext> = async (
         httpOnly: true,
         domain: "localhost",
         path: "/",
-        sameSite: "strict",
+        sameSite: "lax",
         secure: false,
       });
     }

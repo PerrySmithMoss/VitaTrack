@@ -1,7 +1,32 @@
 import qs from "qs";
 import axios from "axios";
+import { hash } from "argon2";
 import { config } from "../../config/config";
 import prisma from "../lib/prisma";
+
+type UserInput = {
+  username: string;
+  email: string;
+  password: string;
+};
+
+export async function createUser(userInput: UserInput) {
+  const hashedPassword = await hash(userInput.password);
+
+  return await prisma.user.create({
+    data: {
+      username: userInput.username,
+      email: userInput.email,
+      password: hashedPassword,
+      profile: {
+        create: {},
+      },
+    },
+    include: {
+      profile: true
+    }
+  });
+}
 
 export async function findUserById(id: string) {
   const user = await prisma.user.findUnique({

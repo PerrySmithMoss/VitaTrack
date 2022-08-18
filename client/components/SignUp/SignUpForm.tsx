@@ -1,37 +1,43 @@
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { useGoogleOauthHandlerMutation } from '../../../graphql/generated/graphql';
-import { getGoogleOAuthURL } from '../../../utils/getGoogleOAuthURL';
-import styles from './Login.module.css';
+import {
+  useGoogleOauthHandlerMutation,
+  useCreateUserMutation,
+} from '../../graphql/generated/graphql';
+import { getGoogleOAuthURL } from '../../utils/getGoogleOAuthURL';
+import styles from './SignUp.module.css';
 
-interface LoginFormProps {}
+interface SignUpFormProps {}
 
-export const LoginForm: React.FC<LoginFormProps> = ({}) => {
+export const SignUpForm: React.FC<SignUpFormProps> = ({}) => {
   const {
     push,
     query: { code },
   } = useRouter();
   const [codeParam, setCodeParam] = useState('');
-  const { mutate, isSuccess, isLoading } = useGoogleOauthHandlerMutation({
+  const { mutate: createUserUsingGoogleCredentails } =
+    useGoogleOauthHandlerMutation({
+      onSuccess: () => push('/'),
+    });
+
+  const { mutate: createUserUsingEmailAndPassword } = useCreateUserMutation({
     onSuccess: () => push('/'),
   });
 
   const [user, setUser] = useState({
     email: '',
     password: '',
+    username: '',
   });
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    // const res = await signIn('credentials', {
-    //   email: user.email,
-    //   password: user.password,
-    //   // redirect: false,
-    //   callbackUrl: '/dashboard',
-    // });
-
-    // console.log(res);
+    createUserUsingEmailAndPassword({
+      username: user.username,
+      email: user.email,
+      password: user.password,
+    });
   }
 
   function handleUserInputChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -46,12 +52,28 @@ export const LoginForm: React.FC<LoginFormProps> = ({}) => {
   useEffect(() => {
     setCodeParam(code as string);
     if (code) {
-      mutate({ code: code as string });
+      createUserUsingGoogleCredentails({ code: code as string });
     }
   }, [code]);
 
   return (
     <form onSubmit={onSubmit}>
+      <div className="mt-4">
+        <div className="flex justify-between mb-2">
+          <label htmlFor="email" className="block mb-2 text-sm text-gray-600">
+            Username
+          </label>
+        </div>
+        <input
+          type="text"
+          name="username"
+          id="username"
+          placeholder="Jane Doe"
+          value={user.username}
+          onChange={handleUserInputChange}
+          className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
+        />
+      </div>
       <div className="mt-4">
         <div className="flex justify-between mb-2">
           <label htmlFor="email" className="block mb-2 text-sm text-gray-600">
@@ -69,7 +91,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({}) => {
           className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
         />
       </div>
-
       <div className="mt-4">
         <div className="flex justify-between mb-2">
           <label htmlFor="password" className="text-sm text-gray-600">
@@ -89,11 +110,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({}) => {
       </div>
       <div className="mt-5">
         <button className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-brand-green hover:bg-brand-green-hover rounded-md focus:outline-none focus:bg-brand-green-hover focus:ring focus:ring-blue-300 focus:ring-opacity-50">
-          Log in
+          Sign up
         </button>
       </div>
       <div
-        className={`${styles.orSeperator} flex justify-center text-center items-center mx-10 mt-5`}
+        className={`${styles.orSeperator} flex justify-center text-center items-center mt-5`}
       >
         <span className="text-gray-500 px-3 font-medium text-sm">OR</span>
       </div>
@@ -127,7 +148,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({}) => {
                 />
               </g>
             </svg>
-            <span className="font-semibold text-sm">Log in with Google</span>
+            <span className="font-semibold text-sm">Sign up with Google</span>
           </a>
           <a className="w-full justify-center text-center bg-blue-500 shadow-md hover:bg-blue-700 px-4 py-3 font-semibold text-white inline-flex items-center space-x-2 rounded">
             <svg
@@ -138,7 +159,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({}) => {
             >
               <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
             </svg>
-            <span className="text-sm">Log in with Facebook</span>
+            <span className="text-sm">Sign up with Facebook</span>
           </a>
         </div>
       </div>

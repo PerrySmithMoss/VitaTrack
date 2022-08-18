@@ -4,7 +4,7 @@ interface WaveProps {}
 
 export const Wave: React.FC<WaveProps> = ({}) => {
   return (
-    <div className="custom-shape-divider-bottom-1660136869">
+    <div className="custom-shape-divider-bottom-1660136869 z-0">
       <svg
         height={200}
         width="100%"

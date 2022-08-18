@@ -10,9 +10,13 @@ import {
 } from "../services/user.service";
 import { PrismaContext } from "../types/PrismaContext";
 import { signJwt } from "../utils/jwt.utils";
+import {
+  accessTokenCookieOptions,
+  refreshTokenCookieOptions,
+} from "../../constants/cookieOptions";
 
 @ObjectType()
-class FieldError {
+class SessionFieldError {
   @Field()
   field!: string;
 
@@ -31,26 +35,12 @@ class TokenResponse {
 
 @ObjectType()
 class SessionResponse {
-  @Field(() => [FieldError], { nullable: true })
-  errors?: FieldError[];
+  @Field(() => [SessionFieldError], { nullable: true })
+  errors?: SessionFieldError[];
 
   @Field(() => TokenResponse, { nullable: true })
   data?: TokenResponse;
 }
-
-const accessTokenCookieOptions: CookieOptions = {
-  maxAge: 900000, // 15 mins
-  httpOnly: true,
-  domain: "localhost",
-  path: "/",
-  sameSite: "lax",
-  secure: false,
-};
-
-const refreshTokenCookieOptions: CookieOptions = {
-  ...accessTokenCookieOptions,
-  maxAge: 3.154e10, // 1 year
-};
 
 @Resolver()
 export class SessionResolver {

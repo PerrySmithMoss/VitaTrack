@@ -15,15 +15,17 @@ export type Scalars = {
   DateTime: any;
 };
 
-export type FieldError = {
-  __typename?: 'FieldError';
-  field: Scalars['String'];
-  message: Scalars['String'];
-};
-
 export type Mutation = {
   __typename?: 'Mutation';
+  createUser: UserResponse;
   googleOauthHandler: SessionResponse;
+};
+
+
+export type MutationCreateUserArgs = {
+  email: Scalars['String'];
+  password: Scalars['String'];
+  username: Scalars['String'];
 };
 
 
@@ -43,8 +45,7 @@ export type Profile = {
 
 export type Query = {
   __typename?: 'Query';
-  getCurrentUser?: Maybe<User>;
-  hello: Scalars['String'];
+  getCurrentUser?: Maybe<UserResponse>;
 };
 
 export type Session = {
@@ -57,10 +58,16 @@ export type Session = {
   valid: Scalars['Boolean'];
 };
 
+export type SessionFieldError = {
+  __typename?: 'SessionFieldError';
+  field: Scalars['String'];
+  message: Scalars['String'];
+};
+
 export type SessionResponse = {
   __typename?: 'SessionResponse';
   data?: Maybe<TokenResponse>;
-  errors?: Maybe<Array<FieldError>>;
+  errors?: Maybe<Array<SessionFieldError>>;
 };
 
 export type TokenResponse = {
@@ -74,25 +81,76 @@ export type User = {
   createdAt: Scalars['String'];
   email: Scalars['String'];
   id: Scalars['String'];
-  profile: Profile;
-  session: Session;
+  profile?: Maybe<Profile>;
+  session?: Maybe<Session>;
   updatedAt: Scalars['String'];
   username: Scalars['String'];
 };
+
+export type UserFieldError = {
+  __typename?: 'UserFieldError';
+  field: Scalars['String'];
+  message: Scalars['String'];
+};
+
+export type UserResponse = {
+  __typename?: 'UserResponse';
+  data?: Maybe<User>;
+  errors?: Maybe<Array<UserFieldError>>;
+};
+
+export type CreateUserMutationVariables = Exact<{
+  password: Scalars['String'];
+  email: Scalars['String'];
+  username: Scalars['String'];
+}>;
+
+
+export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'UserResponse', data?: { __typename?: 'User', username: string, email: string, id: string, profile?: { __typename?: 'Profile', id: string, bio?: string | null, avatar?: string | null } | null } | null, errors?: Array<{ __typename?: 'UserFieldError', field: string, message: string }> | null } };
 
 export type GoogleOauthHandlerMutationVariables = Exact<{
   code: Scalars['String'];
 }>;
 
 
-export type GoogleOauthHandlerMutation = { __typename?: 'Mutation', googleOauthHandler: { __typename?: 'SessionResponse', data?: { __typename?: 'TokenResponse', access_token: string, id_token: string } | null, errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null } };
+export type GoogleOauthHandlerMutation = { __typename?: 'Mutation', googleOauthHandler: { __typename?: 'SessionResponse', data?: { __typename?: 'TokenResponse', access_token: string, id_token: string } | null, errors?: Array<{ __typename?: 'SessionFieldError', field: string, message: string }> | null } };
 
 export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetCurrentUserQuery = { __typename?: 'Query', getCurrentUser?: { __typename?: 'User', id: string, createdAt: string, updatedAt: string, email: string, username: string, profile: { __typename?: 'Profile', id: string, bio?: string | null, avatar?: string | null, avatarId?: string | null }, session: { __typename?: 'Session', userId: string, valid: boolean, userAgent: string, createdAt: string, updatedAt: any } } | null };
+export type GetCurrentUserQuery = { __typename?: 'Query', getCurrentUser?: { __typename?: 'UserResponse', data?: { __typename?: 'User', id: string, email: string, username: string, profile?: { __typename?: 'Profile', avatar?: string | null, bio?: string | null, id: string } | null, session?: { __typename?: 'Session', userId: string, valid: boolean, userAgent: string, createdAt: string, updatedAt: any } | null } | null } | null };
 
 
+export const CreateUserDocument = /*#__PURE__*/ `
+    mutation CreateUser($password: String!, $email: String!, $username: String!) {
+  createUser(password: $password, email: $email, username: $username) {
+    data {
+      username
+      email
+      id
+      profile {
+        id
+        bio
+        avatar
+      }
+    }
+    errors {
+      field
+      message
+    }
+  }
+}
+    `;
+export const useCreateUserMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateUserMutation, TError, CreateUserMutationVariables, TContext>) =>
+    useMutation<CreateUserMutation, TError, CreateUserMutationVariables, TContext>(
+      ['CreateUser'],
+      (variables?: CreateUserMutationVariables) => customFetcher<CreateUserMutation, CreateUserMutationVariables>(CreateUserDocument, variables)(),
+      options
+    );
+useCreateUserMutation.fetcher = (variables: CreateUserMutationVariables, options?: RequestInit['headers']) => customFetcher<CreateUserMutation, CreateUserMutationVariables>(CreateUserDocument, variables, options);
 export const GoogleOauthHandlerDocument = /*#__PURE__*/ `
     mutation googleOauthHandler($code: String!) {
   googleOauthHandler(code: $code) {
@@ -120,23 +178,22 @@ useGoogleOauthHandlerMutation.fetcher = (variables: GoogleOauthHandlerMutationVa
 export const GetCurrentUserDocument = /*#__PURE__*/ `
     query GetCurrentUser {
   getCurrentUser {
-    id
-    createdAt
-    updatedAt
-    email
-    username
-    profile {
+    data {
       id
-      bio
-      avatar
-      avatarId
-    }
-    session {
-      userId
-      valid
-      userAgent
-      createdAt
-      updatedAt
+      email
+      username
+      profile {
+        avatar
+        bio
+        id
+      }
+      session {
+        userId
+        valid
+        userAgent
+        createdAt
+        updatedAt
+      }
     }
   }
 }

@@ -21,9 +21,9 @@ export class User {
   @Field(() => String)
   username: string;
 
-  @Field(() => Session)
+  @Field(() => Session, { nullable: true })
   session: Session;
 
-  @Field(() => Profile)
+  @Field(() => Profile, { nullable: true })
   profile: Profile;
 }
