@@ -1,36 +1,10 @@
 import { useMutation, useQuery, UseMutationOptions, UseQueryOptions } from '@tanstack/react-query';
+import { customFetcher } from '../fetcher';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-
-function fetcher<TData, TVariables>(query: string, variables?: TVariables) {
-  return async (): Promise<TData> => {
-    const res = await fetch("http://localhost:5000/graphql", {
-    method: "POST",
-    ...({
-  headers: {
-    "Apollo-Require-Preflight": "true",
-    "Content-Type": "application/json"
-  }, 
-  credentials: 'include',
-}
-),
-      body: JSON.stringify({ query, variables }),
-    });
-
-    const json = await res.json();
-
-    if (json.errors) {
-      const { message } = json.errors[0];
-
-      throw new Error(message);
-    }
-
-    return json.data;
-  }
-}
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -59,9 +33,9 @@ export type MutationGoogleOauthHandlerArgs = {
 
 export type Profile = {
   __typename?: 'Profile';
-  avatar: Scalars['String'];
-  avatarId: Scalars['String'];
-  bio: Scalars['String'];
+  avatar?: Maybe<Scalars['String']>;
+  avatarId?: Maybe<Scalars['String']>;
+  bio?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
   user: Array<User>;
   userId: Scalars['String'];
@@ -75,7 +49,7 @@ export type Query = {
 
 export type Session = {
   __typename?: 'Session';
-  createdAt: Scalars['DateTime'];
+  createdAt: Scalars['String'];
   updatedAt: Scalars['DateTime'];
   user: Array<User>;
   userAgent: Scalars['String'];
@@ -97,12 +71,12 @@ export type TokenResponse = {
 
 export type User = {
   __typename?: 'User';
-  createdAt: Scalars['DateTime'];
+  createdAt: Scalars['String'];
   email: Scalars['String'];
   id: Scalars['String'];
   profile: Profile;
   session: Session;
-  updatedAt: Scalars['DateTime'];
+  updatedAt: Scalars['String'];
   username: Scalars['String'];
 };
 
@@ -116,7 +90,7 @@ export type GoogleOauthHandlerMutation = { __typename?: 'Mutation', googleOauthH
 export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetCurrentUserQuery = { __typename?: 'Query', getCurrentUser?: { __typename?: 'User', id: string, createdAt: any, updatedAt: any, email: string, username: string, profile: { __typename?: 'Profile', id: string, bio: string, avatar: string, avatarId: string }, session: { __typename?: 'Session', userId: string, valid: boolean, userAgent: string, createdAt: any, updatedAt: any } } | null };
+export type GetCurrentUserQuery = { __typename?: 'Query', getCurrentUser?: { __typename?: 'User', id: string, createdAt: string, updatedAt: string, email: string, username: string, profile: { __typename?: 'Profile', id: string, bio?: string | null, avatar?: string | null, avatarId?: string | null }, session: { __typename?: 'Session', userId: string, valid: boolean, userAgent: string, createdAt: string, updatedAt: any } } | null };
 
 
 export const GoogleOauthHandlerDocument = /*#__PURE__*/ `
@@ -139,10 +113,10 @@ export const useGoogleOauthHandlerMutation = <
     >(options?: UseMutationOptions<GoogleOauthHandlerMutation, TError, GoogleOauthHandlerMutationVariables, TContext>) =>
     useMutation<GoogleOauthHandlerMutation, TError, GoogleOauthHandlerMutationVariables, TContext>(
       ['googleOauthHandler'],
-      (variables?: GoogleOauthHandlerMutationVariables) => fetcher<GoogleOauthHandlerMutation, GoogleOauthHandlerMutationVariables>(GoogleOauthHandlerDocument, variables)(),
+      (variables?: GoogleOauthHandlerMutationVariables) => customFetcher<GoogleOauthHandlerMutation, GoogleOauthHandlerMutationVariables>(GoogleOauthHandlerDocument, variables)(),
       options
     );
-useGoogleOauthHandlerMutation.fetcher = (variables: GoogleOauthHandlerMutationVariables) => fetcher<GoogleOauthHandlerMutation, GoogleOauthHandlerMutationVariables>(GoogleOauthHandlerDocument, variables);
+useGoogleOauthHandlerMutation.fetcher = (variables: GoogleOauthHandlerMutationVariables, options?: RequestInit['headers']) => customFetcher<GoogleOauthHandlerMutation, GoogleOauthHandlerMutationVariables>(GoogleOauthHandlerDocument, variables, options);
 export const GetCurrentUserDocument = /*#__PURE__*/ `
     query GetCurrentUser {
   getCurrentUser {
@@ -176,11 +150,13 @@ export const useGetCurrentUserQuery = <
     ) =>
     useQuery<GetCurrentUserQuery, TError, TData>(
       variables === undefined ? ['GetCurrentUser'] : ['GetCurrentUser', variables],
-      fetcher<GetCurrentUserQuery, GetCurrentUserQueryVariables>(GetCurrentUserDocument, variables),
+      customFetcher<GetCurrentUserQuery, GetCurrentUserQueryVariables>(GetCurrentUserDocument, variables),
       options
     );
+useGetCurrentUserQuery.document = GetCurrentUserDocument;
+
 
 useGetCurrentUserQuery.getKey = (variables?: GetCurrentUserQueryVariables) => variables === undefined ? ['GetCurrentUser'] : ['GetCurrentUser', variables];
 ;
 
-useGetCurrentUserQuery.fetcher = (variables?: GetCurrentUserQueryVariables) => fetcher<GetCurrentUserQuery, GetCurrentUserQueryVariables>(GetCurrentUserDocument, variables);
+useGetCurrentUserQuery.fetcher = (variables?: GetCurrentUserQueryVariables, options?: RequestInit['headers']) => customFetcher<GetCurrentUserQuery, GetCurrentUserQueryVariables>(GetCurrentUserDocument, variables, options);

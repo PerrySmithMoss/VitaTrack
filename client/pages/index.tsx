@@ -16,18 +16,19 @@ interface HomeProps {
 }
 
 const Home: NextPage<HomeProps> = ({ dehydratedState }) => {
-  console.log("dehydratedState: ", dehydratedState)
+  console.log('WHAT PROPS DO WE HAVE?: ', dehydratedState);
+
   const { data, isLoading, isError } =
     useGetCurrentUserQuery<GetCurrentUserQuery>();
+  console.log('DO WE HAVE ANY DATA: ', data);
 
-      if (data?.getCurrentUser?.id) {
-        return (
-          <div>
-            Welcome! <div>{JSON.stringify(data.getCurrentUser.username, null, 2)}</div>
-          </div>
-        );
-      }
-  console.log("data: ", data)
+  if (data?.getCurrentUser?.id) {
+    return (
+      <div>
+        Welcome! <div>{data.getCurrentUser.username}</div>
+      </div>
+    );
+  }
 
   // if (isLoading) return <div>Loading...</div>;
   // if (isError) return <div>Something went wrong while fetching user.</div>;
@@ -98,15 +99,19 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   //   `${process.env.NEXT_PUBLIC_SERVER_ENDPOINT}/api/me`,
   //   context.req.headers
   // );
+  console.log('Server headers: ', context.req.headers);
 
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery(
     useGetCurrentUserQuery.getKey(),
-    useGetCurrentUserQuery.fetcher()
+    useGetCurrentUserQuery.fetcher(
+      undefined,
+      context.req.headers as Record<string, string>
+    )
   );
 
-  // return { props: { fallbackData: data } };
+  // return { props: { fallbackData: 'Perry' } };
   return {
     props: {
       dehydratedState: dehydrate(queryClient),

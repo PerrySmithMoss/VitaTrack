@@ -1,4 +1,4 @@
-schema: 'http://localhost:5000/graphql'
+schema: 'http://localhost:5000/graphql/'
 documents: 'graphql/**/*/*.graphql'
 overwrite: true
 generates:
@@ -10,17 +10,10 @@ generates:
     config:
       pureMagicComment: true
       exposeQueryKeys: true
-      fetcher:
-        endpoint: "http://localhost:5000/graphql"
-        fetchParams: >
-          {
-            headers: {
-              "Apollo-Require-Preflight": "true",
-              "Content-Type": "application/json"
-            }, 
-            credentials: 'include',
-          }
+      exposeDocument: true
       exposeFetcher: true
+      fetcher:
+        func: '../fetcher#customFetcher'
   ./graphql.schema.json:
     plugins:
       - 'introspection'
