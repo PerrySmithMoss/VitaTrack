@@ -11,13 +11,29 @@ export function signJwt(object: Object, options?: jwt.SignOptions | undefined) {
   });
 }
 
+interface Decoded {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  email: string;
+  password: null | string;
+  username: string;
+  session: string;
+  iat: number;
+  exp: number;
+}
+
+interface JwtPayload {
+  decoded: Decoded;
+}
+
 export function verifyJwt(token: string) {
   try {
     const decoded = jwt.verify(token, publicKey);
     return {
       valid: true,
       expired: false,
-      decoded,
+      decoded: decoded as JwtPayload,
     };
   } catch (e: any) {
     console.error(e);

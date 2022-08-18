@@ -66,13 +66,10 @@ export class SessionResolver {
       const { id_token, access_token } = await getGoogleOAuthTokensV2(
         formattedCode
       );
-      console.log({ id_token, access_token });
 
       // get user with tokens
       const googleUser = await getGoogleUser({ id_token, access_token });
       // const googleUser = jwt.decode(id_token);
-
-      console.log({ googleUser });
 
       if (!googleUser.verified_email) {
         return {

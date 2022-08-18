@@ -1,4 +1,4 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query';
+import { useMutation, useQuery, UseMutationOptions, UseQueryOptions } from '@tanstack/react-query';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -38,6 +38,7 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  DateTime: any;
 };
 
 export type FieldError = {
@@ -56,9 +57,30 @@ export type MutationGoogleOauthHandlerArgs = {
   code: Scalars['String'];
 };
 
+export type Profile = {
+  __typename?: 'Profile';
+  avatar: Scalars['String'];
+  avatarId: Scalars['String'];
+  bio: Scalars['String'];
+  id: Scalars['ID'];
+  user: Array<User>;
+  userId: Scalars['String'];
+};
+
 export type Query = {
   __typename?: 'Query';
+  getCurrentUser?: Maybe<User>;
   hello: Scalars['String'];
+};
+
+export type Session = {
+  __typename?: 'Session';
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  user: Array<User>;
+  userAgent: Scalars['String'];
+  userId: Scalars['String'];
+  valid: Scalars['Boolean'];
 };
 
 export type SessionResponse = {
@@ -73,6 +95,17 @@ export type TokenResponse = {
   id_token: Scalars['String'];
 };
 
+export type User = {
+  __typename?: 'User';
+  createdAt: Scalars['DateTime'];
+  email: Scalars['String'];
+  id: Scalars['String'];
+  profile: Profile;
+  session: Session;
+  updatedAt: Scalars['DateTime'];
+  username: Scalars['String'];
+};
+
 export type GoogleOauthHandlerMutationVariables = Exact<{
   code: Scalars['String'];
 }>;
@@ -80,8 +113,13 @@ export type GoogleOauthHandlerMutationVariables = Exact<{
 
 export type GoogleOauthHandlerMutation = { __typename?: 'Mutation', googleOauthHandler: { __typename?: 'SessionResponse', data?: { __typename?: 'TokenResponse', access_token: string, id_token: string } | null, errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null } };
 
+export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
-export const GoogleOauthHandlerDocument = `
+
+export type GetCurrentUserQuery = { __typename?: 'Query', getCurrentUser?: { __typename?: 'User', id: string, createdAt: any, updatedAt: any, email: string, username: string, profile: { __typename?: 'Profile', id: string, bio: string, avatar: string, avatarId: string }, session: { __typename?: 'Session', userId: string, valid: boolean, userAgent: string, createdAt: any, updatedAt: any } } | null };
+
+
+export const GoogleOauthHandlerDocument = /*#__PURE__*/ `
     mutation googleOauthHandler($code: String!) {
   googleOauthHandler(code: $code) {
     data {
@@ -104,3 +142,45 @@ export const useGoogleOauthHandlerMutation = <
       (variables?: GoogleOauthHandlerMutationVariables) => fetcher<GoogleOauthHandlerMutation, GoogleOauthHandlerMutationVariables>(GoogleOauthHandlerDocument, variables)(),
       options
     );
+useGoogleOauthHandlerMutation.fetcher = (variables: GoogleOauthHandlerMutationVariables) => fetcher<GoogleOauthHandlerMutation, GoogleOauthHandlerMutationVariables>(GoogleOauthHandlerDocument, variables);
+export const GetCurrentUserDocument = /*#__PURE__*/ `
+    query GetCurrentUser {
+  getCurrentUser {
+    id
+    createdAt
+    updatedAt
+    email
+    username
+    profile {
+      id
+      bio
+      avatar
+      avatarId
+    }
+    session {
+      userId
+      valid
+      userAgent
+      createdAt
+      updatedAt
+    }
+  }
+}
+    `;
+export const useGetCurrentUserQuery = <
+      TData = GetCurrentUserQuery,
+      TError = unknown
+    >(
+      variables?: GetCurrentUserQueryVariables,
+      options?: UseQueryOptions<GetCurrentUserQuery, TError, TData>
+    ) =>
+    useQuery<GetCurrentUserQuery, TError, TData>(
+      variables === undefined ? ['GetCurrentUser'] : ['GetCurrentUser', variables],
+      fetcher<GetCurrentUserQuery, GetCurrentUserQueryVariables>(GetCurrentUserDocument, variables),
+      options
+    );
+
+useGetCurrentUserQuery.getKey = (variables?: GetCurrentUserQueryVariables) => variables === undefined ? ['GetCurrentUser'] : ['GetCurrentUser', variables];
+;
+
+useGetCurrentUserQuery.fetcher = (variables?: GetCurrentUserQueryVariables) => fetcher<GetCurrentUserQuery, GetCurrentUserQueryVariables>(GetCurrentUserDocument, variables);

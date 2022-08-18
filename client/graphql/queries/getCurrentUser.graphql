@@ -1,0 +1,22 @@
+query GetCurrentUser {
+  getCurrentUser {
+    id
+    createdAt
+    updatedAt
+    email
+    username
+    profile {
+      id
+      bio
+      avatar
+      avatarId
+    }
+    session {
+      userId
+      valid
+      userAgent
+      createdAt
+      updatedAt
+    }
+  }
+}

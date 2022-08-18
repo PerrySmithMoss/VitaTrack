@@ -1,7 +1,5 @@
-import { HelloResolver } from "./hello"
-import { SessionResolver } from "./session"
+import { HelloResolver } from "./hello";
+import { SessionResolver } from "./session.resolver";
+import { UserResolver } from "./user.resolver";
 
-export {
-    HelloResolver,
-    SessionResolver
-}
+export { HelloResolver, SessionResolver, UserResolver };

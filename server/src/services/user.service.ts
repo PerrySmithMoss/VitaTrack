@@ -3,6 +3,16 @@ import axios from "axios";
 import { config } from "../../config/config";
 import prisma from "../lib/prisma";
 
+export async function findUserById(id: string) {
+  const user = await prisma.user.findUnique({
+    where: {
+      id,
+    },
+  });
+
+  return user;
+}
+
 interface InputFields {
   email: string;
   username: string;
@@ -81,7 +91,6 @@ export async function getGoogleOAuthTokens({
 export async function getGoogleOAuthTokensV2(
   code: string
 ): Promise<GoogleTokensResult> {
-  console.log("code: ", code);
   const url = "https://oauth2.googleapis.com/token";
 
   const values = {

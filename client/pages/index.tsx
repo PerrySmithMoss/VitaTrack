@@ -1,19 +1,36 @@
-import type { NextPage } from 'next';
+import { dehydrate, QueryClient } from '@tanstack/react-query';
+import type { GetServerSideProps, NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import { LoginForm } from '../components/Home/Login/LoginForm';
 import { Hero } from '../components/Svgs/Home/Hero';
 import { Wave } from '../components/Svgs/Home/Wave';
 import { Logo } from '../components/Svgs/Logo/Logo';
+import {
+  GetCurrentUserQuery,
+  useGetCurrentUserQuery,
+} from '../graphql/generated/graphql';
 
 interface HomeProps {
-  fallbackData: any;
+  dehydratedState: any;
 }
 
-const Home: NextPage<HomeProps> = ({ fallbackData: user }) => {
-  if (user) {
-    return <div>Welcome! {user.name}</div>;
-  }
+const Home: NextPage<HomeProps> = ({ dehydratedState }) => {
+  console.log("dehydratedState: ", dehydratedState)
+  const { data, isLoading, isError } =
+    useGetCurrentUserQuery<GetCurrentUserQuery>();
+
+      if (data?.getCurrentUser?.id) {
+        return (
+          <div>
+            Welcome! <div>{JSON.stringify(data.getCurrentUser.username, null, 2)}</div>
+          </div>
+        );
+      }
+  console.log("data: ", data)
+
+  // if (isLoading) return <div>Loading...</div>;
+  // if (isError) return <div>Something went wrong while fetching user.</div>;
   return (
     <>
       <Head>
@@ -76,10 +93,23 @@ const Home: NextPage<HomeProps> = ({ fallbackData: user }) => {
   );
 };
 
-export const getServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  // const data = await fetcher(
+  //   `${process.env.NEXT_PUBLIC_SERVER_ENDPOINT}/api/me`,
+  //   context.req.headers
+  // );
+
+  const queryClient = new QueryClient();
+
+  await queryClient.prefetchQuery(
+    useGetCurrentUserQuery.getKey(),
+    useGetCurrentUserQuery.fetcher()
+  );
+
+  // return { props: { fallbackData: data } };
   return {
     props: {
-      fallbackData: null,
+      dehydratedState: dehydrate(queryClient),
     },
   };
 };
