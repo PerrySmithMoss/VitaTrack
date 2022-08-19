@@ -12,14 +12,16 @@ import { PrismaContext } from "../types/PrismaContext";
 import { User } from "../entities/user.entity";
 import { requireUser } from "../middleware/requireUser";
 import deserializeUser from "../middleware/deserializeUser";
-import { createUser } from "../services/user.service";
+import { createUser, findUserByEmail } from "../services/user.service";
 import { createSession } from "../services/session.service";
 import { signJwt } from "../utils/jwt.utils";
 import { config } from "../../config/config";
+import argon2 from "argon2";
 import {
   accessTokenCookieOptions,
   refreshTokenCookieOptions,
 } from "../../constants/cookieOptions";
+import { validateEmail } from "../utils/validateEmail";
 
 @ObjectType()
 class UserFieldError {
@@ -77,6 +79,89 @@ export class UserResolver {
   }
 
   @Mutation(() => UserResponse)
+  async loginUserWithEmailAndPassword(
+    @Ctx() ctx: PrismaContext,
+    @Arg("email") email: string,
+    @Arg("password") password: string
+  ) {
+    try {
+      const user = await ctx.prisma.user.findUnique({
+        where: { email: email },
+        include: { profile: true },
+      });
+      if (!user) {
+        return {
+          errors: [
+            {
+              field: "Bad Request",
+              message: "Incorrect email or password.",
+            },
+          ],
+        };
+      }
+
+      const validUser = await argon2.verify(user.password as string, password);
+
+      if (!validUser) {
+        return {
+          errors: [
+            {
+              field: "Bad Request",
+              message: "Incorrect email or password.",
+            },
+          ],
+        };
+      }
+
+      // create a session
+      const session = await createSession(
+        user.id,
+        ctx.req.get("user-agent") || ""
+      );
+
+      // create an access token
+      const accessToken = signJwt(
+        { ...user, session: session.userId },
+        { expiresIn: config.accessTokenTtl }
+      );
+
+      // create a refresh token
+      const refreshToken = signJwt(
+        { ...user, session: session.userId },
+        { expiresIn: config.refreshTokenTtl }
+      );
+
+      // set cookies
+      ctx.res.cookie("accessToken", accessToken, accessTokenCookieOptions);
+
+      ctx.res.cookie("refreshToken", refreshToken, refreshTokenCookieOptions);
+
+      return {
+        data: user,
+      };
+    } catch (err: any) {
+      if (err.code === "P2002") {
+        return {
+          errors: [
+            {
+              field: "error",
+              message: "Session already exists",
+            },
+          ],
+        };
+      }
+      return {
+        errors: [
+          {
+            field: "error",
+            message: err,
+          },
+        ],
+      };
+    }
+  }
+
+  @Mutation(() => UserResponse)
   async createUser(
     @Ctx() ctx: PrismaContext,
     @Arg("username") username: string,
@@ -89,6 +174,42 @@ export class UserResolver {
         password,
         username,
       };
+
+      if (validateEmail(email) === false) {
+        return {
+          errors: [
+            {
+              field: "email",
+              message: "Email provided is not valid.",
+            },
+          ],
+        };
+      }
+
+      if (password.length < 8) {
+        return {
+          errors: [
+            {
+              field: "password",
+              message: "Password must be 8 characters or greater.",
+            },
+          ],
+        };
+      }
+
+      const checkIfUserExists = await findUserByEmail(email);
+
+      if (checkIfUserExists) {
+        return {
+          errors: [
+            {
+              field: "email",
+              message:
+                "A user with this username already exists, please choose another one.",
+            },
+          ],
+        };
+      }
 
       const registeredUser = await createUser(userObj);
 

@@ -19,6 +19,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   createUser: UserResponse;
   googleOauthHandler: SessionResponse;
+  loginUserWithEmailAndPassword: UserResponse;
 };
 
 
@@ -31,6 +32,12 @@ export type MutationCreateUserArgs = {
 
 export type MutationGoogleOauthHandlerArgs = {
   code: Scalars['String'];
+};
+
+
+export type MutationLoginUserWithEmailAndPasswordArgs = {
+  email: Scalars['String'];
+  password: Scalars['String'];
 };
 
 export type Profile = {
@@ -115,6 +122,14 @@ export type GoogleOauthHandlerMutationVariables = Exact<{
 
 export type GoogleOauthHandlerMutation = { __typename?: 'Mutation', googleOauthHandler: { __typename?: 'SessionResponse', data?: { __typename?: 'TokenResponse', access_token: string, id_token: string } | null, errors?: Array<{ __typename?: 'SessionFieldError', field: string, message: string }> | null } };
 
+export type LoginUserWithEmailAndPasswordMutationVariables = Exact<{
+  password: Scalars['String'];
+  email: Scalars['String'];
+}>;
+
+
+export type LoginUserWithEmailAndPasswordMutation = { __typename?: 'Mutation', loginUserWithEmailAndPassword: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'UserFieldError', field: string, message: string }> | null, data?: { __typename?: 'User', username: string, email: string, updatedAt: string, createdAt: string, id: string, profile?: { __typename?: 'Profile', avatar?: string | null, bio?: string | null, id: string, avatarId?: string | null } | null } | null } };
+
 export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -175,6 +190,39 @@ export const useGoogleOauthHandlerMutation = <
       options
     );
 useGoogleOauthHandlerMutation.fetcher = (variables: GoogleOauthHandlerMutationVariables, options?: RequestInit['headers']) => customFetcher<GoogleOauthHandlerMutation, GoogleOauthHandlerMutationVariables>(GoogleOauthHandlerDocument, variables, options);
+export const LoginUserWithEmailAndPasswordDocument = /*#__PURE__*/ `
+    mutation LoginUserWithEmailAndPassword($password: String!, $email: String!) {
+  loginUserWithEmailAndPassword(password: $password, email: $email) {
+    errors {
+      field
+      message
+    }
+    data {
+      profile {
+        avatar
+        bio
+        id
+        avatarId
+      }
+      username
+      email
+      updatedAt
+      createdAt
+      id
+    }
+  }
+}
+    `;
+export const useLoginUserWithEmailAndPasswordMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<LoginUserWithEmailAndPasswordMutation, TError, LoginUserWithEmailAndPasswordMutationVariables, TContext>) =>
+    useMutation<LoginUserWithEmailAndPasswordMutation, TError, LoginUserWithEmailAndPasswordMutationVariables, TContext>(
+      ['LoginUserWithEmailAndPassword'],
+      (variables?: LoginUserWithEmailAndPasswordMutationVariables) => customFetcher<LoginUserWithEmailAndPasswordMutation, LoginUserWithEmailAndPasswordMutationVariables>(LoginUserWithEmailAndPasswordDocument, variables)(),
+      options
+    );
+useLoginUserWithEmailAndPasswordMutation.fetcher = (variables: LoginUserWithEmailAndPasswordMutationVariables, options?: RequestInit['headers']) => customFetcher<LoginUserWithEmailAndPasswordMutation, LoginUserWithEmailAndPasswordMutationVariables>(LoginUserWithEmailAndPasswordDocument, variables, options);
 export const GetCurrentUserDocument = /*#__PURE__*/ `
     query GetCurrentUser {
   getCurrentUser {

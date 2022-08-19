@@ -4,6 +4,16 @@ import { signJwt, verifyJwt } from "../utils/jwt.utils";
 import { findUserById } from "./user.service";
 
 export async function createSession(userId: string, userAgent: string) {
+  const activeSession = await prisma.session.findUnique({
+    where: { userId },
+  });
+
+  if (activeSession) {
+    await prisma.session.delete({
+      where: { userId },
+    });
+  }
+
   const session = await prisma.session.create({
     data: {
       userId,

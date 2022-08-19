@@ -1,6 +1,11 @@
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { useGoogleOauthHandlerMutation } from '../../../graphql/generated/graphql';
+import {
+  GetCurrentUserQuery,
+  useGetCurrentUserQuery,
+  useGoogleOauthHandlerMutation,
+  useLoginUserWithEmailAndPasswordMutation,
+} from '../../../graphql/generated/graphql';
 import { getGoogleOAuthURL } from '../../../utils/getGoogleOAuthURL';
 import styles from './Login.module.css';
 
@@ -12,9 +17,24 @@ export const LoginForm: React.FC<LoginFormProps> = ({}) => {
     query: { code },
   } = useRouter();
   const [codeParam, setCodeParam] = useState('');
-  const { mutate, isSuccess, isLoading } = useGoogleOauthHandlerMutation({
-    onSuccess: () => push('/'),
-  });
+
+  const { refetch: refetchCurrentUser } =
+    useGetCurrentUserQuery<GetCurrentUserQuery>(undefined, {
+      // Don't think I need this because the 'initialData' is already being set
+      // in getServerSideProps
+      // initialData: getDataFromDehydratedState('GetCurrentUser', dehydratedState),
+    });
+
+  const { mutate: loginUsingGoogleCredentails } = useGoogleOauthHandlerMutation(
+    {
+      onSuccess: () => refetchCurrentUser(),
+    }
+  );
+
+  const { mutate: loginUsingEmailAndPasswordCredentails } =
+    useLoginUserWithEmailAndPasswordMutation({
+      onSuccess: () => refetchCurrentUser(),
+    });
 
   const [user, setUser] = useState({
     email: '',
@@ -23,6 +43,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({}) => {
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
+    loginUsingEmailAndPasswordCredentails({
+      email: user.email,
+      password: user.password,
+    });
 
     // const res = await signIn('credentials', {
     //   email: user.email,
@@ -46,7 +71,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({}) => {
   useEffect(() => {
     setCodeParam(code as string);
     if (code) {
-      mutate({ code: code as string });
+      loginUsingGoogleCredentails({ code: code as string });
     }
   }, [code]);
 
@@ -93,7 +118,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({}) => {
         </button>
       </div>
       <div
-        className={`${styles.orSeperator} flex justify-center text-center items-center mx-10 mt-5`}
+        className={`${styles.orSeperator} flex justify-center text-center items-center mt-5`}
       >
         <span className="text-gray-500 px-3 font-medium text-sm">OR</span>
       </div>

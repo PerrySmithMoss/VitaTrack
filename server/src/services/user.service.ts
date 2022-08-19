@@ -23,8 +23,8 @@ export async function createUser(userInput: UserInput) {
       },
     },
     include: {
-      profile: true
-    }
+      profile: true,
+    },
   });
 }
 
@@ -32,6 +32,16 @@ export async function findUserById(id: string) {
   const user = await prisma.user.findUnique({
     where: {
       id,
+    },
+  });
+
+  return user;
+}
+
+export async function findUserByEmail(email: string) {
+  const user = await prisma.user.findUnique({
+    where: {
+      email,
     },
   });
 

@@ -7,8 +7,7 @@ import { Hero } from '../components/Svgs/Home/Hero';
 import { Wave } from '../components/Svgs/Home/Wave';
 import { Logo } from '../components/Svgs/Logo/Logo';
 
-interface SignUpPageProps {
-}
+interface SignUpPageProps {}
 
 const SignUpPage: NextPage<SignUpPageProps> = () => {
   return (
@@ -23,7 +22,7 @@ const SignUpPage: NextPage<SignUpPageProps> = () => {
       </Head>
 
       <main className="bg-white relative">
-        <div className="absolute bottom-0">
+        <div className="absolute bottom-0 z-0">
           <Wave />
         </div>
         <div className="absolute top-0">
@@ -34,13 +33,13 @@ const SignUpPage: NextPage<SignUpPageProps> = () => {
             <h1 className="text-3xl font-bold text-gray-700">VitaTrack</h1>
           </div>
         </div>
-        <div className="flex justify-center h-screen">
+        <div className="flex justify-center h-screen z-10">
           <div className="hidden bg-cover lg:block lg:w-7/12">
-            <div className="flex items-center h-full pl-20">
+          <div className="flex items-center h-full pl-20 z-10">
               <Hero />
             </div>
           </div>
-          <div className="flex items-center w-full max-w-md pr-10 mx-auto lg:w-5/12">
+          <div className="flex items-center w-full max-w-md pr-10 mx-auto lg:w-5/12 z-10">
             <div className="flex-1 mr-6">
               <div className="text-center">
                 <h2 className="text-5xl font-bold text-center text-gray-700">
