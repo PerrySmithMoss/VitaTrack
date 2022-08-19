@@ -26,7 +26,6 @@ const Home: NextPage<HomeProps> = ({ dehydratedState }) => {
       // initialData: getDataFromDehydratedState('GetCurrentUser', dehydratedState),
     });
 
-  console.log("Current User: ", data?.getCurrentUser?.data);
   const { mutate: logoutUser } = useLogoutUserMutation({
     onSuccess: () => refetchCurrentUser(),
   });
@@ -46,9 +45,7 @@ const Home: NextPage<HomeProps> = ({ dehydratedState }) => {
       </div>
     );
   }
-
-  // if (isLoading) return <div>Loading...</div>;
-  // if (isError) return <div>Something went wrong while fetching user.</div>;
+  
   return (
     <>
       <Head>

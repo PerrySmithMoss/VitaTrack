@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import {
   useGoogleOauthHandlerMutation,
   useCreateUserMutation,
+  useGetCurrentUserQuery,
+  GetCurrentUserQuery,
 } from '../../graphql/generated/graphql';
 import { getGoogleOAuthURL } from '../../utils/getGoogleOAuthURL';
 import styles from './SignUp.module.css';
@@ -15,10 +17,20 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({}) => {
     query: { code },
   } = useRouter();
   const [codeParam, setCodeParam] = useState('');
+
+  const { refetch: refetchCurrentUser } =
+    useGetCurrentUserQuery<GetCurrentUserQuery>();
+
   const { mutate: createUserUsingGoogleCredentails } =
     useGoogleOauthHandlerMutation({
-      onSuccess: () => push('/'),
+      onSuccess: () => handleSuccessfulSignUp(),
     });
+
+  function handleSuccessfulSignUp() {
+    refetchCurrentUser();
+
+    push('/');
+  }
 
   const { mutate: createUserUsingEmailAndPassword } = useCreateUserMutation({
     onSuccess: () => push('/'),

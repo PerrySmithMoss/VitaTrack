@@ -19,15 +19,17 @@ export const LoginForm: React.FC<LoginFormProps> = ({}) => {
   const [codeParam, setCodeParam] = useState('');
 
   const { refetch: refetchCurrentUser } =
-    useGetCurrentUserQuery<GetCurrentUserQuery>(undefined, {
-      // Don't think I need this because the 'initialData' is already being set
-      // in getServerSideProps
-      // initialData: getDataFromDehydratedState('GetCurrentUser', dehydratedState),
-    });
+    useGetCurrentUserQuery<GetCurrentUserQuery>();
+
+  function handleSuccessfulSignUp() {
+    refetchCurrentUser();
+
+    push('/');
+  }
 
   const { mutate: loginUsingGoogleCredentails } = useGoogleOauthHandlerMutation(
     {
-      onSuccess: () => refetchCurrentUser(),
+      onSuccess: () => handleSuccessfulSignUp(),
     }
   );
 
