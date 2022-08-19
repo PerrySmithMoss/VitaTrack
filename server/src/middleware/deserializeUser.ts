@@ -17,28 +17,29 @@ const deserializeUser: MiddlewareFn<PrismaContext> = async (
 
       return next();
     } else if (!decoded || decoded === null) {
-      // res.status(401);
       return next();
     }
   } else if (!accessToken) {
-    const newAccessToken = await reIssueAccessToken({ refreshToken });
+    if (refreshToken) {
+      const newAccessToken = await reIssueAccessToken(refreshToken);
 
-    if (newAccessToken) {
-      context.res.setHeader("x-access-token", newAccessToken);
+      if (newAccessToken) {
+        context.res.setHeader("x-access-token", newAccessToken);
 
-      context.res.cookie("accessToken", newAccessToken, {
-        maxAge: 900000, // 15 mins
-        httpOnly: true,
-        domain: "localhost",
-        path: "/",
-        sameSite: "lax",
-        secure: false,
-      });
+        context.res.cookie("accessToken", newAccessToken, {
+          maxAge: 900000, // 15 mins
+          httpOnly: true,
+          domain: "localhost",
+          path: "/",
+          sameSite: "lax",
+          secure: false,
+        });
+      }
+
+      const result = verifyJwt(newAccessToken as string);
+
+      context.res.locals.user = result.decoded;
     }
-
-    const result = verifyJwt(newAccessToken as string);
-
-    context.res.locals.user = result.decoded;
     return next();
   }
   return next();

@@ -48,15 +48,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({}) => {
       email: user.email,
       password: user.password,
     });
-
-    // const res = await signIn('credentials', {
-    //   email: user.email,
-    //   password: user.password,
-    //   // redirect: false,
-    //   callbackUrl: '/dashboard',
-    // });
-
-    // console.log(res);
   }
 
   function handleUserInputChange(e: React.ChangeEvent<HTMLInputElement>) {

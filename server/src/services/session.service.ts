@@ -42,11 +42,7 @@ interface IJwtPayload {
   decoded: Decoded | null;
 }
 
-export async function reIssueAccessToken({
-  refreshToken,
-}: {
-  refreshToken: string;
-}) {
+export async function reIssueAccessToken(refreshToken: string) {
   const { decoded } = verifyJwt(refreshToken) as IJwtPayload;
 
   if (!decoded || !decoded.session) return false;
@@ -69,4 +65,11 @@ export async function reIssueAccessToken({
   );
 
   return accessToken;
+}
+
+export async function invalidateSession(sessionId: string) {
+  return await prisma.session.update({
+    where: { userId: sessionId },
+    data: { valid: false },
+  });
 }

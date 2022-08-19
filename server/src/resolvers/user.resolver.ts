@@ -13,7 +13,7 @@ import { User } from "../entities/user.entity";
 import { requireUser } from "../middleware/requireUser";
 import deserializeUser from "../middleware/deserializeUser";
 import { createUser, findUserByEmail } from "../services/user.service";
-import { createSession } from "../services/session.service";
+import { createSession, invalidateSession } from "../services/session.service";
 import { signJwt } from "../utils/jwt.utils";
 import { config } from "../../config/config";
 import argon2 from "argon2";
@@ -41,11 +41,22 @@ class UserResponse {
   data?: User;
 }
 
+@ObjectType()
+class LogoutUserResponse {
+  @Field()
+  message!: string;
+
+  @Field()
+  success!: boolean;
+}
+
 @Resolver()
 export class UserResolver {
   @Query(() => UserResponse, { nullable: true })
   @UseMiddleware(deserializeUser)
-  @UseMiddleware(requireUser)
+  // The error which is returned from this middleware
+  // is causing issues on front-end
+  // @UseMiddleware(requireUser)
   async getCurrentUser(@Ctx() ctx: PrismaContext) {
     try {
       const userId = ctx.res.locals.user.id;
@@ -70,7 +81,7 @@ export class UserResolver {
       return {
         errors: [
           {
-            field: "Error while trying to fetch current user.",
+            field: "Error while trying to log user out.",
             message: err,
           },
         ],
@@ -257,6 +268,33 @@ export class UserResolver {
             message: err,
           },
         ],
+      };
+    }
+  }
+
+  @Mutation(() => LogoutUserResponse)
+  @UseMiddleware(deserializeUser)
+  @UseMiddleware(requireUser)
+  async logoutUser(@Ctx() ctx: PrismaContext) {
+    try {
+      const sessionId = ctx.res.locals.user.session;
+
+      await invalidateSession(sessionId);
+
+      ctx.res.clearCookie(config.accessTokenCookieName as string);
+
+      ctx.res.clearCookie(config.refreshTokenCookieName as string);
+
+      ctx.res.removeHeader("x-access-token");
+
+      return {
+        message: "Logout successful",
+        success: true,
+      };
+    } catch (err) {
+      return {
+        message: err,
+        success: false,
       };
     }
   }

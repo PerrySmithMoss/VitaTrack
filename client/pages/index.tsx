@@ -9,6 +9,7 @@ import { Logo } from '../components/Svgs/Logo/Logo';
 import {
   GetCurrentUserQuery,
   useGetCurrentUserQuery,
+  useLogoutUserMutation,
 } from '../graphql/generated/graphql';
 import { getDataFromDehydratedState } from '../utils/getDataFromDehydratedState';
 
@@ -17,17 +18,31 @@ interface HomeProps {
 }
 
 const Home: NextPage<HomeProps> = ({ dehydratedState }) => {
-  const { data, isLoading, isError, error } =
+  const queryClient = new QueryClient();
+  const { data, refetch: refetchCurrentUser } =
     useGetCurrentUserQuery<GetCurrentUserQuery>(undefined, {
       // Don't think I need this because the 'initialData' is already being set
       // in getServerSideProps
       // initialData: getDataFromDehydratedState('GetCurrentUser', dehydratedState),
     });
 
+  console.log("Current User: ", data?.getCurrentUser?.data);
+  const { mutate: logoutUser } = useLogoutUserMutation({
+    onSuccess: () => refetchCurrentUser(),
+  });
+
   if (data?.getCurrentUser?.data?.id) {
     return (
-      <div>
-        Welcome! <div>{data.getCurrentUser.data.username}</div>
+      <div className="m-4">
+        <div>
+          Welcome! <div>{data.getCurrentUser.data.username}</div>
+        </div>
+        <button
+          onClick={() => logoutUser({})}
+          className="mt-4 px-4 py-2 bg-brand-green hover:bg-brand-green-hover text-white rounded"
+        >
+          Logout
+        </button>
       </div>
     );
   }

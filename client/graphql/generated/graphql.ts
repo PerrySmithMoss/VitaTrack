@@ -15,11 +15,18 @@ export type Scalars = {
   DateTime: any;
 };
 
+export type LogoutUserResponse = {
+  __typename?: 'LogoutUserResponse';
+  message: Scalars['String'];
+  success: Scalars['Boolean'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   createUser: UserResponse;
   googleOauthHandler: SessionResponse;
   loginUserWithEmailAndPassword: UserResponse;
+  logoutUser: LogoutUserResponse;
 };
 
 
@@ -130,6 +137,11 @@ export type LoginUserWithEmailAndPasswordMutationVariables = Exact<{
 
 export type LoginUserWithEmailAndPasswordMutation = { __typename?: 'Mutation', loginUserWithEmailAndPassword: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'UserFieldError', field: string, message: string }> | null, data?: { __typename?: 'User', username: string, email: string, updatedAt: string, createdAt: string, id: string, profile?: { __typename?: 'Profile', avatar?: string | null, bio?: string | null, id: string, avatarId?: string | null } | null } | null } };
 
+export type LogoutUserMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LogoutUserMutation = { __typename?: 'Mutation', logoutUser: { __typename?: 'LogoutUserResponse', message: string, success: boolean } };
+
 export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -223,6 +235,24 @@ export const useLoginUserWithEmailAndPasswordMutation = <
       options
     );
 useLoginUserWithEmailAndPasswordMutation.fetcher = (variables: LoginUserWithEmailAndPasswordMutationVariables, options?: RequestInit['headers']) => customFetcher<LoginUserWithEmailAndPasswordMutation, LoginUserWithEmailAndPasswordMutationVariables>(LoginUserWithEmailAndPasswordDocument, variables, options);
+export const LogoutUserDocument = /*#__PURE__*/ `
+    mutation LogoutUser {
+  logoutUser {
+    message
+    success
+  }
+}
+    `;
+export const useLogoutUserMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<LogoutUserMutation, TError, LogoutUserMutationVariables, TContext>) =>
+    useMutation<LogoutUserMutation, TError, LogoutUserMutationVariables, TContext>(
+      ['LogoutUser'],
+      (variables?: LogoutUserMutationVariables) => customFetcher<LogoutUserMutation, LogoutUserMutationVariables>(LogoutUserDocument, variables)(),
+      options
+    );
+useLogoutUserMutation.fetcher = (variables?: LogoutUserMutationVariables, options?: RequestInit['headers']) => customFetcher<LogoutUserMutation, LogoutUserMutationVariables>(LogoutUserDocument, variables, options);
 export const GetCurrentUserDocument = /*#__PURE__*/ `
     query GetCurrentUser {
   getCurrentUser {

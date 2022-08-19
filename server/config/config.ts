@@ -16,6 +16,8 @@ export const config = {
   privateKey: process.env.PRIVATE_KEY,
   accessTokenTtl: process.env.ACCESS_TOKEN_TTL,
   refreshTokenTtl: process.env.REFRESH_TOKEN_TTL,
+  accessTokenCookieName: process.env.ACCESS_TOKEN_COOKIE_NAME,
+  refreshTokenCookieName: process.env.REFRESH_TOKEN_COOKIE_NAME,
 
   googleClientID: process.env.GOOGLE_CLIENT_ID,
   googleClientSecret: process.env.GOOGLE_CLIENT_SECRET,
