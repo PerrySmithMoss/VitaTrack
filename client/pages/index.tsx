@@ -2,15 +2,11 @@ import { dehydrate, QueryClient } from '@tanstack/react-query';
 import type { GetServerSideProps, NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
-import { LoginForm } from '../components/Home/Login/LoginForm';
+import { LoginForm } from '../components/Login/LoginForm';
 import { Hero } from '../components/Svgs/Home/Hero';
 import { Wave } from '../components/Svgs/Home/Wave';
 import { Logo } from '../components/Svgs/Logo/Logo';
-import {
-  GetCurrentUserQuery,
-  useGetCurrentUserQuery,
-  useLogoutUserMutation,
-} from '../graphql/generated/graphql';
+import { useGetCurrentUserQuery } from '../graphql/generated/graphql';
 import { getDataFromDehydratedState } from '../utils/getDataFromDehydratedState';
 
 interface HomeProps {
@@ -18,34 +14,6 @@ interface HomeProps {
 }
 
 const Home: NextPage<HomeProps> = ({ dehydratedState }) => {
-  const queryClient = new QueryClient();
-  const { data, refetch: refetchCurrentUser } =
-    useGetCurrentUserQuery<GetCurrentUserQuery>(undefined, {
-      // Don't think I need this because the 'initialData' is already being set
-      // in getServerSideProps
-      // initialData: getDataFromDehydratedState('GetCurrentUser', dehydratedState),
-    });
-
-  const { mutate: logoutUser } = useLogoutUserMutation({
-    onSuccess: () => refetchCurrentUser(),
-  });
-
-  if (data?.getCurrentUser?.data?.id) {
-    return (
-      <div className="m-4">
-        <div>
-          Welcome! <div>{data.getCurrentUser.data.username}</div>
-        </div>
-        <button
-          onClick={() => logoutUser({})}
-          className="mt-4 px-4 py-2 bg-brand-green hover:bg-brand-green-hover text-white rounded"
-        >
-          Logout
-        </button>
-      </div>
-    );
-  }
-  
   return (
     <>
       <Head>
@@ -109,6 +77,17 @@ const Home: NextPage<HomeProps> = ({ dehydratedState }) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { cookie } = context.req.headers;
+
+  if (cookie) {
+    return {
+      redirect: {
+        destination: '/account/dashboard',
+        permanent: false,
+      },
+    };
+  }
+
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery(

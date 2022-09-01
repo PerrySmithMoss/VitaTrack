@@ -5,8 +5,8 @@ import {
   useGetCurrentUserQuery,
   useGoogleOauthHandlerMutation,
   useLoginUserWithEmailAndPasswordMutation,
-} from '../../../graphql/generated/graphql';
-import { getGoogleOAuthURL } from '../../../utils/getGoogleOAuthURL';
+} from '../../graphql/generated/graphql';
+import { getGoogleOAuthURL } from '../../utils/getGoogleOAuthURL';
 import styles from './Login.module.css';
 
 interface LoginFormProps {}
@@ -24,7 +24,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({}) => {
   function handleSuccessfulSignUp() {
     refetchCurrentUser();
 
-    push('/');
+    push('/account/dashboard');
   }
 
   const { mutate: loginUsingGoogleCredentails } = useGoogleOauthHandlerMutation(
@@ -35,7 +35,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({}) => {
 
   const { mutate: loginUsingEmailAndPasswordCredentails } =
     useLoginUserWithEmailAndPasswordMutation({
-      onSuccess: () => refetchCurrentUser(),
+      onSuccess: () => handleSuccessfulSignUp(),
     });
 
   const [user, setUser] = useState({

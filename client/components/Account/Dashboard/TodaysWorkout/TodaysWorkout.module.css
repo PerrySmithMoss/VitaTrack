@@ -1,0 +1,45 @@
+.legendList {
+  display: flex;
+  flex-direction: column;
+  margin-left: 15px;
+  list-style: none; /* Remove default bullets */
+}
+
+.legendList li {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.bulletLabel {
+  margin-top: 13px;
+  display: flex;
+  align-items: center;
+}
+
+.cirecleBullet {
+  border-radius: 50%;
+}
+
+.bulletLabelText {
+  margin-left: 10px;
+  color: #7e7e89;
+}
+
+.centeredLabelValue {
+  font-size: 36px;
+  font-weight: 600;
+  fill: #0088fe;
+}
+
+.showMore {
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(250, 250, 250, 0.8) 12%,
+    rgba(250, 250, 250, 0.9) 34%,
+    rgba(250, 250, 250, 0.96) 57%,
+    rgb(250, 250, 250) 73%
+  );
+}

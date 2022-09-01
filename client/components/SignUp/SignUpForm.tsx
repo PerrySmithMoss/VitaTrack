@@ -29,11 +29,11 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({}) => {
   function handleSuccessfulSignUp() {
     refetchCurrentUser();
 
-    push('/');
+    push('/account/dashboard');
   }
 
   const { mutate: createUserUsingEmailAndPassword } = useCreateUserMutation({
-    onSuccess: () => push('/'),
+    onSuccess: () => handleSuccessfulSignUp(),
   });
 
   const [user, setUser] = useState({
