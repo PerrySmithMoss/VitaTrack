@@ -8,9 +8,19 @@ import {
   useGetCurrentUserQuery,
 } from '../../graphql/generated/graphql';
 import { MyWorkouts } from '../../components/Account/Dashboard/MyWokouts/MyWorkouts';
-import { AiOutlinePlus } from 'react-icons/ai';
 import { useState } from 'react';
-import { AddWorkoutModal } from '../../components/Modals/Workouts/AddWorkoutModal';
+import { Modal } from '../../components/Modals/Modal';
+import { Drawer } from '../../components/Drawer/Drawer';
+import { AiOutlinePlus, AiOutlineHistory, AiOutlineStar } from 'react-icons/ai';
+import { BsBarChartFill, BsBarChartLine } from 'react-icons/bs';
+import {
+  FiChevronLeft,
+  FiMoreHorizontal,
+  FiMoreVertical,
+} from 'react-icons/fi';
+import { MuscleGroupList } from '../../components/List/Exercise/MuscleGroupList';
+import { useGlobalContext } from '../../context/global.context';
+import { ExerciseList } from '../../components/List/Exercise/ExerciseList';
 
 interface DashboardPageProps {}
 
@@ -18,7 +28,36 @@ const DashboardPage: NextPage<DashboardPageProps> = () => {
   const { data, refetch: refetchCurrentUser } =
     useGetCurrentUserQuery<GetCurrentUserQuery>();
 
+  const { selectedMuscleGroup, setSelectedMuscleGroup } = useGlobalContext();
+
+  const [isAddExerciseOpen, setIsAddExerciseOpen] = useState(false);
+
   const [isAddWorkoutModalOpen, setIsAddWorkoutModalOpen] = useState(false);
+  const [workout, setWorkout] = useState({
+    name: '',
+    type: 'Strength' || 'Cardio',
+    startDate: new Date(),
+    endDate: new Date(),
+    bodyWeight: 0,
+    notes: '',
+  });
+  const [exercises, setExercises] = useState([]);
+
+  // const showToastSuccess = () => {
+  //     toast.success("User avatar updated successfully", {
+  //       position: "top-right",
+  //       autoClose: 5000,
+  //       hideProgressBar: false,
+  //       closeOnClick: true,
+  //       pauseOnHover: true,
+  //       draggable: true,
+  //       progress: undefined,
+  //     });
+  //   };
+
+  const handleAddExercise = () => {
+    setIsAddExerciseOpen(!isAddExerciseOpen);
+  };
 
   if (data?.getCurrentUser?.data?.id) {
     return (
@@ -42,16 +81,357 @@ const DashboardPage: NextPage<DashboardPageProps> = () => {
                 </section>
               </div>
               {isAddWorkoutModalOpen && (
-                <AddWorkoutModal
+                <Modal
                   open={isAddWorkoutModalOpen}
                   onClose={() => setIsAddWorkoutModalOpen(false)}
                   selector="addWorkoutModal"
-                />
+                  title="Add Workout"
+                >
+                  <div className="relative h-full flex flex-col">
+                    <section className="h-full overflow-auto w-full flex flex-col mb-4 bg-gray-100">
+                      <div className="">
+                        <input
+                          type="text"
+                          placeholder="Name"
+                          className="block border-t bg-transparent text-sm py-3 px-4  w-full outline-none"
+                        />
+                        <div className="mx-4">
+                          <hr />
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 ">
+                          <div>
+                            <input
+                              type="text"
+                              placeholder="Start Time"
+                              className="block border-l   bg-transparent text-sm py-3 px-4 w-full outline-none"
+                            />
+                          </div>
+                          <div>
+                            <input
+                              type="text"
+                              placeholder="End Time"
+                              className="block border-l bg-transparent text-sm py-3 px-4 w-full outline-none"
+                            />
+                          </div>
+                        </div>
+                        <div className="mx-4">
+                          <hr />
+                        </div>
+                        <input
+                          type="text"
+                          placeholder="Bodyweight"
+                          className="block   bg-transparent text-sm py-3 px-4 w-full outline-none"
+                        />
+                             <div className="mx-4">
+                          <hr />
+                        </div>
+                        <input
+                          type="text"
+                          placeholder="Notes"
+                          className="block border-b bg-transparent text-sm py-3 px-4 w-full outline-none"
+                        />
+                      </div>
+                    </section>
+
+                    <div className="flex space-y-3 my-4 flex-col  bg-gray-100 boder-b">
+                      {/* Exercises */}
+                      <div className="border-t">
+                        {/* Exercise Name */}
+                        <div className="py-3">
+                          <div>
+                            <div className="flex justify-between items-center mx-5">
+                              <div>
+                                <h5 className="text-lg font-semibold">
+                                  Cable curl
+                                </h5>
+                              </div>
+                              <div>
+                                <FiMoreVertical
+                                  size={24}
+                                  className="cursor-pointer text-brand-green hover:text-brand-green-hover"
+                                />
+                              </div>
+                            </div>
+                            <div className="ml-5 pt-2">
+                              <hr />
+                            </div>
+                          </div>
+                          {/* Weight, Reps, Notes */}
+                          <div>
+                            <div className="flex items-center space-x-4 py-2 mx-5">
+                              <div>
+                                <div className="h-7 w-7 border rounded-full flex items-center justify-center">
+                                  <div>
+                                    <span className="pl-0.5 text-sm text-gray-500">
+                                      1
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex flex-col w-36">
+                                <div>
+                                  <span className="text-gray-500 text-sm">
+                                    Weight
+                                  </span>
+                                </div>
+                                <div>
+                                  <input
+                                    className="w-full bg-transparent text-gray-800 outline-none text-sm"
+                                    type="number"
+                                  />
+                                </div>
+                              </div>
+                              <div className="flex flex-col  w-36">
+                                <div>
+                                  <span className="text-gray-500 text-sm">
+                                    Reps
+                                  </span>
+                                </div>
+                                <div>
+                                  <input
+                                    className="w-full bg-transparent text-gray-800 outline-none  text-sm "
+                                    type="number"
+                                  />
+                                </div>
+                              </div>
+                              <div className="flex flex-col w-full">
+                                <div>
+                                  <span className="text-gray-500  text-sm">
+                                    Notes
+                                  </span>
+                                </div>
+                                <div>
+                                  <input
+                                    className="w-full bg-transparent text-gray-800 text-sm outline-none"
+                                    type="text"
+                                  />
+                                </div>
+                              </div>
+                              <div>
+                                <FiMoreVertical
+                                  size={24}
+                                  className="cursor-pointer text-brand-green hover:text-brand-green-hover"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                          <div className="ml-5">
+                            <hr />
+                          </div>
+                          <div>
+                            <div className="flex items-center space-x-4 py-2 mx-5">
+                              <div>
+                                <div className="h-7 w-7 border rounded-full flex items-center justify-center">
+                                  <div>
+                                    <span className="pl-0.5 text-sm text-gray-500">
+                                      2
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex flex-col w-36">
+                                <div>
+                                  <span className="text-gray-500 text-sm">
+                                    Weight
+                                  </span>
+                                </div>
+                                <div>
+                                  <input
+                                    className="w-full bg-transparent text-gray-800 outline-none text-sm"
+                                    type="number"
+                                  />
+                                </div>
+                              </div>
+                              <div className="flex flex-col  w-36">
+                                <div>
+                                  <span className="text-gray-500 text-sm">
+                                    Reps
+                                  </span>
+                                </div>
+                                <div>
+                                  <input
+                                    className="w-full bg-transparent text-gray-800 outline-none  text-sm "
+                                    type="number"
+                                  />
+                                </div>
+                              </div>
+                              <div className="flex flex-col w-full">
+                                <div>
+                                  <span className="text-gray-500  text-sm">
+                                    Notes
+                                  </span>
+                                </div>
+                                <div>
+                                  <input
+                                    className="w-full bg-transparent text-gray-800 text-sm outline-none"
+                                    type="text"
+                                  />
+                                </div>
+                              </div>
+                              <div>
+                                <FiMoreVertical
+                                  size={24}
+                                  className="cursor-pointer text-brand-green hover:text-brand-green-hover"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                          <div className="ml-5">
+                            <hr />
+                          </div>
+                          {/* Actions */}
+                          <div>
+                            <div className="flex justify-between items-center pt-3 mx-5">
+                              <div>
+                                <button className="cursor-pointer text-brand-green hover:text-brand-green-hover">
+                                  Add set
+                                </button>
+                              </div>
+                              <div className="flex items-center space-x-3">
+                                <div>
+                                  <AiOutlineHistory
+                                    size={24}
+                                    className="cursor-pointer text-brand-green hover:text-brand-green-hover"
+                                  />
+                                </div>
+                                <div>
+                                  <BsBarChartLine
+                                    size={24}
+                                    className="cursor-pointer text-brand-green hover:text-brand-green-hover"
+                                  />
+                                </div>
+                                <div>
+                                  <AiOutlineStar
+                                    size={24}
+                                    className="cursor-pointer text-brand-green hover:text-brand-green-hover"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mx-5">
+                      <button
+                        onClick={handleAddExercise}
+                        className="rounded w-full py-2 bg-brand-green hover:bg-brand-green-hover text-white focus:shadow-outline focus:outline-none"
+                      >
+                        Add Exercise
+                      </button>
+                    </div>
+                    <footer className="flex justify-end px-8 pb-6 pt-8">
+                      <button
+                        id="submit"
+                        className="rounded px-5 py-1.5 text-gray-800 bg-gray-100 hover:bg-gray-200  focus:shadow-outline focus:outline-none"
+                      >
+                        Complete
+                      </button>
+                      <button
+                        onClick={() => setIsAddWorkoutModalOpen(false)}
+                        id="cancel"
+                        className="ml-3 rounded-sm px-3 hover:text-gray-600 focus:shadow-outline focus:outline-none"
+                      >
+                        Cancel
+                      </button>
+                    </footer>
+                  </div>
+                </Modal>
               )}
+              <Drawer
+                isOpen={isAddExerciseOpen}
+                setIsOpen={setIsAddExerciseOpen}
+                title="Add Exercise"
+              >
+                <div>
+                  <header className="flex items-center justify-between px-2 py-5 bg-brand-green text-white ">
+                    <div className="flex items-center">
+                      {selectedMuscleGroup !== '' ? (
+                        <div
+                          onClick={() => setSelectedMuscleGroup('')}
+                          className="flex items-center cursor-pointer group"
+                        >
+                          <FiChevronLeft
+                            size={26}
+                            className="cursor-pointer text-brand-green hover:text-brand-green-hover"
+                          />
+                          <p className="cursor-pointer text-brand-green hover:text-brand-green-hover">
+                            Select Exercise
+                          </p>
+                        </div>
+                      ) : (
+                        <button className="hover:text-gray-200" type="button">
+                          Cancel
+                        </button>
+                      )}
+                    </div>
+                    <div>
+                      {selectedMuscleGroup !== '' ? (
+                        <h4 className="text-xl font-bold">
+                          {selectedMuscleGroup}
+                        </h4>
+                      ) : (
+                        <h4 className="text-xl font-bold">Select Exercise</h4>
+                      )}
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        type="button"
+                        className="relative cursor-pointer flex text-center items-center justify-center h-8 w-8 rounded-full bg-brand-green hover:bg-brand-green-hover"
+                        data-modal-toggle="default-modal"
+                      >
+                        <AiOutlinePlus size={26} color="white" />
+                      </button>
+                      <button
+                        type="button"
+                        className="relative cursor-pointer flex text-center items-center justify-center h-8 w-8 rounded-full bg-brand-green hover:bg-brand-green-hover"
+                        data-modal-toggle="default-modal"
+                      >
+                        <FiMoreHorizontal size={26} color="white" />
+                      </button>
+                    </div>
+                  </header>
+                  <div>
+                    <div className="flex w-full justify-center items-center py-1">
+                      <div className="relative mt-4 w-full mx-4">
+                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                          <svg
+                            className="w-5 h-5 text-gray-500"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                              clipRule="evenodd"
+                            ></path>
+                          </svg>
+                        </div>
+                        <input
+                          type="text"
+                          id="searchExercises"
+                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-brand-green focus:border-brand-green w-full pl-10 p-2.5"
+                          placeholder="Search"
+                        />
+                      </div>
+                    </div>
+                    {selectedMuscleGroup !== '' ? (
+                      <div>
+                        <ExerciseList />
+                      </div>
+                    ) : (
+                      <div>
+                        <MuscleGroupList />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </Drawer>
               <button
                 onClick={() => setIsAddWorkoutModalOpen(true)}
                 title="Add Workout"
-                className="fixed z-90 bottom-10 right-8 bg-brand-green w-16 h-16 md:w-20 md:h-20 rounded-full drop-shadow-lg flex justify-center items-center text-white text-4xl hover:bg-brand-green-hover "
+                className="fixed z-90 bottom-10 right-8 bg-brand-green w-16 h-16  rounded-full drop-shadow-lg flex justify-center items-center text-white text-4xl hover:bg-brand-green-hover "
               >
                 <AiOutlinePlus size={45} color="white" />
               </button>

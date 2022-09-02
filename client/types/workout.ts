@@ -9,7 +9,7 @@ export interface IWorkout {
   exercises: IExercise[];
 }
 
-interface IExercise {
+export interface IExercise {
   id: number;
   name: string;
   category: string;

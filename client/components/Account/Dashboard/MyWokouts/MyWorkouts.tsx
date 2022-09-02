@@ -11,11 +11,6 @@ export const MyWorkouts: React.FC<MyWorkoutsProps> = ({}) => {
         <div>
           <h3 className="text-2xl font-bold text-[#2b3042]">My Workouts</h3>
         </div>
-        {/* <div>
-          <button className="px-6 py-2.5 text-sm text-white bg-brand-green hover:bg-brand-green-hover rounded">
-            Add workout
-          </button>
-        </div> */}
       </div>
       <div className="flex items-center  mt-5 pt-4">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">

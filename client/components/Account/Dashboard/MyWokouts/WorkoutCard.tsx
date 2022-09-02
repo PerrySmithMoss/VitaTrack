@@ -1,6 +1,7 @@
 import React from 'react';
 import { GiWeightLiftingUp, GiRun } from 'react-icons/gi';
 import { IWorkout } from '../../../../types/workout';
+
 interface WorkoutCardProps {
   workout: IWorkout;
 }
