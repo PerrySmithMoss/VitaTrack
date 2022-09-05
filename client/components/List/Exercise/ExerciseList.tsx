@@ -10,7 +10,7 @@ interface IExercise {
 }
 
 export const ExerciseList: React.FC<ExerciseListProps> = ({}) => {
-  const { selectedMuscleGroup } = useGlobalContext();
+  const { selectedMuscleGroup, setWorkoutExercises } = useGlobalContext();
   const [exercises, setExercises] = useState<any>();
 
   function findExercisesForSelectedMuscleGroup() {
@@ -23,13 +23,14 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({}) => {
     return exercise;
   }
 
-  const handleSelectExercise = (exerciseName: string) => {
-    
+  const handleSelectExercise = (exercise: any) => {
+    setWorkoutExercises((prev: any) => [...prev, exercise])
   };
 
   useEffect(() => {
     setExercises(findExercisesForSelectedMuscleGroup());
   }, [selectedMuscleGroup]);
+
 
   return (
     <ul className="mt-4">
@@ -41,7 +42,7 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({}) => {
               (exercise: IExercise) => (
                 <li
                   key={exercise.id}
-                  onClick={() => handleSelectExercise(exercise.name)}
+                  onClick={() => handleSelectExercise(exercise)}
                   className="p-4 cursor-pointer hover:bg-gray-100 border-b flex items-center justify-between text-gray-800"
                 >
                   <div>{exercise.name}</div>

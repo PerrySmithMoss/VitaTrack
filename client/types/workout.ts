@@ -1,5 +1,4 @@
 export interface IWorkout {
-  id: number;
   name: string;
   type: string;
   startTime: string;
@@ -10,7 +9,6 @@ export interface IWorkout {
 }
 
 export interface IExercise {
-  id: number;
   name: string;
   category: string;
   exerciseType: string;
@@ -19,7 +17,6 @@ export interface IExercise {
 }
 
 interface IStrengthSet {
-  id: number;
   setNumber: number;
   weight: number;
   reps: number;
@@ -27,7 +24,6 @@ interface IStrengthSet {
 }
 
 interface ICardioSet {
-  id: number;
   setNumber: number;
   minutes: number;
   seconds: number;
