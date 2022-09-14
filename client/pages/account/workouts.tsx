@@ -5,29 +5,55 @@ import { Navbar } from '../../components/Navbar/Navbar';
 import { SidebarNav } from '../../components/SidebarNav/SidebarNav';
 import {
   GetCurrentUserQuery,
+  GetUsersWorkoutsQuery,
+  useCreateWorkoutMutation,
   useGetCurrentUserQuery,
+  useGetUsersWorkoutsQuery,
 } from '../../graphql/generated/graphql';
 import { MyWorkouts } from '../../components/Account/Dashboard/MyWokouts/MyWorkouts';
 import { useState } from 'react';
 import { Modal } from '../../components/Modals/Modal';
 import { Drawer } from '../../components/Drawer/Drawer';
-import { AiOutlinePlus, AiOutlineHistory, AiOutlineStar } from 'react-icons/ai';
-import { BsBarChartFill, BsBarChartLine } from 'react-icons/bs';
-import {
-  FiChevronLeft,
-  FiMoreHorizontal,
-  FiMoreVertical,
-} from 'react-icons/fi';
+import { AiOutlinePlus } from 'react-icons/ai';
+import { FiChevronLeft, FiMoreHorizontal } from 'react-icons/fi';
 import { MuscleGroupList } from '../../components/List/Exercise/MuscleGroupList';
-import { useGlobalContext } from '../../context/global.context';
+import { useGlobalContext } from '../../state/context/global.context';
 import { ExerciseList } from '../../components/List/Exercise/ExerciseList';
 import { WorkoutList } from '../../components/List/Workout/WorkoutList';
 
-interface DashboardPageProps {}
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import moment from 'moment';
 
-const DashboardPage: NextPage<DashboardPageProps> = () => {
-  const { data, refetch: refetchCurrentUser } =
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+interface WorkoutPageProps {}
+
+const WorkoutPage: NextPage<WorkoutPageProps> = () => {
+  const { data: user } =
     useGetCurrentUserQuery<GetCurrentUserQuery>();
+
+  const { refetch: refetchUsersWorkouts } =
+    useGetUsersWorkoutsQuery<GetUsersWorkoutsQuery>();
+
+  const { mutate } = useCreateWorkoutMutation({
+    onSuccess: () => {
+      refetchUsersWorkouts();
+      setIsAddExerciseOpen(false);
+      setIsAddWorkoutModalOpen(false);
+
+      toast.success('Workout completed 💪', {
+        position: 'top-right',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    },
+  });
 
   const { selectedMuscleGroup, setSelectedMuscleGroup, workoutExercises } =
     useGlobalContext();
@@ -37,13 +63,31 @@ const DashboardPage: NextPage<DashboardPageProps> = () => {
   const [isAddWorkoutModalOpen, setIsAddWorkoutModalOpen] = useState(false);
   const [workout, setWorkout] = useState({
     name: '',
-    type: 'Strength' || 'Cardio',
     startDate: new Date(),
     endDate: new Date(),
-    bodyWeight: 0,
+    bodyWeight: null,
     notes: '',
   });
-  const [exercises, setExercises] = useState([]);
+
+  function handleUserInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+
+    setWorkout({
+      ...workout,
+      [name]: name === 'bodyWeight' ? parseFloat(value) : value,
+    });
+  }
+
+  async function handleCompleteWorkout() {
+    mutate({
+      name: workout.name,
+      startTime: moment(workout.startDate).format('MMM do, YYYY H:mm A'),
+      endTime: moment(workout.endDate).format('MMM do, YYYY H:mm A'),
+      bodyweight: workout.bodyWeight,
+      notes: workout.notes,
+      exercises: workoutExercises,
+    });
+  }
 
   // const showToastSuccess = () => {
   //     toast.success("User avatar updated successfully", {
@@ -57,13 +101,11 @@ const DashboardPage: NextPage<DashboardPageProps> = () => {
   //     });
   //   };
 
-  const handleAddExercise = () => {
+  function handleAddExercise() {
     setIsAddExerciseOpen(!isAddExerciseOpen);
-  };
+  }
 
-  console.log('workoutExercises: ', workoutExercises);
-
-  if (data?.getCurrentUser?.data?.id) {
+  if (user?.getCurrentUser?.data?.id) {
     return (
       <>
         <Head>
@@ -75,6 +117,17 @@ const DashboardPage: NextPage<DashboardPageProps> = () => {
           <link rel="icon" href="/favicon.ico" />
         </Head>
         <div className="relative min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased bg-white">
+        <ToastContainer
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+          />
           <div className="flex h-screen w-full">
             <SidebarNav />
             <main className="w-full">
@@ -92,56 +145,124 @@ const DashboardPage: NextPage<DashboardPageProps> = () => {
                   title="Add Workout"
                 >
                   <div className="relative flex  flex-col overflow-x-hidden w-full flex-grow flex-shrink min-h-0 overflow-auto">
-                    <div className="overflow-y-scroll h-[550px] w-full">
+                    <div className="overflow-y-auto h-auto max-h-[600px] w-full">
                       <section className="w-full flex flex-col mb-4 bg-gray-100">
                         <div className="">
                           <input
                             type="text"
                             placeholder="Name"
+                            name="name"
+                            value={workout.name}
+                            onChange={handleUserInputChange}
                             className="block border-t bg-transparent py-3 px-4  w-full outline-none"
                           />
                           <div className="mx-4">
                             <hr />
                           </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 ">
-                            <div>
-                              <input
-                                type="text"
-                                placeholder="Start Time"
-                                className="block border-l bg-transparent py-3 px-4 w-full outline-none"
-                              />
+                          <div className="flex items-center">
+                            <div className="block border-l text-gray-800 bg-transparent py-3 px-4 w-full outline-none">
+                              <span>Start Time:</span>
                             </div>
-                            <div>
-                              <input
-                                type="text"
-                                placeholder="End Time"
-                                className="block border-l bg-transparent py-3 px-4 w-full outline-none"
+                            <div className="block text-gray-800 bg-transparent py-3 px-4 w-full outline-none">
+                              <DatePicker
+                                selected={workout.startDate}
+                                // selected={moment(data.startTime) || moment()}
+                                onChange={(date) =>
+                                  setWorkout({
+                                    ...workout,
+                                    startDate: date as Date,
+                                  })
+                                }
+                                dateFormat="MMM do, yyyy H:mm a"
+                                wrapperClassName="datePicker"
+                                showTimeSelect
+                                timeIntervals={1}
+                                timeFormat="HH:mm"
+                                className="block cursor-pointer text-right text-gray-800 bg-transparent  w-full outline-none"
                               />
                             </div>
                           </div>
                           <div className="mx-4">
                             <hr />
                           </div>
-                          <input
-                            type="text"
-                            placeholder="Bodyweight"
-                            className="block   bg-transparent py-3 px-4 w-full outline-none"
-                          />
+                          <div className="flex items-center">
+                            <div className="block border-l text-gray-800 bg-transparent py-3 px-4 w-full outline-none">
+                              <span>End Time:</span>
+                            </div>
+                            <div className="block text-gray-800 bg-transparent py-3 px-4 w-full outline-none">
+                              <DatePicker
+                                selected={workout.endDate}
+                                // selected={moment("September 6th, 2022 10:22 AM", 'MMMM Do, yyyy h:mm aa').toDate() || workout.endDate}
+                                // selected={moment(data.endTime) || moment()}
+                                onChange={(date) =>
+                                  setWorkout({
+                                    ...workout,
+                                    endDate: date as Date,
+                                  })
+                                }
+                                dateFormat="MMM do, yyyy H:mm a"
+                                wrapperClassName="datePicker"
+                                showTimeSelect
+                                timeIntervals={1}
+                                timeFormat="HH:mm"
+                                className="block cursor-pointer text-right text-gray-800 bg-transparent w-full outline-none"
+                              />
+                            </div>
+                          </div>
+                          <div className="mx-4">
+                            <hr />
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <div className="block border-l text-gray-800 bg-transparent py-3 px-4 w-full outline-none">
+                              <span>Bodyweight</span>
+                            </div>
+                            <div className="flex items-center space-x-1 text-gray-800  py-3 px-4">
+                              <div>
+                                <input
+                                  type="number"
+                                  step="0.1"
+                                  value={workout.bodyWeight || ''}
+                                  name="bodyWeight"
+                                  // onKeyPress={(event) => {
+                                  //   if (
+                                  //     !/^-?[0-9]*[.][0-9]+$/.test(event.key)
+                                  //   ) {
+                                  //     event.preventDefault();
+                                  //   }
+                                  // }}
+                                  onChange={handleUserInputChange}
+                                  className="block text-right text-gray-800 bg-transparent outline-none"
+                                />
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <div>
+                                  <span>(lbs)</span>
+                                </div>
+                                <div>
+                                  <span className="">{'>'}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
                           <div className="mx-4">
                             <hr />
                           </div>
                           <input
                             type="text"
                             placeholder="Notes"
-                            className="block border-b bg-transparent py-3 px-4 w-full outline-none"
+                            value={workout.notes}
+                            name="notes"
+                            onChange={handleUserInputChange}
+                            className="block  text-gray-800 border-b bg-transparent py-3 px-4 w-full outline-none"
                           />
                         </div>
                       </section>
                       <WorkoutList />
-                      <div className="mx-5">
+                      <div className="mx-3">
                         <button
                           onClick={handleAddExercise}
-                          className="rounded w-full py-2 bg-brand-green hover:bg-brand-green-hover text-white focus:shadow-outline focus:outline-none"
+                          className="rounded w-full py-2 bg-gray-100 hover:bg-gray-200  text-gray-800 focus:shadow-outline focus:outline-none"
                         >
                           Add Exercise
                         </button>
@@ -149,7 +270,8 @@ const DashboardPage: NextPage<DashboardPageProps> = () => {
                       <footer className="flex justify-end px-8 pb-6 pt-8">
                         <button
                           id="submit"
-                          className="rounded px-5 py-1.5 text-gray-800 bg-gray-100 hover:bg-gray-200  focus:shadow-outline focus:outline-none"
+                          onClick={handleCompleteWorkout}
+                          className="rounded px-5 py-1.5 bg-brand-green hover:bg-brand-green-hover text-white focus:shadow-outline focus:outline-none"
                         >
                           Complete
                         </button>
@@ -315,4 +437,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   };
 };
 
-export default DashboardPage;
+export default WorkoutPage;

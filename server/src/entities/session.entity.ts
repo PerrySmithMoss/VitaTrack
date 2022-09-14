@@ -12,11 +12,11 @@ export class Session {
   @Field(() => String)
   userAgent: string;
 
-  @Field(() => String)
-  createdAt: string;
+  @Field(() => Date)
+  createdAt: Date;
 
   @Field(() => Date)
-  updatedAt: string;
+  updatedAt: Date;
 
   @Field(() => [User])
   user: User;

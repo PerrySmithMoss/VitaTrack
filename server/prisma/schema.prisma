@@ -21,14 +21,15 @@ model Profile {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  email     String   @unique
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  email     String    @unique
   password  String?
   username  String
   profile   Profile?
   session   Session?
+  workouts  Workout[]
 }
 
 model Session {
@@ -38,4 +39,58 @@ model Session {
   updatedAt DateTime @updatedAt
   userId    String   @unique
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Workout {
+  id         Int        @id @default(autoincrement())
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  name       String
+  startTime  String
+  endTime    String
+  bodyweight Float?
+  notes      String?
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  exercises  Exercise[]
+}
+
+model Exercise {
+  id           Int           @id @default(autoincrement())
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  name         String
+  category     String
+  exerciseType String
+  unilateral   Boolean       @default(false)
+  workout      Workout       @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+  workoutId    Int
+  strengthSets StrengthSet[]
+  cardioSets   CardioSet[]
+}
+
+model StrengthSet {
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  setNumber  Int      @default(1)
+  weight     String?
+  reps       String?
+  notes      String?
+  exercise   Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  exerciseId Int
+}
+
+model CardioSet {
+  id             Int      @id @default(autoincrement())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  setNumber      Int      @default(1)
+  minutes        String?
+  seconds        String?
+  distance       String?
+  caloriesBurned String?
+  notes          String?
+  exercise       Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  exerciseId     Int
 }

@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { FiChevronRight, FiMoreHorizontal } from 'react-icons/fi';
-import { useGlobalContext } from '../../../context/global.context';
+import { Exercise } from '../../../graphql/generated/graphql';
+import { useGlobalContext } from '../../../state/context/global.context';
+import { useExercisesContext } from '../../../state/context/exercise.context';
 
 interface ExerciseListProps {}
 
-interface IExercise {
-  id: number;
-  name: string;
-}
-
 export const ExerciseList: React.FC<ExerciseListProps> = ({}) => {
-  const { selectedMuscleGroup, setWorkoutExercises } = useGlobalContext();
+  const { selectedMuscleGroup, setWorkoutExercises, workoutExercises } =
+    useGlobalContext();
   const [exercises, setExercises] = useState<any>();
+  const { exercisesDispatch, exercisesState } = useExercisesContext();
 
   function findExercisesForSelectedMuscleGroup() {
     const exercise = exerciseList1.find((exercise) =>
@@ -23,14 +22,14 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({}) => {
     return exercise;
   }
 
-  const handleSelectExercise = (exercise: any) => {
-    setWorkoutExercises((prev: any) => [...prev, exercise])
+  const handleSelectExercise = (exercise: Exercise) => {
+    setWorkoutExercises((prev: Exercise[]) => [...prev, exercise]);
+    // exercisesDispatch({ payload: exercise, type: 'ADD_EXERCISE_TO_WORKOUT' });
   };
 
   useEffect(() => {
     setExercises(findExercisesForSelectedMuscleGroup());
   }, [selectedMuscleGroup]);
-
 
   return (
     <ul className="mt-4">
@@ -39,9 +38,9 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({}) => {
         <>
           {exercises &&
             exercises[selectedMuscleGroup.toLowerCase()].map(
-              (exercise: IExercise) => (
+              (exercise: Exercise, index: number) => (
                 <li
-                  key={exercise.id}
+                  key={index}
                   onClick={() => handleSelectExercise(exercise)}
                   className="p-4 cursor-pointer hover:bg-gray-100 border-b flex items-center justify-between text-gray-800"
                 >
@@ -65,20 +64,16 @@ const exerciseList2 = [
   {
     abs: [
       {
-        id: 1,
         muscleGroup: 'abs',
         name: 'Crunches',
       },
       {
-        id: 2,
         name: 'Leg Raises',
       },
       {
-        id: 3,
         name: 'Machine Crunch',
       },
       {
-        id: 4,
         name: 'Rope Crunch',
       },
     ],
@@ -86,19 +81,15 @@ const exerciseList2 = [
   {
     back: [
       {
-        id: 1,
         name: 'Crunches',
       },
       {
-        id: 2,
         name: 'Leg Raises',
       },
       {
-        id: 3,
         name: 'Machine Crunch',
       },
       {
-        id: 4,
         name: 'Rope Crunch',
       },
     ],
@@ -106,19 +97,15 @@ const exerciseList2 = [
   {
     biceps: [
       {
-        id: 1,
         name: 'Crunches',
       },
       {
-        id: 2,
         name: 'Leg Raises',
       },
       {
-        id: 3,
         name: 'Machine Crunch',
       },
       {
-        id: 4,
         name: 'Rope Crunch',
       },
     ],
@@ -126,19 +113,15 @@ const exerciseList2 = [
   {
     cardio: [
       {
-        id: 1,
         name: 'Crunches',
       },
       {
-        id: 2,
         name: 'Leg Raises',
       },
       {
-        id: 3,
         name: 'Machine Crunch',
       },
       {
-        id: 4,
         name: 'Rope Crunch',
       },
     ],
@@ -146,19 +129,15 @@ const exerciseList2 = [
   {
     chest: [
       {
-        id: 1,
         name: 'Crunches',
       },
       {
-        id: 2,
         name: 'Leg Raises',
       },
       {
-        id: 3,
         name: 'Machine Crunch',
       },
       {
-        id: 4,
         name: 'Rope Crunch',
       },
     ],
@@ -166,19 +145,15 @@ const exerciseList2 = [
   {
     legs: [
       {
-        id: 1,
         name: 'Crunches',
       },
       {
-        id: 2,
         name: 'Leg Raises',
       },
       {
-        id: 3,
         name: 'Machine Crunch',
       },
       {
-        id: 4,
         name: 'Rope Crunch',
       },
     ],
@@ -186,19 +161,15 @@ const exerciseList2 = [
   {
     shoulders: [
       {
-        id: 1,
         name: 'Crunches',
       },
       {
-        id: 2,
         name: 'Leg Raises',
       },
       {
-        id: 3,
         name: 'Machine Crunch',
       },
       {
-        id: 4,
         name: 'Rope Crunch',
       },
     ],
@@ -206,19 +177,15 @@ const exerciseList2 = [
   {
     triceps: [
       {
-        id: 1,
         name: 'Crunches',
       },
       {
-        id: 2,
         name: 'Leg Raises',
       },
       {
-        id: 3,
         name: 'Machine Crunch',
       },
       {
-        id: 4,
         name: 'Rope Crunch',
       },
     ],
@@ -229,160 +196,490 @@ const exerciseList1 = [
   {
     abs: [
       {
-        id: 1,
         name: 'Crunches',
+        category: 'Abs',
+        exerciseType: 'Strength',
+        unilateral: false,
+        strengthSets: [
+          {
+            setNumber: 1,
+            weight: '',
+            reps: '',
+            notes: '',
+          },
+        ],
       },
       {
-        id: 2,
         name: 'Leg Raises',
+        category: 'Abs',
+        exerciseType: 'Strength',
+        unilateral: false,
+        strengthSets: [
+          {
+            setNumber: 1,
+            weight: '',
+            reps: '',
+            notes: '',
+          },
+        ],
       },
       {
-        id: 3,
         name: 'Machine Crunch',
+        category: 'Abs',
+        exerciseType: 'Strength',
+        unilateral: false,
+        strengthSets: [
+          {
+            setNumber: 1,
+            weight: '',
+            reps: '',
+            notes: '',
+          },
+        ],
       },
       {
-        id: 4,
         name: 'Rope Crunch',
+        category: 'Abs',
+        exerciseType: 'Strength',
+        unilateral: false,
+        strengthSets: [
+          {
+            setNumber: 1,
+            weight: '',
+            reps: '',
+            notes: '',
+          },
+        ],
       },
     ],
   },
   {
     back: [
       {
-        id: 1,
-        name: 'Crunches',
+        name: 'Lat Pulldown',
+        category: 'Back',
+        exerciseType: 'Strength',
+        unilateral: false,
+        strengthSets: [
+          {
+            setNumber: 1,
+            weight: '',
+            reps: '',
+            notes: '',
+          },
+        ],
       },
       {
-        id: 2,
-        name: 'Leg Raises',
+        name: 'Barbell Rows',
+        category: 'Back',
+        exerciseType: 'Strength',
+        unilateral: false,
+        strengthSets: [
+          {
+            setNumber: 1,
+            weight: '',
+            reps: '',
+            notes: '',
+          },
+        ],
       },
       {
-        id: 3,
-        name: 'Machine Crunch',
+        name: 'Deadlift',
+        category: 'Back',
+        exerciseType: 'Strength',
+        unilateral: false,
+        strengthSets: [
+          {
+            setNumber: 1,
+            weight: '',
+            reps: '',
+            notes: '',
+          },
+        ],
       },
       {
-        id: 4,
-        name: 'Rope Crunch',
+        name: 'Dumbbell Rows',
+        category: 'Back',
+        exerciseType: 'Strength',
+        unilateral: false,
+        strengthSets: [
+          {
+            setNumber: 1,
+            weight: '',
+            reps: '',
+            notes: '',
+          },
+        ],
       },
     ],
   },
   {
     biceps: [
       {
-        id: 1,
-        name: 'Crunches',
+        name: 'Barbell Curl',
+        category: 'Biceps',
+        exerciseType: 'Strength',
+        unilateral: false,
+        strengthSets: [
+          {
+            setNumber: 1,
+            weight: '',
+            reps: '',
+            notes: '',
+          },
+        ],
       },
       {
-        id: 2,
-        name: 'Leg Raises',
+        name: 'Dumbbell Curl',
+        category: 'Biceps',
+        exerciseType: 'Strength',
+        unilateral: false,
+        strengthSets: [
+          {
+            setNumber: 1,
+            weight: '',
+            reps: '',
+            notes: '',
+          },
+        ],
       },
       {
-        id: 3,
-        name: 'Machine Crunch',
+        name: 'Preacher Curl',
+        category: 'Biceps',
+        exerciseType: 'Strength',
+        unilateral: false,
+        strengthSets: [
+          {
+            setNumber: 1,
+            weight: '',
+            reps: '',
+            notes: '',
+          },
+        ],
       },
       {
-        id: 4,
-        name: 'Rope Crunch',
+        name: 'Cable Curl',
+        category: 'Biceps',
+        exerciseType: 'Strength',
+        unilateral: false,
+        strengthSets: [
+          {
+            setNumber: 1,
+            weight: '',
+            reps: '',
+            notes: '',
+          },
+        ],
       },
     ],
   },
   {
     cardio: [
       {
-        id: 1,
-        name: 'Crunches',
+        name: 'Assault Bike',
+        category: 'Cardio',
+        exerciseType: 'Cardio',
+        unilateral: false,
+        cardioSets: [
+          {
+            setNumber: 1,
+
+            minutes: '',
+            seconds: '',
+            distance: '',
+            caloriesBurned: '',
+            notes: '',
+          },
+        ],
       },
       {
-        id: 2,
-        name: 'Leg Raises',
+        name: 'Running',
+        category: 'Cardio',
+        exerciseType: 'Cardio',
+        unilateral: false,
+        cardioSets: [
+          {
+            setNumber: 1,
+
+            minutes: '',
+            seconds: '',
+            distance: '',
+            caloriesBurned: '',
+            notes: '',
+          },
+        ],
       },
       {
-        id: 3,
-        name: 'Machine Crunch',
+        name: 'Rowing Machine',
+        category: 'Cardio',
+        exerciseType: 'Cardio',
+        unilateral: false,
+        cardioSets: [
+          {
+            setNumber: 1,
+            minutes: '',
+            seconds: '',
+            distance: '',
+            caloriesBurned: '',
+            notes: '',
+          },
+        ],
       },
       {
-        id: 4,
-        name: 'Rope Crunch',
+        name: 'Swimming',
+        category: 'Cardio',
+        exerciseType: 'Cardio',
+        unilateral: false,
+        cardioSets: [
+          {
+            setNumber: 1,
+            minutes: '',
+            seconds: '',
+            distance: '',
+            caloriesBurned: '',
+            notes: '',
+          },
+        ],
       },
     ],
   },
   {
     chest: [
       {
-        id: 1,
-        name: 'Crunches',
+        name: 'Barbell Bench Press',
+        category: 'Chest',
+        exerciseType: 'Strength',
+        unilateral: false,
+        strengthSets: [
+          {
+            setNumber: 1,
+            weight: '',
+            reps: '',
+            notes: '',
+          },
+        ],
       },
       {
-        id: 2,
-        name: 'Leg Raises',
+        name: 'Dumbbell Bench Press',
+        category: 'Chest',
+        exerciseType: 'Strength',
+        unilateral: false,
+        strengthSets: [
+          {
+            setNumber: 1,
+            weight: '',
+            reps: '',
+            notes: '',
+          },
+        ],
       },
       {
-        id: 3,
-        name: 'Machine Crunch',
+        name: 'Machine Press',
+        category: 'Chest',
+        exerciseType: 'Strength',
+        unilateral: false,
+        strengthSets: [
+          {
+            setNumber: 1,
+            weight: '',
+            reps: '',
+            notes: '',
+          },
+        ],
       },
       {
-        id: 4,
-        name: 'Rope Crunch',
+        name: 'Cable Crossover',
+        category: 'Chest',
+        exerciseType: 'Strength',
+        unilateral: false,
+        strengthSets: [
+          {
+            setNumber: 1,
+            weight: '',
+            reps: '',
+            notes: '',
+          },
+        ],
       },
     ],
   },
   {
     legs: [
       {
-        id: 1,
-        name: 'Crunches',
+        name: 'Barbell Squat',
+        category: 'Legs',
+        exerciseType: 'Strength',
+        unilateral: false,
+        strengthSets: [
+          {
+            setNumber: 1,
+            weight: '',
+            reps: '',
+            notes: '',
+          },
+        ],
       },
       {
-        id: 2,
-        name: 'Leg Raises',
+        name: 'Leg Extentions',
+        category: 'Legs',
+        exerciseType: 'Strength',
+        unilateral: false,
+        strengthSets: [
+          {
+            setNumber: 1,
+            weight: '',
+            reps: '',
+            notes: '',
+          },
+        ],
       },
       {
-        id: 3,
-        name: 'Machine Crunch',
+        name: 'Leg Press',
+        category: 'Legs',
+        exerciseType: 'Strength',
+        unilateral: false,
+        strengthSets: [
+          {
+            setNumber: 1,
+            weight: '',
+            reps: '',
+            notes: '',
+          },
+        ],
       },
       {
-        id: 4,
-        name: 'Rope Crunch',
+        name: 'Dumbbell Lunges',
+        category: 'Legs',
+        exerciseType: 'Strength',
+        unilateral: true,
+        strengthSets: [
+          {
+            setNumber: 1,
+            weight: '',
+            reps: '',
+            notes: '',
+          },
+        ],
       },
     ],
   },
   {
     shoulders: [
       {
-        id: 1,
-        name: 'Crunches',
+        name: 'Dumbbell Military Press',
+        category: 'Shoulders',
+        exerciseType: 'Strength',
+        unilateral: false,
+        strengthSets: [
+          {
+            setNumber: 1,
+            weight: '',
+            reps: '',
+            notes: '',
+          },
+        ],
       },
       {
-        id: 2,
-        name: 'Leg Raises',
+        name: 'Dumbbell Lateral Raises',
+        category: 'Shoulders',
+        exerciseType: 'Strength',
+        unilateral: false,
+        strengthSets: [
+          {
+            setNumber: 1,
+            weight: '',
+            reps: '',
+            notes: '',
+          },
+        ],
       },
       {
-        id: 3,
-        name: 'Machine Crunch',
+        name: 'Cable Lateral Raises',
+        category: 'Shoulders',
+        exerciseType: 'Strength',
+        unilateral: true,
+        strengthSets: [
+          {
+            setNumber: 1,
+            weight: '',
+            reps: '',
+            notes: '',
+          },
+        ],
       },
       {
-        id: 4,
-        name: 'Rope Crunch',
+        name: 'Machine Military Press',
+        category: 'Shoulders',
+        exerciseType: 'Strength',
+        unilateral: false,
+        strengthSets: [
+          {
+            setNumber: 1,
+            weight: '',
+            reps: '',
+            notes: '',
+          },
+        ],
       },
     ],
   },
   {
     triceps: [
       {
-        id: 1,
-        name: 'Crunches',
+        name: 'Close Grip Bench Press',
+        category: 'Triceps',
+        exerciseType: 'Strength',
+        unilateral: false,
+        strengthSets: [
+          {
+            setNumber: 1,
+            weight: '',
+            reps: '',
+            notes: '',
+          },
+        ],
       },
       {
-        id: 2,
-        name: 'Leg Raises',
+        name: 'Barbell Skullcrushers',
+        category: 'Triceps',
+        exerciseType: 'Strength',
+        unilateral: false,
+        strengthSets: [
+          {
+            setNumber: 1,
+            weight: '',
+            reps: '',
+            notes: '',
+          },
+        ],
       },
       {
-        id: 3,
-        name: 'Machine Crunch',
+        name: 'Rope Extentions',
+        category: 'Triceps',
+        exerciseType: 'Strength',
+        unilateral: false,
+        strengthSets: [
+          {
+            setNumber: 1,
+            weight: '',
+            reps: '',
+            notes: '',
+          },
+        ],
       },
       {
-        id: 4,
-        name: 'Rope Crunch',
+        name: 'Behind Body Dumbbell Extentions',
+        category: 'Triceps',
+        exerciseType: 'Strength',
+        unilateral: false,
+        strengthSets: [
+          {
+            setNumber: 1,
+            weight: '',
+            reps: '',
+            notes: '',
+          },
+        ],
       },
     ],
   },

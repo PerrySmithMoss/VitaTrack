@@ -7,11 +7,11 @@ export class User {
   @Field(() => String)
   id: string;
 
-  @Field(() => String)
-  createdAt: String;
+  @Field(() => Date)
+  createdAt: Date;
 
-  @Field(() => String)
-  updatedAt: String;
+  @Field(() => Date)
+  updatedAt: Date;
 
   @Field(() => String)
   email: string;

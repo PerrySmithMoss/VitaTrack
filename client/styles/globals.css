@@ -19,8 +19,8 @@ a {
   box-sizing: border-box;
 }
 
-/* Charts */
-.recharts-legend-wrapper {
-  /* right: 0px !important;
-  top: 0px !important; */
-}
+/* React DateTime Picker */
+/* .react-datepicker-popper {
+  top: -7px !important;
+  left: 20px !important;
+} */

@@ -6,7 +6,7 @@ import {
   useGetCurrentUserQuery,
   useLogoutUserMutation,
 } from '../../graphql/generated/graphql';
-import { useGlobalContext } from '../../context/global.context';
+import { useGlobalContext } from '../../state/context/global.context';
 import { useRouter } from 'next/router';
 
 interface NavbarProps {}

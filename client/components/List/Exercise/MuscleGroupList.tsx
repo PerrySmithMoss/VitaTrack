@@ -1,6 +1,6 @@
 import React from 'react';
 import { FiChevronRight } from 'react-icons/fi';
-import { useGlobalContext } from '../../../context/global.context';
+import { useGlobalContext } from '../../../state/context/global.context';
 
 interface MuscleGroupListProps {}
 

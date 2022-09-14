@@ -7,7 +7,8 @@ import {
   QueryClientProvider,
 } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { GlobalContextProvider } from '../context/global.context';
+import { GlobalContextProvider } from '../state/context/global.context';
+import { ExercisesContextProvider } from '../state/context/exercise.context';
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [queryClient] = React.useState(() => new QueryClient());
@@ -17,7 +18,9 @@ function MyApp({ Component, pageProps }: AppProps) {
       <ReactQueryDevtools initialIsOpen={false} />
       <Hydrate state={pageProps.dehydratedState}>
         <GlobalContextProvider>
-          <Component {...pageProps} />
+          <ExercisesContextProvider>
+            <Component {...pageProps} />
+          </ExercisesContextProvider>
         </GlobalContextProvider>
       </Hydrate>
     </QueryClientProvider>

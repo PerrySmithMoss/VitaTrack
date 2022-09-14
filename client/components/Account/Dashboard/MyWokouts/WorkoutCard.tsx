@@ -1,15 +1,15 @@
 import React from 'react';
 import { GiWeightLiftingUp, GiRun } from 'react-icons/gi';
-import { IWorkout } from '../../../../types/workout';
+import { Workout } from '../../../../graphql/generated/graphql';
 
 interface WorkoutCardProps {
-  workout: IWorkout;
+  workout: Workout;
 }
 
 export const WorkoutCard: React.FC<WorkoutCardProps> = ({ workout }) => {
   return (
-    <div className="relative bg-white pt-6 pb-2 px-2 rounded-3xl w-full my-4 cursor-pointer shadow hover:shadow-md">
-      <div
+    <div className="relative bg-white pt-3 pb-1 px-2 rounded-3xl w-full  cursor-pointer border hover:shadow">
+      {/* <div
         className={`text-white flex items-center absolute rounded-full py-4 px-4 shadow-xl ${
           workout.type === 'Cardio' ? 'bg-purple-500' : 'bg-blue-500'
         } left-4 -top-6`}
@@ -19,7 +19,7 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = ({ workout }) => {
         ) : (
           <GiWeightLiftingUp size={30} color="white" />
         )}
-      </div>
+      </div> */}
       {/* <div
         className={`text-white flex items-center space-x-1.5 absolute rounded-full right-3 top-3`}
       >
@@ -30,7 +30,7 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = ({ workout }) => {
           <MdOutlineDelete size={18} color="white" />
         </div>
       </div> */}
-      <div className="mt-8">
+
         <div className="px-6">
           <p className="text-xl font-semibold my-2">{workout.name}</p>
           <div className="flex space-x-2 text-gray-400 text-sm mt-4">
@@ -101,7 +101,7 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = ({ workout }) => {
             </div>
           </div>
         </div> */}
-      </div>
+
     </div>
   );
 };

@@ -1,0 +1,65 @@
+mutation CreateWorkout(
+  $exercises: [ExercisesInput!]!
+  $endTime: String!
+  $startTime: String!
+  $name: String!
+  $notes: String
+  $bodyweight: Float
+) {
+  createWorkout(
+    exercises: $exercises
+    endTime: $endTime
+    startTime: $startTime
+    name: $name
+    notes: $notes
+    bodyweight: $bodyweight
+  ) {
+    errors {
+      field
+      message
+    }
+    data {
+      id
+      createdAt
+      updatedAt
+      name
+      startTime
+      endTime
+      bodyweight
+      notes
+      userId
+      exercises {
+        id
+        createdAt
+        updatedAt
+        name
+        category
+        exerciseType
+        unilateral
+        workoutId
+        strengthSets {
+          id
+          createdAt
+          updatedAt
+          setNumber
+          weight
+          reps
+          notes
+          exerciseId
+        }
+        cardioSets {
+          id
+          createdAt
+          updatedAt
+          setNumber
+          minutes
+          seconds
+          distance
+          caloriesBurned
+          notes
+          exerciseId
+        }
+      }
+    }
+  }
+}

@@ -15,6 +15,54 @@ export type Scalars = {
   DateTime: any;
 };
 
+export type CardioSet = {
+  __typename?: 'CardioSet';
+  caloriesBurned?: Maybe<Scalars['String']>;
+  createdAt: Scalars['DateTime'];
+  distance?: Maybe<Scalars['String']>;
+  exercise: Exercise;
+  exerciseId: Scalars['ID'];
+  id: Scalars['ID'];
+  minutes?: Maybe<Scalars['String']>;
+  notes?: Maybe<Scalars['String']>;
+  seconds?: Maybe<Scalars['String']>;
+  setNumber?: Maybe<Scalars['Int']>;
+  updatedAt: Scalars['DateTime'];
+};
+
+export type CardioSetInput = {
+  caloriesBurned?: InputMaybe<Scalars['String']>;
+  distance?: InputMaybe<Scalars['String']>;
+  minutes?: InputMaybe<Scalars['String']>;
+  notes?: InputMaybe<Scalars['String']>;
+  seconds?: InputMaybe<Scalars['String']>;
+  setNumber?: InputMaybe<Scalars['Int']>;
+};
+
+export type Exercise = {
+  __typename?: 'Exercise';
+  cardioSets: Array<CardioSet>;
+  category: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+  exerciseType: Scalars['String'];
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  strengthSets: Array<StrengthSet>;
+  unilateral?: Maybe<Scalars['Boolean']>;
+  updatedAt: Scalars['DateTime'];
+  workout: Workout;
+  workoutId: Scalars['Int'];
+};
+
+export type ExercisesInput = {
+  cardioSets?: InputMaybe<Array<CardioSetInput>>;
+  category: Scalars['String'];
+  exerciseType: Scalars['String'];
+  name: Scalars['String'];
+  strengthSets?: InputMaybe<Array<StrengthSetInput>>;
+  unilateral?: InputMaybe<Scalars['Boolean']>;
+};
+
 export type LogoutUserResponse = {
   __typename?: 'LogoutUserResponse';
   message: Scalars['String'];
@@ -24,6 +72,7 @@ export type LogoutUserResponse = {
 export type Mutation = {
   __typename?: 'Mutation';
   createUser: UserResponse;
+  createWorkout: WorkoutResponse;
   googleOauthHandler: SessionResponse;
   loginUserWithEmailAndPassword: UserResponse;
   logoutUser: LogoutUserResponse;
@@ -34,6 +83,16 @@ export type MutationCreateUserArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
   username: Scalars['String'];
+};
+
+
+export type MutationCreateWorkoutArgs = {
+  bodyweight?: InputMaybe<Scalars['Float']>;
+  endTime: Scalars['String'];
+  exercises?: InputMaybe<Array<ExercisesInput>>;
+  name: Scalars['String'];
+  notes?: InputMaybe<Scalars['String']>;
+  startTime: Scalars['String'];
 };
 
 
@@ -60,11 +119,12 @@ export type Profile = {
 export type Query = {
   __typename?: 'Query';
   getCurrentUser?: Maybe<UserResponse>;
+  getUsersWorkouts: WorkoutResponseIterable;
 };
 
 export type Session = {
   __typename?: 'Session';
-  createdAt: Scalars['String'];
+  createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
   user: Array<User>;
   userAgent: Scalars['String'];
@@ -84,6 +144,26 @@ export type SessionResponse = {
   errors?: Maybe<Array<SessionFieldError>>;
 };
 
+export type StrengthSet = {
+  __typename?: 'StrengthSet';
+  createdAt: Scalars['DateTime'];
+  exercise: Exercise;
+  exerciseId: Scalars['ID'];
+  id: Scalars['ID'];
+  notes?: Maybe<Scalars['String']>;
+  reps?: Maybe<Scalars['String']>;
+  setNumber?: Maybe<Scalars['String']>;
+  updatedAt: Scalars['DateTime'];
+  weight?: Maybe<Scalars['String']>;
+};
+
+export type StrengthSetInput = {
+  notes?: InputMaybe<Scalars['String']>;
+  reps?: InputMaybe<Scalars['String']>;
+  setNumber?: InputMaybe<Scalars['Int']>;
+  weight?: InputMaybe<Scalars['String']>;
+};
+
 export type TokenResponse = {
   __typename?: 'TokenResponse';
   access_token: Scalars['String'];
@@ -92,12 +172,12 @@ export type TokenResponse = {
 
 export type User = {
   __typename?: 'User';
-  createdAt: Scalars['String'];
+  createdAt: Scalars['DateTime'];
   email: Scalars['String'];
   id: Scalars['String'];
   profile?: Maybe<Profile>;
   session?: Maybe<Session>;
-  updatedAt: Scalars['String'];
+  updatedAt: Scalars['DateTime'];
   username: Scalars['String'];
 };
 
@@ -113,6 +193,39 @@ export type UserResponse = {
   errors?: Maybe<Array<UserFieldError>>;
 };
 
+export type Workout = {
+  __typename?: 'Workout';
+  bodyweight?: Maybe<Scalars['Float']>;
+  createdAt: Scalars['DateTime'];
+  endTime: Scalars['String'];
+  exercises: Array<Exercise>;
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  notes?: Maybe<Scalars['String']>;
+  startTime: Scalars['String'];
+  updatedAt: Scalars['DateTime'];
+  user: User;
+  userId: Scalars['String'];
+};
+
+export type WorkoutFieldError = {
+  __typename?: 'WorkoutFieldError';
+  field: Scalars['String'];
+  message: Scalars['String'];
+};
+
+export type WorkoutResponse = {
+  __typename?: 'WorkoutResponse';
+  data?: Maybe<Workout>;
+  errors?: Maybe<Array<WorkoutFieldError>>;
+};
+
+export type WorkoutResponseIterable = {
+  __typename?: 'WorkoutResponseIterable';
+  data?: Maybe<Array<Workout>>;
+  errors?: Maybe<Array<WorkoutFieldError>>;
+};
+
 export type CreateUserMutationVariables = Exact<{
   password: Scalars['String'];
   email: Scalars['String'];
@@ -121,6 +234,18 @@ export type CreateUserMutationVariables = Exact<{
 
 
 export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'UserResponse', data?: { __typename?: 'User', username: string, email: string, id: string, profile?: { __typename?: 'Profile', id: string, bio?: string | null, avatar?: string | null } | null } | null, errors?: Array<{ __typename?: 'UserFieldError', field: string, message: string }> | null } };
+
+export type CreateWorkoutMutationVariables = Exact<{
+  exercises: Array<ExercisesInput> | ExercisesInput;
+  endTime: Scalars['String'];
+  startTime: Scalars['String'];
+  name: Scalars['String'];
+  notes?: InputMaybe<Scalars['String']>;
+  bodyweight?: InputMaybe<Scalars['Float']>;
+}>;
+
+
+export type CreateWorkoutMutation = { __typename?: 'Mutation', createWorkout: { __typename?: 'WorkoutResponse', errors?: Array<{ __typename?: 'WorkoutFieldError', field: string, message: string }> | null, data?: { __typename?: 'Workout', id: string, createdAt: any, updatedAt: any, name: string, startTime: string, endTime: string, bodyweight?: number | null, notes?: string | null, userId: string, exercises: Array<{ __typename?: 'Exercise', id: string, createdAt: any, updatedAt: any, name: string, category: string, exerciseType: string, unilateral?: boolean | null, workoutId: number, strengthSets: Array<{ __typename?: 'StrengthSet', id: string, createdAt: any, updatedAt: any, setNumber?: string | null, weight?: string | null, reps?: string | null, notes?: string | null, exerciseId: string }>, cardioSets: Array<{ __typename?: 'CardioSet', id: string, createdAt: any, updatedAt: any, setNumber?: number | null, minutes?: string | null, seconds?: string | null, distance?: string | null, caloriesBurned?: string | null, notes?: string | null, exerciseId: string }> }> } | null } };
 
 export type GoogleOauthHandlerMutationVariables = Exact<{
   code: Scalars['String'];
@@ -135,7 +260,7 @@ export type LoginUserWithEmailAndPasswordMutationVariables = Exact<{
 }>;
 
 
-export type LoginUserWithEmailAndPasswordMutation = { __typename?: 'Mutation', loginUserWithEmailAndPassword: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'UserFieldError', field: string, message: string }> | null, data?: { __typename?: 'User', username: string, email: string, updatedAt: string, createdAt: string, id: string, profile?: { __typename?: 'Profile', avatar?: string | null, bio?: string | null, id: string, avatarId?: string | null } | null } | null } };
+export type LoginUserWithEmailAndPasswordMutation = { __typename?: 'Mutation', loginUserWithEmailAndPassword: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'UserFieldError', field: string, message: string }> | null, data?: { __typename?: 'User', username: string, email: string, updatedAt: any, createdAt: any, id: string, profile?: { __typename?: 'Profile', avatar?: string | null, bio?: string | null, id: string, avatarId?: string | null } | null } | null } };
 
 export type LogoutUserMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -145,7 +270,12 @@ export type LogoutUserMutation = { __typename?: 'Mutation', logoutUser: { __type
 export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetCurrentUserQuery = { __typename?: 'Query', getCurrentUser?: { __typename?: 'UserResponse', data?: { __typename?: 'User', id: string, email: string, username: string, profile?: { __typename?: 'Profile', avatar?: string | null, bio?: string | null, id: string } | null, session?: { __typename?: 'Session', userId: string, valid: boolean, userAgent: string, createdAt: string, updatedAt: any } | null } | null } | null };
+export type GetCurrentUserQuery = { __typename?: 'Query', getCurrentUser?: { __typename?: 'UserResponse', data?: { __typename?: 'User', id: string, email: string, username: string, profile?: { __typename?: 'Profile', avatar?: string | null, bio?: string | null, id: string } | null, session?: { __typename?: 'Session', userId: string, valid: boolean, userAgent: string, createdAt: any, updatedAt: any } | null } | null } | null };
+
+export type GetUsersWorkoutsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetUsersWorkoutsQuery = { __typename?: 'Query', getUsersWorkouts: { __typename?: 'WorkoutResponseIterable', errors?: Array<{ __typename?: 'WorkoutFieldError', field: string, message: string }> | null, data?: Array<{ __typename?: 'Workout', id: string, createdAt: any, updatedAt: any, name: string, startTime: string, endTime: string, bodyweight?: number | null, notes?: string | null, userId: string, exercises: Array<{ __typename?: 'Exercise', id: string, createdAt: any, updatedAt: any, name: string, category: string, exerciseType: string, unilateral?: boolean | null, workoutId: number, strengthSets: Array<{ __typename?: 'StrengthSet', id: string, createdAt: any, updatedAt: any, setNumber?: string | null, weight?: string | null, reps?: string | null, notes?: string | null, exerciseId: string }>, cardioSets: Array<{ __typename?: 'CardioSet', id: string, createdAt: any, updatedAt: any, setNumber?: number | null, minutes?: string | null, seconds?: string | null, distance?: string | null, caloriesBurned?: string | null, notes?: string | null, exerciseId: string }> }> }> | null } };
 
 
 export const CreateUserDocument = /*#__PURE__*/ `
@@ -178,6 +308,76 @@ export const useCreateUserMutation = <
       options
     );
 useCreateUserMutation.fetcher = (variables: CreateUserMutationVariables, options?: RequestInit['headers']) => customFetcher<CreateUserMutation, CreateUserMutationVariables>(CreateUserDocument, variables, options);
+export const CreateWorkoutDocument = /*#__PURE__*/ `
+    mutation CreateWorkout($exercises: [ExercisesInput!]!, $endTime: String!, $startTime: String!, $name: String!, $notes: String, $bodyweight: Float) {
+  createWorkout(
+    exercises: $exercises
+    endTime: $endTime
+    startTime: $startTime
+    name: $name
+    notes: $notes
+    bodyweight: $bodyweight
+  ) {
+    errors {
+      field
+      message
+    }
+    data {
+      id
+      createdAt
+      updatedAt
+      name
+      startTime
+      endTime
+      bodyweight
+      notes
+      userId
+      exercises {
+        id
+        createdAt
+        updatedAt
+        name
+        category
+        exerciseType
+        unilateral
+        workoutId
+        strengthSets {
+          id
+          createdAt
+          updatedAt
+          setNumber
+          weight
+          reps
+          notes
+          exerciseId
+        }
+        cardioSets {
+          id
+          createdAt
+          updatedAt
+          setNumber
+          minutes
+          seconds
+          distance
+          caloriesBurned
+          notes
+          exerciseId
+        }
+      }
+    }
+  }
+}
+    `;
+export const useCreateWorkoutMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateWorkoutMutation, TError, CreateWorkoutMutationVariables, TContext>) =>
+    useMutation<CreateWorkoutMutation, TError, CreateWorkoutMutationVariables, TContext>(
+      ['CreateWorkout'],
+      (variables?: CreateWorkoutMutationVariables) => customFetcher<CreateWorkoutMutation, CreateWorkoutMutationVariables>(CreateWorkoutDocument, variables)(),
+      options
+    );
+useCreateWorkoutMutation.fetcher = (variables: CreateWorkoutMutationVariables, options?: RequestInit['headers']) => customFetcher<CreateWorkoutMutation, CreateWorkoutMutationVariables>(CreateWorkoutDocument, variables, options);
 export const GoogleOauthHandlerDocument = /*#__PURE__*/ `
     mutation googleOauthHandler($code: String!) {
   googleOauthHandler(code: $code) {
@@ -295,3 +495,75 @@ useGetCurrentUserQuery.getKey = (variables?: GetCurrentUserQueryVariables) => va
 ;
 
 useGetCurrentUserQuery.fetcher = (variables?: GetCurrentUserQueryVariables, options?: RequestInit['headers']) => customFetcher<GetCurrentUserQuery, GetCurrentUserQueryVariables>(GetCurrentUserDocument, variables, options);
+export const GetUsersWorkoutsDocument = /*#__PURE__*/ `
+    query GetUsersWorkouts {
+  getUsersWorkouts {
+    errors {
+      field
+      message
+    }
+    data {
+      id
+      createdAt
+      updatedAt
+      name
+      startTime
+      endTime
+      bodyweight
+      notes
+      userId
+      exercises {
+        id
+        createdAt
+        updatedAt
+        name
+        category
+        exerciseType
+        unilateral
+        workoutId
+        strengthSets {
+          id
+          createdAt
+          updatedAt
+          setNumber
+          weight
+          reps
+          notes
+          exerciseId
+        }
+        cardioSets {
+          id
+          createdAt
+          updatedAt
+          setNumber
+          minutes
+          seconds
+          distance
+          caloriesBurned
+          notes
+          exerciseId
+        }
+      }
+    }
+  }
+}
+    `;
+export const useGetUsersWorkoutsQuery = <
+      TData = GetUsersWorkoutsQuery,
+      TError = unknown
+    >(
+      variables?: GetUsersWorkoutsQueryVariables,
+      options?: UseQueryOptions<GetUsersWorkoutsQuery, TError, TData>
+    ) =>
+    useQuery<GetUsersWorkoutsQuery, TError, TData>(
+      variables === undefined ? ['GetUsersWorkouts'] : ['GetUsersWorkouts', variables],
+      customFetcher<GetUsersWorkoutsQuery, GetUsersWorkoutsQueryVariables>(GetUsersWorkoutsDocument, variables),
+      options
+    );
+useGetUsersWorkoutsQuery.document = GetUsersWorkoutsDocument;
+
+
+useGetUsersWorkoutsQuery.getKey = (variables?: GetUsersWorkoutsQueryVariables) => variables === undefined ? ['GetUsersWorkouts'] : ['GetUsersWorkouts', variables];
+;
+
+useGetUsersWorkoutsQuery.fetcher = (variables?: GetUsersWorkoutsQueryVariables, options?: RequestInit['headers']) => customFetcher<GetUsersWorkoutsQuery, GetUsersWorkoutsQueryVariables>(GetUsersWorkoutsDocument, variables, options);

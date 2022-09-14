@@ -11,6 +11,7 @@ import { buildSchema } from "type-graphql";
 import {
   SessionResolver,
   UserResolver,
+  WorkoutResolver,
 } from "./resolvers/index";
 import cors from "cors";
 import deserializeUser from "./middleware/deserializeUser";
@@ -31,7 +32,7 @@ async function main() {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [SessionResolver, UserResolver],
+      resolvers: [SessionResolver, UserResolver, WorkoutResolver],
       // @TODO: For some reason this is running multiple times
       // globalMiddlewares: [deserializeUser],
     }),

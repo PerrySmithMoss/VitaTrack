@@ -1,5 +1,5 @@
 import React from 'react';
-import { useGlobalContext } from '../../context/global.context';
+import { useGlobalContext } from '../../state/context/global.context';
 import { Logo } from '../../components/Svgs/Logo/Logo';
 import { MdTrendingUp, MdOutlineSettings, MdLogout } from 'react-icons/md';
 import { TbMeat } from 'react-icons/tb';

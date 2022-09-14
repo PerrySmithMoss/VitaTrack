@@ -1,10 +1,10 @@
 export interface IWorkout {
   name: string;
-  type: string;
+  // type: string;
   startTime: string;
   endTime: string;
-  bodyWeight: number;
-  notes: string;
+  bodyweight: number | null;
+  notes: string | null;
   exercises: IExercise[];
 }
 
@@ -13,21 +13,25 @@ export interface IExercise {
   category: string;
   exerciseType: string;
   unilateral: boolean;
-  sets: IStrengthSet[] | ICardioSet[];
+  strengthSets: IStrengthSet[];
+  cardioSets: ICardioSet[];
 }
 
 interface IStrengthSet {
   setNumber: number;
-  weight: number;
-  reps: number;
-  notes: string;
+  weight: number | null;
+  reps: number | null;
+  notes: string | null;
+  // exerciseId: number;
+  // exercise: IExercise;
 }
 
 interface ICardioSet {
-  setNumber: number;
-  minutes: number;
-  seconds: number;
-  distance: number;
-  kcal: number;
-  notes: string;
+  minutes: number | null;
+  seconds: number | null;
+  distance: number | null;
+  caloriesBurned: number | null;
+  notes: number | null;
+  // exerciseId: number;
+  // exercise: IExercise;
 }
