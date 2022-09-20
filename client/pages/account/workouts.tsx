@@ -11,7 +11,7 @@ import {
   useGetUsersWorkoutsQuery,
 } from '../../graphql/generated/graphql';
 import { MyWorkouts } from '../../components/Account/Dashboard/MyWokouts/MyWorkouts';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Modal } from '../../components/Modals/Modal';
 import { Drawer } from '../../components/Drawer/Drawer';
 import { AiOutlinePlus } from 'react-icons/ai';
@@ -43,7 +43,7 @@ const WorkoutPage: NextPage<WorkoutPageProps> = () => {
       setIsAddExerciseOpen(false);
       setIsAddWorkoutModalOpen(false);
 
-      toast.success('Workout completed 💪', {
+      toast.success('Workout added 💪', {
         position: 'top-right',
         autoClose: 5000,
         hideProgressBar: false,
@@ -59,8 +59,8 @@ const WorkoutPage: NextPage<WorkoutPageProps> = () => {
     useGlobalContext();
 
   const [isAddExerciseOpen, setIsAddExerciseOpen] = useState(false);
-
   const [isAddWorkoutModalOpen, setIsAddWorkoutModalOpen] = useState(false);
+  
   const [workout, setWorkout] = useState({
     name: '',
     startDate: new Date(),
@@ -88,18 +88,6 @@ const WorkoutPage: NextPage<WorkoutPageProps> = () => {
       exercises: workoutExercises,
     });
   }
-
-  // const showToastSuccess = () => {
-  //     toast.success("User avatar updated successfully", {
-  //       position: "top-right",
-  //       autoClose: 5000,
-  //       hideProgressBar: false,
-  //       closeOnClick: true,
-  //       pauseOnHover: true,
-  //       draggable: true,
-  //       progress: undefined,
-  //     });
-  //   };
 
   function handleAddExercise() {
     setIsAddExerciseOpen(!isAddExerciseOpen);
@@ -259,7 +247,7 @@ const WorkoutPage: NextPage<WorkoutPageProps> = () => {
                         </div>
                       </section>
                       <WorkoutList />
-                      <div className="mx-3">
+                      <div className="mx-3 mt-4">
                         <button
                           onClick={handleAddExercise}
                           className="rounded w-full py-2 bg-gray-100 hover:bg-gray-200  text-gray-800 focus:shadow-outline focus:outline-none"

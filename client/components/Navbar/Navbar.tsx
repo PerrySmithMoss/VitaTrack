@@ -81,9 +81,9 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
                   alt="Avatar"
                 />
               </div>
-              {/* <p className="font-medium ">
-              {data?.getCurrentUser?.data?.username}
-            </p> */}
+              <p className="font-bold pl-1">
+                {data?.getCurrentUser?.data?.username}
+              </p>
             </div>
           </div>
           <button

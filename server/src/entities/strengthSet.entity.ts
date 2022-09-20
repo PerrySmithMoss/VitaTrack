@@ -12,8 +12,8 @@ export class StrengthSet {
   @Field(() => Date)
   updatedAt: Date;
 
-  @Field(() => String, {defaultValue: 1 })
-  setNumber: string;
+  @Field(() => Int, {defaultValue: 1 })
+  setNumber: number;
 
   @Field(() => String, { nullable: true })
   weight: string;
