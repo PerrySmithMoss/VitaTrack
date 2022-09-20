@@ -11,7 +11,7 @@ import {
   useGetUsersWorkoutsQuery,
 } from '../../graphql/generated/graphql';
 import { MyWorkouts } from '../../components/Account/Dashboard/MyWokouts/MyWorkouts';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { Modal } from '../../components/Modals/Modal';
 import { Drawer } from '../../components/Drawer/Drawer';
 import { AiOutlinePlus } from 'react-icons/ai';
@@ -31,8 +31,7 @@ import 'react-toastify/dist/ReactToastify.css';
 interface WorkoutPageProps {}
 
 const WorkoutPage: NextPage<WorkoutPageProps> = () => {
-  const { data: user } =
-    useGetCurrentUserQuery<GetCurrentUserQuery>();
+  const { data: user } = useGetCurrentUserQuery<GetCurrentUserQuery>();
 
   const { refetch: refetchUsersWorkouts } =
     useGetUsersWorkoutsQuery<GetUsersWorkoutsQuery>();
@@ -60,7 +59,7 @@ const WorkoutPage: NextPage<WorkoutPageProps> = () => {
 
   const [isAddExerciseOpen, setIsAddExerciseOpen] = useState(false);
   const [isAddWorkoutModalOpen, setIsAddWorkoutModalOpen] = useState(false);
-  
+
   const [workout, setWorkout] = useState({
     name: '',
     startDate: new Date(),
@@ -81,8 +80,8 @@ const WorkoutPage: NextPage<WorkoutPageProps> = () => {
   async function handleCompleteWorkout() {
     mutate({
       name: workout.name,
-      startTime: moment(workout.startDate).format('MMM do, YYYY H:mm A'),
-      endTime: moment(workout.endDate).format('MMM do, YYYY H:mm A'),
+      startTime: moment(workout.startDate).format(),
+      endTime: moment(workout.endDate).format(),
       bodyweight: workout.bodyWeight,
       notes: workout.notes,
       exercises: workoutExercises,
@@ -105,7 +104,7 @@ const WorkoutPage: NextPage<WorkoutPageProps> = () => {
           <link rel="icon" href="/favicon.ico" />
         </Head>
         <div className="relative min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased bg-white">
-        <ToastContainer
+          <ToastContainer
             position="top-right"
             autoClose={5000}
             hideProgressBar={false}

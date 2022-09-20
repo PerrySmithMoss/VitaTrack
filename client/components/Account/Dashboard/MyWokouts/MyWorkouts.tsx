@@ -4,8 +4,8 @@ import {
   useGetUsersWorkoutsQuery,
   Workout,
 } from '../../../../graphql/generated/graphql';
-import { IWorkout } from '../../../../types/workout';
 import { WorkoutCard } from './WorkoutCard';
+import { WorkoutCardv2 } from './WorkoutCardv2';
 
 interface MyWorkoutsProps {}
 
@@ -21,10 +21,10 @@ export const MyWorkouts: React.FC<MyWorkoutsProps> = ({}) => {
           <h3 className="text-2xl font-bold text-[#2b3042]">My Workouts</h3>
         </div>
       </div>
-      <div className="flex items-center  mt-5 pt-4">
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+      <div className="flex items-center mt-2">
+        <div className="flex flex-row flex-wrap gap-x-6 gap-y-2">
           {data?.getUsersWorkouts?.data?.map((workout) => (
-            <WorkoutCard key={workout.id} workout={workout as Workout} />
+            <WorkoutCardv2 key={workout.id} workout={workout as Workout} />
           ))}
         </div>
       </div>

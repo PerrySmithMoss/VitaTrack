@@ -161,7 +161,14 @@ export class WorkoutResolver {
   ) {
     try {
       if (!ctx.res.locals.user) {
-        return null;
+        return {
+          errors: [
+            {
+              field: "Error while trying to create workout.",
+              message: "You must be logged in to create a workout.",
+            },
+          ],
+        };
       }
 
       const userId = ctx.res.locals.user.id;
@@ -179,9 +186,9 @@ export class WorkoutResolver {
 
       if (workout && exercises.length > 0) {
         await Promise.all(
-          exercises.map(async (exercise) => {
+          exercises.map((exercise) => {
             if (exercise.exerciseType === "Strength") {
-              return await ctx.prisma.exercise.create({
+              return ctx.prisma.exercise.create({
                 data: {
                   name: exercise.name,
                   category: exercise.category,
@@ -200,7 +207,7 @@ export class WorkoutResolver {
                 },
               });
             } else if (exercise.exerciseType === "Cardio") {
-              return await ctx.prisma.exercise.create({
+              return ctx.prisma.exercise.create({
                 data: {
                   name: exercise.name,
                   category: exercise.category,
@@ -240,7 +247,7 @@ export class WorkoutResolver {
         return {
           errors: [
             {
-              field: "Error while trying to create workout.",
+              field: "Error while trying to fetch workout.",
               message: "Could not find the specified workout.",
             },
           ],
