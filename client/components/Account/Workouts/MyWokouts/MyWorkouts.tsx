@@ -18,7 +18,7 @@ export const MyWorkouts: React.FC<MyWorkoutsProps> = ({}) => {
     <div>
       <div className="flex justify-between items-center">
         <div>
-          <h3 className="text-2xl font-bold text-[#2b3042]">My Workouts</h3>
+          <h2 className="text-3xl font-bold text-[#2b3042]">My Workouts</h2>
         </div>
       </div>
       <div className="flex items-center mt-2">

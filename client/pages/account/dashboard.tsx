@@ -12,7 +12,7 @@ import { TodaysWorkout } from '../../components/Account/Dashboard/TodaysWorkout/
 import { TrendCard } from '../../components/Account/Dashboard/TrendCard/TrendCard';
 import { Recipes } from '../../components/Account/Dashboard/Recipes/Recipes';
 import { CaloriesGraph } from '../../components/Account/Dashboard/CaloriesGraph/CaloriesGraph';
-import { MyWorkouts } from '../../components/Account/Dashboard/MyWokouts/MyWorkouts';
+import { MyWorkouts } from '../../components/Account/Workouts/MyWokouts/MyWorkouts';
 
 interface DashboardPageProps {}
 

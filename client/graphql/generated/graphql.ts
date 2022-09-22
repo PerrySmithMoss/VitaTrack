@@ -63,6 +63,44 @@ export type ExercisesInput = {
   unilateral?: InputMaybe<Scalars['Boolean']>;
 };
 
+export type Goals = {
+  __typename?: 'Goals';
+  calories?: Maybe<Scalars['Int']>;
+  carbohydrate?: Maybe<Scalars['Int']>;
+  createdAt: Scalars['DateTime'];
+  currentWeight?: Maybe<Scalars['Float']>;
+  fat?: Maybe<Scalars['Int']>;
+  goalWeight?: Maybe<Scalars['Float']>;
+  id: Scalars['ID'];
+  protein?: Maybe<Scalars['Int']>;
+  startingWeight?: Maybe<Scalars['Float']>;
+  updatedAt: Scalars['DateTime'];
+  user: User;
+  userId: Scalars['ID'];
+};
+
+export type GoalsFieldError = {
+  __typename?: 'GoalsFieldError';
+  field: Scalars['String'];
+  message: Scalars['String'];
+};
+
+export type GoalsInput = {
+  calories?: InputMaybe<Scalars['Int']>;
+  carbohydrate?: InputMaybe<Scalars['Int']>;
+  currentWeight?: InputMaybe<Scalars['Float']>;
+  fat?: InputMaybe<Scalars['Int']>;
+  goalWeight?: InputMaybe<Scalars['Float']>;
+  protein?: InputMaybe<Scalars['Int']>;
+  startingWeight?: InputMaybe<Scalars['Float']>;
+};
+
+export type GoalsResponse = {
+  __typename?: 'GoalsResponse';
+  data?: Maybe<Goals>;
+  errors?: Maybe<Array<GoalsFieldError>>;
+};
+
 export type LogoutUserResponse = {
   __typename?: 'LogoutUserResponse';
   message: Scalars['String'];
@@ -76,6 +114,7 @@ export type Mutation = {
   googleOauthHandler: SessionResponse;
   loginUserWithEmailAndPassword: UserResponse;
   logoutUser: LogoutUserResponse;
+  upsertUserGoals: GoalsResponse;
 };
 
 
@@ -106,6 +145,11 @@ export type MutationLoginUserWithEmailAndPasswordArgs = {
   password: Scalars['String'];
 };
 
+
+export type MutationUpsertUserGoalsArgs = {
+  goalsInput: GoalsInput;
+};
+
 export type Profile = {
   __typename?: 'Profile';
   avatar?: Maybe<Scalars['String']>;
@@ -119,6 +163,7 @@ export type Profile = {
 export type Query = {
   __typename?: 'Query';
   getCurrentUser?: Maybe<UserResponse>;
+  getCurrentUsersGoals: GoalsResponse;
   getUsersWorkouts: WorkoutResponseIterable;
 };
 
@@ -267,10 +312,22 @@ export type LogoutUserMutationVariables = Exact<{ [key: string]: never; }>;
 
 export type LogoutUserMutation = { __typename?: 'Mutation', logoutUser: { __typename?: 'LogoutUserResponse', message: string, success: boolean } };
 
+export type UpsertUserGoalsMutationVariables = Exact<{
+  goalsInput: GoalsInput;
+}>;
+
+
+export type UpsertUserGoalsMutation = { __typename?: 'Mutation', upsertUserGoals: { __typename?: 'GoalsResponse', errors?: Array<{ __typename?: 'GoalsFieldError', field: string, message: string }> | null, data?: { __typename?: 'Goals', id: string, createdAt: any, updatedAt: any, startingWeight?: number | null, currentWeight?: number | null, goalWeight?: number | null, calories?: number | null, protein?: number | null, fat?: number | null, carbohydrate?: number | null, userId: string } | null } };
+
 export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetCurrentUserQuery = { __typename?: 'Query', getCurrentUser?: { __typename?: 'UserResponse', data?: { __typename?: 'User', id: string, email: string, username: string, profile?: { __typename?: 'Profile', avatar?: string | null, bio?: string | null, id: string } | null, session?: { __typename?: 'Session', userId: string, valid: boolean, userAgent: string, createdAt: any, updatedAt: any } | null } | null } | null };
+
+export type GetCurrentUsersGoalsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetCurrentUsersGoalsQuery = { __typename?: 'Query', getCurrentUsersGoals: { __typename?: 'GoalsResponse', errors?: Array<{ __typename?: 'GoalsFieldError', field: string, message: string }> | null, data?: { __typename?: 'Goals', id: string, createdAt: any, updatedAt: any, startingWeight?: number | null, currentWeight?: number | null, goalWeight?: number | null, calories?: number | null, protein?: number | null, fat?: number | null, carbohydrate?: number | null } | null } };
 
 export type GetUsersWorkoutsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -453,6 +510,39 @@ export const useLogoutUserMutation = <
       options
     );
 useLogoutUserMutation.fetcher = (variables?: LogoutUserMutationVariables, options?: RequestInit['headers']) => customFetcher<LogoutUserMutation, LogoutUserMutationVariables>(LogoutUserDocument, variables, options);
+export const UpsertUserGoalsDocument = /*#__PURE__*/ `
+    mutation UpsertUserGoals($goalsInput: GoalsInput!) {
+  upsertUserGoals(goalsInput: $goalsInput) {
+    errors {
+      field
+      message
+    }
+    data {
+      id
+      createdAt
+      updatedAt
+      startingWeight
+      currentWeight
+      goalWeight
+      calories
+      protein
+      fat
+      carbohydrate
+      userId
+    }
+  }
+}
+    `;
+export const useUpsertUserGoalsMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpsertUserGoalsMutation, TError, UpsertUserGoalsMutationVariables, TContext>) =>
+    useMutation<UpsertUserGoalsMutation, TError, UpsertUserGoalsMutationVariables, TContext>(
+      ['UpsertUserGoals'],
+      (variables?: UpsertUserGoalsMutationVariables) => customFetcher<UpsertUserGoalsMutation, UpsertUserGoalsMutationVariables>(UpsertUserGoalsDocument, variables)(),
+      options
+    );
+useUpsertUserGoalsMutation.fetcher = (variables: UpsertUserGoalsMutationVariables, options?: RequestInit['headers']) => customFetcher<UpsertUserGoalsMutation, UpsertUserGoalsMutationVariables>(UpsertUserGoalsDocument, variables, options);
 export const GetCurrentUserDocument = /*#__PURE__*/ `
     query GetCurrentUser {
   getCurrentUser {
@@ -495,6 +585,47 @@ useGetCurrentUserQuery.getKey = (variables?: GetCurrentUserQueryVariables) => va
 ;
 
 useGetCurrentUserQuery.fetcher = (variables?: GetCurrentUserQueryVariables, options?: RequestInit['headers']) => customFetcher<GetCurrentUserQuery, GetCurrentUserQueryVariables>(GetCurrentUserDocument, variables, options);
+export const GetCurrentUsersGoalsDocument = /*#__PURE__*/ `
+    query GetCurrentUsersGoals {
+  getCurrentUsersGoals {
+    errors {
+      field
+      message
+    }
+    data {
+      id
+      createdAt
+      updatedAt
+      startingWeight
+      currentWeight
+      goalWeight
+      calories
+      protein
+      fat
+      carbohydrate
+    }
+  }
+}
+    `;
+export const useGetCurrentUsersGoalsQuery = <
+      TData = GetCurrentUsersGoalsQuery,
+      TError = unknown
+    >(
+      variables?: GetCurrentUsersGoalsQueryVariables,
+      options?: UseQueryOptions<GetCurrentUsersGoalsQuery, TError, TData>
+    ) =>
+    useQuery<GetCurrentUsersGoalsQuery, TError, TData>(
+      variables === undefined ? ['GetCurrentUsersGoals'] : ['GetCurrentUsersGoals', variables],
+      customFetcher<GetCurrentUsersGoalsQuery, GetCurrentUsersGoalsQueryVariables>(GetCurrentUsersGoalsDocument, variables),
+      options
+    );
+useGetCurrentUsersGoalsQuery.document = GetCurrentUsersGoalsDocument;
+
+
+useGetCurrentUsersGoalsQuery.getKey = (variables?: GetCurrentUsersGoalsQueryVariables) => variables === undefined ? ['GetCurrentUsersGoals'] : ['GetCurrentUsersGoals', variables];
+;
+
+useGetCurrentUsersGoalsQuery.fetcher = (variables?: GetCurrentUsersGoalsQueryVariables, options?: RequestInit['headers']) => customFetcher<GetCurrentUsersGoalsQuery, GetCurrentUsersGoalsQueryVariables>(GetCurrentUsersGoalsDocument, variables, options);
 export const GetUsersWorkoutsDocument = /*#__PURE__*/ `
     query GetUsersWorkouts {
   getUsersWorkouts {

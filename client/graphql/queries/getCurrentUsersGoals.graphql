@@ -1,0 +1,20 @@
+query GetCurrentUsersGoals {
+  getCurrentUsersGoals {
+    errors {
+      field
+      message
+    }
+    data {
+      id
+      createdAt
+      updatedAt
+      startingWeight
+      currentWeight
+      goalWeight
+      calories
+      protein
+      fat
+      carbohydrate
+    }
+  }
+}

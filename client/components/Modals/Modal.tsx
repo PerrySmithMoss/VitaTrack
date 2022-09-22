@@ -37,7 +37,7 @@ export const Modal: React.FC<ModalProps> = ({
           />
           <div
             onClick={(e) => e.stopPropagation()}
-            className="fixed top-2/4 left-2/4 container mx-auto w-11/12 md:w-2/3 max-w-lg z-40"
+            className="fixed top-2/4 left-2/4 container mx-auto w-11/12 md:w-2/3 max-w-md z-40"
             style={{
               transform: 'translate(-50%, -50%)',
               backgroundColor: '#FFF',

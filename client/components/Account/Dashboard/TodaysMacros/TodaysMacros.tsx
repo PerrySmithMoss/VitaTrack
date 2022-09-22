@@ -8,15 +8,14 @@ import {
   Label,
   Legend,
 } from 'recharts';
+import { useGetCurrentUsersGoalsQuery } from '../../../../graphql/generated/graphql';
+import {
+  calculateGramsFromMacronutrient,
+  calculatePercentage,
+} from '../../../../utils/macroCalculations';
 import styles from './TodaysMacros.module.css';
 
 interface TodaysMacrosProps {}
-
-const data01 = [
-  { name: 'Carb', value: 300 },
-  { name: 'Fat', value: 56 },
-  { name: 'Protein', value: 220 },
-];
 
 const COLORS = ['#22d1ee', '#775ada', '#facf5a'];
 
@@ -97,6 +96,65 @@ const CustomLabel = ({
 };
 
 export const TodaysMacros: React.FC<TodaysMacrosProps> = ({}) => {
+  const { data } = useGetCurrentUsersGoalsQuery();
+
+  const data01 = [
+    {
+      name: 'Carb',
+      value: Math.round(
+        calculateGramsFromMacronutrient(
+          calculatePercentage(
+            data?.getCurrentUsersGoals.data?.carbohydrate === null ||
+              data?.getCurrentUsersGoals.data?.carbohydrate === undefined
+              ? 0
+              : data?.getCurrentUsersGoals.data?.carbohydrate,
+            data?.getCurrentUsersGoals.data?.calories === null ||
+              data?.getCurrentUsersGoals.data?.calories === undefined
+              ? 0
+              : data?.getCurrentUsersGoals.data?.calories
+          ),
+          'protein'
+        )
+      ),
+    },
+    {
+      name: 'Fat',
+      value: Math.round(
+        calculateGramsFromMacronutrient(
+          calculatePercentage(
+            data?.getCurrentUsersGoals.data?.fat === null ||
+              data?.getCurrentUsersGoals.data?.fat === undefined
+              ? 0
+              : data?.getCurrentUsersGoals.data?.fat,
+            data?.getCurrentUsersGoals.data?.calories === null ||
+              data?.getCurrentUsersGoals.data?.calories === undefined
+              ? 0
+              : data?.getCurrentUsersGoals.data?.calories
+          ),
+          'fat'
+        )
+      ),
+    },
+    {
+      name: 'Protein',
+      value: Math.round(
+        calculateGramsFromMacronutrient(
+          calculatePercentage(
+            data?.getCurrentUsersGoals.data?.protein === null ||
+              data?.getCurrentUsersGoals.data?.protein === undefined
+              ? 0
+              : data?.getCurrentUsersGoals.data?.protein,
+            data?.getCurrentUsersGoals.data?.calories === null ||
+              data?.getCurrentUsersGoals.data?.calories === undefined
+              ? 0
+              : data?.getCurrentUsersGoals.data?.calories
+          ),
+          'protein'
+        )
+      ),
+    },
+  ];
+
   return (
     <section className="mt-2  cursor-pointer">
       <h2 className="text-2xl text-[#2b3042] font-bold cursor-pointer">
@@ -125,7 +183,9 @@ export const TodaysMacros: React.FC<TodaysMacrosProps> = ({}) => {
               <Label
                 content={
                   <CustomLabel
-                    labelText="2,550"
+                    labelText={`${
+                      data?.getCurrentUsersGoals.data?.calories as number
+                    }`}
                     value={'Remaining'}
                     viewBox={undefined}
                   />

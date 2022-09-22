@@ -10,7 +10,7 @@ import {
   useGetCurrentUserQuery,
   useGetUsersWorkoutsQuery,
 } from '../../graphql/generated/graphql';
-import { MyWorkouts } from '../../components/Account/Dashboard/MyWokouts/MyWorkouts';
+import { MyWorkouts } from '../../components/Account/Workouts/MyWokouts/MyWorkouts';
 import { useState } from 'react';
 import { Modal } from '../../components/Modals/Modal';
 import { Drawer } from '../../components/Drawer/Drawer';

@@ -1,20 +1,22 @@
 import { dehydrate, QueryClient } from '@tanstack/react-query';
 import type { GetServerSideProps, NextPage } from 'next';
 import Head from 'next/head';
+import { useState } from 'react';
+import { Calories } from '../../components/Account/Nutrition/Calories';
+import { Modal } from '../../components/Modals/Modal';
 import { Navbar } from '../../components/Navbar/Navbar';
 import { SidebarNav } from '../../components/SidebarNav/SidebarNav';
 import {
   GetCurrentUserQuery,
   useGetCurrentUserQuery,
 } from '../../graphql/generated/graphql';
-import { MySchedule } from '../../components/Account/Dashboard/MySchedule/MySchedule';
 
 interface NutritionPageProps {}
 
 const NutritionPage: NextPage<NutritionPageProps> = () => {
-  const { data, refetch: refetchCurrentUser } =
-    useGetCurrentUserQuery<GetCurrentUserQuery>();
-  
+  const { data } = useGetCurrentUserQuery<GetCurrentUserQuery>();
+
+
   if (data?.getCurrentUser?.data?.id) {
     return (
       <>
@@ -32,9 +34,9 @@ const NutritionPage: NextPage<NutritionPageProps> = () => {
             <main className="w-full">
               <Navbar />
               <div className="p-8">
-                <section className="">
-                Nutrition
-                </section>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <Calories />
+                </div>
               </div>
             </main>
           </div>

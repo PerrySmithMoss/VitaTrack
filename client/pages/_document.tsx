@@ -22,6 +22,7 @@ class Document extends NextDocument<Props> {
         <body>
           <Main />
           <div id="addWorkoutModal" />
+          <div id="editMacrosModal" />
           <NextScript />
         </body>
       </Html>

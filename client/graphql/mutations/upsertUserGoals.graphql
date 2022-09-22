@@ -1,0 +1,21 @@
+mutation UpsertUserGoals($goalsInput: GoalsInput!) {
+  upsertUserGoals(goalsInput: $goalsInput) {
+    errors {
+      field
+      message
+    }
+    data {
+      id
+      createdAt
+      updatedAt
+      startingWeight
+      currentWeight
+      goalWeight
+      calories
+      protein
+      fat
+      carbohydrate
+      userId
+    }
+  }
+}

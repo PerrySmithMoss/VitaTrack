@@ -16,6 +16,7 @@ import {
 import cors from "cors";
 import deserializeUser from "./middleware/deserializeUser";
 import cookieParser from "cookie-parser";
+import { GoalsResolver } from "./resolvers/goals.resolver";
 
 const app: Application = express();
 const httpServer = createServer(app);
@@ -32,7 +33,7 @@ async function main() {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [SessionResolver, UserResolver, WorkoutResolver],
+      resolvers: [SessionResolver, UserResolver, WorkoutResolver, GoalsResolver],
       // @TODO: For some reason this is running multiple times
       // globalMiddlewares: [deserializeUser],
     }),
