@@ -100,8 +100,8 @@ const CustomLabel = ({
 };
 
 export const Calories: React.FC<CaloriesProps> = ({}) => {
-  const { data } = useGetCurrentUsersGoalsQuery();
-  const { mutate } = useUpsertUserGoalsMutation();
+  const { data, refetch } = useGetCurrentUsersGoalsQuery();
+  const { mutate } = useUpsertUserGoalsMutation({ onSuccess: () => refetch() });
 
   const [isEditMacrosOpen, setIsEditMacrosModalOpen] = useState(false);
   const [caloriesInput, setCaloriesInput] = useState(
@@ -126,13 +126,49 @@ export const Calories: React.FC<CaloriesProps> = ({}) => {
   );
 
   const handleCompleteEditingMacros = () => {
-    mutate({goalsInput: {
-      calories: caloriesInput,
-      protein: proteinInput,
-      carbohydrate: carbohydrateInput,
-      fat: fatInput
-    }})
+    mutate({
+      goalsInput: {
+        calories: caloriesInput,
+        protein: proteinInput,
+        carbohydrate: carbohydrateInput,
+        fat: fatInput,
+      },
+    });
+
+    setIsEditMacrosModalOpen(false);
   };
+
+  useEffect(() => {
+    setCaloriesInput(
+      data?.getCurrentUsersGoals.data?.calories == null
+        ? 0
+        : data?.getCurrentUsersGoals.data?.calories
+    );
+  }, [data?.getCurrentUsersGoals.data?.calories]);
+
+  useEffect(() => {
+    setProteinInput(
+      data?.getCurrentUsersGoals.data?.protein == null
+        ? 0
+        : data?.getCurrentUsersGoals.data?.protein
+    );
+  }, [data?.getCurrentUsersGoals.data?.protein]);
+
+  useEffect(() => {
+    setCarbohydrateInput(
+      data?.getCurrentUsersGoals.data?.carbohydrate == null
+        ? 0
+        : data?.getCurrentUsersGoals.data?.carbohydrate
+    );
+  }, [data?.getCurrentUsersGoals.data?.carbohydrate]);
+
+  useEffect(() => {
+    setFatInput(
+      data?.getCurrentUsersGoals.data?.fat == null
+        ? 0
+        : data?.getCurrentUsersGoals.data?.fat
+    );
+  }, [data?.getCurrentUsersGoals.data?.fat]);
 
   const data01 = [
     {
@@ -190,7 +226,6 @@ export const Calories: React.FC<CaloriesProps> = ({}) => {
       ),
     },
   ];
-
 
   return (
     <section className="mt-2">
