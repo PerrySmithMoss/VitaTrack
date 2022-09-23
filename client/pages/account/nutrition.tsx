@@ -1,9 +1,8 @@
 import { dehydrate, QueryClient } from '@tanstack/react-query';
 import type { GetServerSideProps, NextPage } from 'next';
 import Head from 'next/head';
-import { useState } from 'react';
 import { Calories } from '../../components/Account/Nutrition/Calories';
-import { Modal } from '../../components/Modals/Modal';
+import { Macros } from '../../components/Account/Nutrition/Macros';
 import { Navbar } from '../../components/Navbar/Navbar';
 import { SidebarNav } from '../../components/SidebarNav/SidebarNav';
 import {
@@ -15,7 +14,6 @@ interface NutritionPageProps {}
 
 const NutritionPage: NextPage<NutritionPageProps> = () => {
   const { data } = useGetCurrentUserQuery<GetCurrentUserQuery>();
-
 
   if (data?.getCurrentUser?.data?.id) {
     return (
@@ -36,6 +34,7 @@ const NutritionPage: NextPage<NutritionPageProps> = () => {
               <div className="p-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   <Calories />
+                  <Macros />
                 </div>
               </div>
             </main>

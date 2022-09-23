@@ -1,0 +1,18 @@
+query GetCurrentUsersNutrition {
+  getCurrentUsersNutrition {
+    errors {
+      field
+      message
+    }
+    data {
+      id
+      createdAt
+      updatedAt
+      calories
+      protein
+      fat
+      carbohydrate
+      userId
+    }
+  }
+}

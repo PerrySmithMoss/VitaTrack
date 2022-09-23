@@ -21,14 +21,15 @@ model Profile {
 }
 
 model User {
-  id        String    @id @default(cuid())
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  email     String    @unique
+  id        String      @id @default(cuid())
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  email     String      @unique
   password  String?
   username  String
   profile   Profile?
   goals     Goals?
+  nutrition Nutrition[]
   session   Session?
   workouts  Workout[]
 }
@@ -55,6 +56,19 @@ model Goals {
   carbohydrate   Int?
   userId         String   @unique
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Nutrition {
+  id           Int      @id @default(autoincrement())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  date         DateTime @unique
+  calories     Int?
+  protein      Int?
+  fat          Int?
+  carbohydrate Int?
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Workout {

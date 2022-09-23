@@ -92,7 +92,7 @@ export class GoalsResolver {
       return {
         errors: [
           {
-            field: "Error while trying to log user out.",
+            field: "Error while trying to fetch user's goals.",
             message: err,
           },
         ],
