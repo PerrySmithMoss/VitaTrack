@@ -69,6 +69,20 @@ model Nutrition {
   carbohydrate Int?
   userId       String
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  foods        Food[]
+}
+
+model Food {
+  id           Int       @id @default(autoincrement())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  calories     Int?
+  protein      Int?
+  fat          Int?
+  carbohydrate Int?
+  sugar        Int?
+  nutrition    Nutrition @relation(fields: [nutritionId], references: [id], onDelete: Cascade)
+  nutritionId  Int
 }
 
 model Workout {

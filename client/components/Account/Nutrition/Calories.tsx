@@ -1,21 +1,11 @@
 import React from 'react';
-import styles from './Nutrition.module.css';
 import {
   PieChart,
   Pie,
   Cell,
-  Sector,
   ResponsiveContainer,
   Label,
-  Legend,
-  RadialBarChart,
-  PolarAngleAxis,
-  RadialBar,
 } from 'recharts';
-import {
-  calculateGramsFromMacronutrient,
-  calculatePercentage,
-} from '../../../utils/macroCalculations';
 import {
   useGetCurrentUsersGoalsQuery,
   useGetCurrentUsersNutritionByDateQuery,

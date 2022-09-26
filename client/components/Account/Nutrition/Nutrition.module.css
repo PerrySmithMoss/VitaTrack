@@ -1,35 +1,270 @@
 .legendList {
-    display: flex;
-    flex-direction: column;
-    margin-left: 15px;
-    list-style: none; /* Remove default bullets */
-  }
-  
-  .legendList li {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-  }
-  
-  .bulletLabel {
-    margin-top: 10px;
-    display: flex;
-    align-items: center;
-  }
-  
-  .cirecleBullet {
-    border-radius: 50%;
-  }
-  
-  .bulletLabelText {
-    margin-left: 10px;
-    color: #7e7e89;
-  }
-  
-  .centeredLabelValue {
-    font-size: 36px;
-    font-weight: 600;
-    fill: #0088fe;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  margin-left: 15px;
+  list-style: none; /* Remove default bullets */
+}
+
+.legendList li {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.bulletLabel {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.cirecleBullet {
+  border-radius: 50%;
+}
+
+.bulletLabelText {
+  margin-left: 10px;
+  color: #7e7e89;
+}
+
+.centeredLabelValue {
+  font-size: 36px;
+  font-weight: 600;
+  fill: #0088fe;
+}
+
+/* Food diary */
+.foodDiaryTable {
+  margin-top: 20px;
+  width: 100%;
+}
+
+.foodDiaryTable tbody tr td {
+  color: #222;
+  line-height: 1.5em;
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-size: 100%;
+  font-style: inherit;
+  font-weight: inherit;
+  margin: 0;
+  outline: 0;
+  border-bottom: 1px solid #e6e6e6;
+  border-right: 1px solid #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  margin-top: 2px;
+  vertical-align: middle;
+  background: #f6f6f6;
+  text-align: center;
+  font-size: 0.8rem /* 14px */;
+  padding: 8px 10px;
+}
+
+.mealHeading {
+  background: none !important;
+  border: none !important;
+  color: #00548f !important;
+  font-size: 1.25rem !important;
+  line-height: 1.75rem !important;
+  border-collapse: collapse !important;
+  border-spacing: 0 !important;
+  font-style: inherit !important;
+  margin: 0 !important;
+  outline: 0 !important;
+  margin-top: 2px !important;
+  vertical-align: middle !important;
+  max-width: 350px !important;
+  white-space: normal !important;
+  background: none !important;
+  font-weight: bold !important;
+  text-transform: capitalize !important;
+  text-align: left !important;
+  padding: 15px 0 10px 0 !important;
+}
+
+.macrosHeading {
+  background: #00548f !important;
+  color: white !important;
+  font-size: 0.875rem /* 14px */ !important;
+  line-height: 1.25rem /* 20px */ !important;
+  padding: 5px 10px 5px 10px !important;
+  text-align: center !important;
+  text-transform: capitalize !important;
+}
+
+.nutritionColumn {
+  font-weight: bold !important;
+  line-height: 14px !important;
+}
+
+.nutritionColumn > .tableCellSubtitle {
+  text-transform: lowercase !important;
+  opacity: 0.7 !important;
+  min-width: 25px !important;
+}
+
+.foodName {
+  text-align: left !important;
+  font-size: 14px !important;
+  max-width: 350px !important;
+  white-space: normal !important;
+  background: #f6f6f6 !important;
+  padding: 4px 10px !important;
+}
+
+.macroValue {
+  background: #f6f6f6 !important;
+  padding: 4px 10px !important;
+  text-align: center !important;
+}
+
+.addFood {
+  line-height: 1.5em;
+  border-collapse: collapse;
+  border-spacing: 0;
+  text-align: left;
+  white-space: normal;
+  font-family: inherit;
+  font-style: inherit;
+  font-weight: bold;
+  margin: 0;
+  outline: 0;
+  padding: 0;
+  vertical-align: baseline;
+  cursor: pointer;
+  text-decoration: none;
+  padding-right: 9px;
+  border-right: solid 1px #0f73ab;
+  margin-right: 7px;
+  font-size: 13px;
+  color: #0072bf;
+}
+
+.quickTools {
+  line-height: 1.5em;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: #0f73ab;
+  text-align: left;
+  white-space: normal;
+  font-family: inherit;
+  font-size: 100%;
+  font-style: inherit;
+  font-weight: bold;
+  margin: 0;
+  outline: 0;
+  padding: 0;
+  vertical-align: baseline;
+  display: inline;
+  position: relative;
+  zoom: 1;
+  font-size: 13px;
+  z-index: 1;
+}
+
+.bottom .foodName {
+  font-weight: bold;
+  text-align: left !important;
+  font-size: 14px !important;
+  max-width: 350px !important;
+  white-space: normal !important;
+  background: none !important;
+  padding: 4px 10px !important;
+}
+.bottom td {
+  background: none !important;
+  color: #0f73ab !important;
+  font-weight: bold !important;
+}
+
+.spacer {
+  padding: 4px 10px;
+  background-color: #fff;
+  border-bottom: none;
+  line-height: 8px;
+  height: 8px;
+}
+.spacer .space {
+  color: #222;
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-size: 100%;
+  font-style: inherit;
+  font-weight: inherit;
+  margin: 0;
+  outline: 0;
+  border-right: 1px solid #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  margin-top: 2px;
+  vertical-align: middle;
+  background: #f6f6f6;
+  padding: 4px 10px;
+  background-color: #fff;
+  border-bottom: none;
+  line-height: 8px;
+  height: 8px;
+  text-align: left;
+  max-width: 350px;
+  white-space: normal;
+}
+.spacer .emptyCell {
+  color: #222;
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-size: 100%;
+  font-style: inherit;
+  font-weight: inherit;
+  margin: 0;
+  outline: 0;
+  border-right: 1px solid #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  margin-top: 2px;
+  vertical-align: middle;
+  background: #f6f6f6;
+  text-align: center;
+  padding: 4px 10px;
+  background-color: #fff;
+  border-bottom: none;
+  line-height: 8px;
+  height: 8px;
+}
+
+.totals .totalsFirstCell {
+  background: none;
+  text-align: right;
+  font-weight: bold;
+  font-size: 15px;
+  border-bottom: 0px solid black;
+}
+.totals td {
+  font-weight: bold !important;
+  font-size: 14px !important;
+}
+.totals .emptyCell {
+  color: #222;
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-size: 100%;
+  font-style: inherit;
+  font-weight: inherit;
+  margin: 0;
+  outline: 0;
+  border-right: 1px solid #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  margin-top: 2px;
+  vertical-align: middle;
+  background: #f6f6f6;
+  text-align: center;
+  padding: 4px 10px;
+  background-color: #fff;
+  border-bottom: none;
+  line-height: 8px;
+  height: 8px;
+}
+
+.possitive {
+  color: #197910 !important;
+}
+.negative {
+  color: #ff0000 !important;
+}

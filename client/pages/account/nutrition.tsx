@@ -2,6 +2,7 @@ import { dehydrate, QueryClient } from '@tanstack/react-query';
 import type { GetServerSideProps, NextPage } from 'next';
 import Head from 'next/head';
 import { Calories } from '../../components/Account/Nutrition/Calories';
+import { FoodDiary } from '../../components/Account/Nutrition/FoodDiary';
 import { Macros } from '../../components/Account/Nutrition/Macros';
 import { Navbar } from '../../components/Navbar/Navbar';
 import { SidebarNav } from '../../components/SidebarNav/SidebarNav';
@@ -36,6 +37,7 @@ const NutritionPage: NextPage<NutritionPageProps> = () => {
                   <Calories />
                   <Macros />
                 </div>
+                <FoodDiary />
               </div>
             </main>
           </div>
