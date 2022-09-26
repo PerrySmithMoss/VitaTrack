@@ -1,4 +1,5 @@
 import { Field, ID, Int, ObjectType } from "type-graphql";
+import { Food } from "./food.entity";
 import { User } from "./user.entity";
 
 @ObjectType()
@@ -32,4 +33,7 @@ export class Nutrition {
 
   @Field(() => User)
   user: User;
+
+  @Field(() => [Food])
+  foods: Food[];
 }

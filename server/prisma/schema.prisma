@@ -30,6 +30,7 @@ model User {
   profile   Profile?
   goals     Goals?
   nutrition Nutrition[]
+  foods     Food[]
   session   Session?
   workouts  Workout[]
 }
@@ -76,11 +77,16 @@ model Food {
   id           Int       @id @default(autoincrement())
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+  name         String
+  mealName     String
+  quantity     Float
   calories     Int?
-  protein      Int?
-  fat          Int?
-  carbohydrate Int?
-  sugar        Int?
+  protein      Float?
+  fat          Float?
+  carbohydrate Float?
+  sugar        Float?
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   nutrition    Nutrition @relation(fields: [nutritionId], references: [id], onDelete: Cascade)
   nutritionId  Int
 }

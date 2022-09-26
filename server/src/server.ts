@@ -18,6 +18,7 @@ import deserializeUser from "./middleware/deserializeUser";
 import cookieParser from "cookie-parser";
 import { GoalsResolver } from "./resolvers/goals.resolver";
 import { NutritionResolver } from "./resolvers/nutrition.resolver";
+import { FoodResolver } from "./resolvers/food.resolver";
 
 const app: Application = express();
 const httpServer = createServer(app);
@@ -40,6 +41,7 @@ async function main() {
         WorkoutResolver,
         GoalsResolver,
         NutritionResolver,
+        FoodResolver,
       ],
       // @TODO: For some reason this is running multiple times
       // globalMiddlewares: [deserializeUser],
