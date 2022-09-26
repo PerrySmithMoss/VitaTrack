@@ -1903,7 +1903,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "NutritionResponseIterable",
+                "name": "NutritionResponse",
                 "ofType": null
               }
             },

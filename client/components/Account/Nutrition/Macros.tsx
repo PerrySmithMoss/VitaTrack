@@ -10,6 +10,7 @@ import {
 } from 'recharts';
 import {
   useGetCurrentUsersGoalsQuery,
+  useGetCurrentUsersNutritionByDateQuery,
   useUpsertUserGoalsMutation,
 } from '../../../graphql/generated/graphql';
 import {
@@ -79,7 +80,7 @@ const CustomLabel = ({
         dominantBaseline="central"
         alignmentBaseline="middle"
         //   fill="#0088FE"
-        fontSize="26"
+        fontSize="36"
         fontWeight="600"
       >
         {labelText}
@@ -99,30 +100,32 @@ const CustomLabel = ({
   );
 };
 
+const todaysDate = new Date().toISOString();
+
 export const Macros: React.FC<MacrosProps> = ({}) => {
-  const { data, refetch } = useGetCurrentUsersGoalsQuery();
-  const { mutate } = useUpsertUserGoalsMutation({ onSuccess: () => refetch() });
+  const { data: usersGoals, refetch: refetchUsersGoals } = useGetCurrentUsersGoalsQuery();
+  const { mutate } = useUpsertUserGoalsMutation({ onSuccess: () => refetchUsersGoals() });
 
   const [isEditMacrosOpen, setIsEditMacrosModalOpen] = useState(false);
   const [caloriesInput, setCaloriesInput] = useState(
-    data?.getCurrentUsersGoals.data?.calories == null
+    usersGoals?.getCurrentUsersGoals.data?.calories == null
       ? 0
-      : data?.getCurrentUsersGoals.data?.calories
+      : usersGoals?.getCurrentUsersGoals.data?.calories
   );
   const [proteinInput, setProteinInput] = useState(
-    data?.getCurrentUsersGoals.data?.protein == null
+    usersGoals?.getCurrentUsersGoals.data?.protein == null
       ? 0
-      : data?.getCurrentUsersGoals.data?.protein
+      : usersGoals?.getCurrentUsersGoals.data?.protein
   );
   const [carbohydrateInput, setCarbohydrateInput] = useState(
-    data?.getCurrentUsersGoals.data?.carbohydrate == null
+    usersGoals?.getCurrentUsersGoals.data?.carbohydrate == null
       ? 0
-      : data?.getCurrentUsersGoals.data?.carbohydrate
+      : usersGoals?.getCurrentUsersGoals.data?.carbohydrate
   );
   const [fatInput, setFatInput] = useState(
-    data?.getCurrentUsersGoals.data?.fat == null
+    usersGoals?.getCurrentUsersGoals.data?.fat == null
       ? 0
-      : data?.getCurrentUsersGoals.data?.fat
+      : usersGoals?.getCurrentUsersGoals.data?.fat
   );
 
   const handleCompleteEditingMacros = () => {
@@ -140,35 +143,35 @@ export const Macros: React.FC<MacrosProps> = ({}) => {
 
   useEffect(() => {
     setCaloriesInput(
-      data?.getCurrentUsersGoals.data?.calories == null
+      usersGoals?.getCurrentUsersGoals.data?.calories == null
         ? 0
-        : data?.getCurrentUsersGoals.data?.calories
+        : usersGoals?.getCurrentUsersGoals.data?.calories
     );
-  }, [data?.getCurrentUsersGoals.data?.calories]);
+  }, [usersGoals?.getCurrentUsersGoals.data?.calories]);
 
   useEffect(() => {
     setProteinInput(
-      data?.getCurrentUsersGoals.data?.protein == null
+      usersGoals?.getCurrentUsersGoals.data?.protein == null
         ? 0
-        : data?.getCurrentUsersGoals.data?.protein
+        : usersGoals?.getCurrentUsersGoals.data?.protein
     );
-  }, [data?.getCurrentUsersGoals.data?.protein]);
+  }, [usersGoals?.getCurrentUsersGoals.data?.protein]);
 
   useEffect(() => {
     setCarbohydrateInput(
-      data?.getCurrentUsersGoals.data?.carbohydrate == null
+      usersGoals?.getCurrentUsersGoals.data?.carbohydrate == null
         ? 0
-        : data?.getCurrentUsersGoals.data?.carbohydrate
+        : usersGoals?.getCurrentUsersGoals.data?.carbohydrate
     );
-  }, [data?.getCurrentUsersGoals.data?.carbohydrate]);
+  }, [usersGoals?.getCurrentUsersGoals.data?.carbohydrate]);
 
   useEffect(() => {
     setFatInput(
-      data?.getCurrentUsersGoals.data?.fat == null
+      usersGoals?.getCurrentUsersGoals.data?.fat == null
         ? 0
-        : data?.getCurrentUsersGoals.data?.fat
+        : usersGoals?.getCurrentUsersGoals.data?.fat
     );
-  }, [data?.getCurrentUsersGoals.data?.fat]);
+  }, [usersGoals?.getCurrentUsersGoals.data?.fat]);
 
   const data01 = [
     {
@@ -176,14 +179,14 @@ export const Macros: React.FC<MacrosProps> = ({}) => {
       value: Math.round(
         calculateGramsFromMacronutrient(
           calculatePercentage(
-            data?.getCurrentUsersGoals.data?.carbohydrate === null ||
-              data?.getCurrentUsersGoals.data?.carbohydrate === undefined
+            usersGoals?.getCurrentUsersGoals.data?.carbohydrate === null ||
+            usersGoals?.getCurrentUsersGoals.data?.carbohydrate === undefined
               ? 0
-              : data?.getCurrentUsersGoals.data?.carbohydrate,
-            data?.getCurrentUsersGoals.data?.calories === null ||
-              data?.getCurrentUsersGoals.data?.calories === undefined
+              : usersGoals?.getCurrentUsersGoals.data?.carbohydrate,
+              usersGoals?.getCurrentUsersGoals.data?.calories === null ||
+              usersGoals?.getCurrentUsersGoals.data?.calories === undefined
               ? 0
-              : data?.getCurrentUsersGoals.data?.calories
+              : usersGoals?.getCurrentUsersGoals.data?.calories
           ),
           'protein'
         )
@@ -194,14 +197,14 @@ export const Macros: React.FC<MacrosProps> = ({}) => {
       value: Math.round(
         calculateGramsFromMacronutrient(
           calculatePercentage(
-            data?.getCurrentUsersGoals.data?.fat === null ||
-              data?.getCurrentUsersGoals.data?.fat === undefined
+            usersGoals?.getCurrentUsersGoals.data?.fat === null ||
+            usersGoals?.getCurrentUsersGoals.data?.fat === undefined
               ? 0
-              : data?.getCurrentUsersGoals.data?.fat,
-            data?.getCurrentUsersGoals.data?.calories === null ||
-              data?.getCurrentUsersGoals.data?.calories === undefined
+              : usersGoals?.getCurrentUsersGoals.data?.fat,
+              usersGoals?.getCurrentUsersGoals.data?.calories === null ||
+              usersGoals?.getCurrentUsersGoals.data?.calories === undefined
               ? 0
-              : data?.getCurrentUsersGoals.data?.calories
+              : usersGoals?.getCurrentUsersGoals.data?.calories
           ),
           'fat'
         )
@@ -212,14 +215,14 @@ export const Macros: React.FC<MacrosProps> = ({}) => {
       value: Math.round(
         calculateGramsFromMacronutrient(
           calculatePercentage(
-            data?.getCurrentUsersGoals.data?.protein === null ||
-              data?.getCurrentUsersGoals.data?.protein === undefined
+            usersGoals?.getCurrentUsersGoals.data?.protein === null ||
+            usersGoals?.getCurrentUsersGoals.data?.protein === undefined
               ? 0
-              : data?.getCurrentUsersGoals.data?.protein,
-            data?.getCurrentUsersGoals.data?.calories === null ||
-              data?.getCurrentUsersGoals.data?.calories === undefined
+              : usersGoals?.getCurrentUsersGoals.data?.protein,
+              usersGoals?.getCurrentUsersGoals.data?.calories === null ||
+              usersGoals?.getCurrentUsersGoals.data?.calories === undefined
               ? 0
-              : data?.getCurrentUsersGoals.data?.calories
+              : usersGoals?.getCurrentUsersGoals.data?.calories
           ),
           'protein'
         )
@@ -266,9 +269,9 @@ export const Macros: React.FC<MacrosProps> = ({}) => {
                 content={
                   <CustomLabel
                     labelText={`${
-                      data?.getCurrentUsersGoals.data?.calories as number
+                      usersGoals?.getCurrentUsersGoals.data?.calories
                     }`}
-                    value={'Remaining'}
+                    value={'Calories'}
                     viewBox={undefined}
                   />
                 }

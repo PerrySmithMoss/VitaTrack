@@ -1,4 +1,4 @@
-query Query($date: DateTime) {
+query GetCurrentUsersNutritionByDate($date: DateTime) {
   getCurrentUsersNutritionByDate(date: $date) {
     errors {
       field

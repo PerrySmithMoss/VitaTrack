@@ -110,7 +110,6 @@ export class NutritionResolver {
       let nutrition;
 
       if (nutritionEntry) {
-        // console.log("\x1b[32m%s\x1b[0m", "User nutrition entry exists!");
         nutrition = await ctx.prisma.nutrition.update({
           data: {
             date: nutritionInput.date,
@@ -132,7 +131,6 @@ export class NutritionResolver {
           },
         });
       } else {
-        // console.log("\x1b[31m%s\x1b[0m", "No user nutrition entry.");
         nutrition = await ctx.prisma.nutrition.create({
           data: {
             date: nutritionInput.date,
@@ -208,13 +206,14 @@ export class NutritionResolver {
     }
   }
 
-  @Query(() => NutritionResponseIterable)
+  @Query(() => NutritionResponse)
   @UseMiddleware(deserializeUser)
   async getCurrentUsersNutritionByDate(
     @Ctx() ctx: PrismaContext,
     @Arg("date", () => Date, { nullable: true }) date: Date | null
   ) {
     try {
+
       const userId = ctx.res.locals.user.id;
 
       if (!userId) {
@@ -238,7 +237,7 @@ export class NutritionResolver {
         let endOfDay = new Date();
         endOfDay.setHours(24, 59, 59, 999);
 
-        usersNutrition = await ctx.prisma.nutrition.findMany({
+        usersNutrition = await ctx.prisma.nutrition.findFirst({
           where: {
             AND: [
               {
@@ -264,7 +263,7 @@ export class NutritionResolver {
         let endOfDay = new Date(date);
         endOfDay.setHours(24, 59, 59, 999);
 
-        usersNutrition = await ctx.prisma.nutrition.findMany({
+        usersNutrition = await ctx.prisma.nutrition.findFirst({
           where: {
             AND: [
               {

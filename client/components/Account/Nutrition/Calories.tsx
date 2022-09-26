@@ -8,65 +8,31 @@ import {
   ResponsiveContainer,
   Label,
   Legend,
+  RadialBarChart,
+  PolarAngleAxis,
+  RadialBar,
 } from 'recharts';
 import {
   calculateGramsFromMacronutrient,
   calculatePercentage,
 } from '../../../utils/macroCalculations';
-import { useGetCurrentUsersGoalsQuery } from '../../../graphql/generated/graphql';
+import {
+  useGetCurrentUsersGoalsQuery,
+  useGetCurrentUsersNutritionByDateQuery,
+} from '../../../graphql/generated/graphql';
 
 interface CaloriesProps {}
 
-const COLORS = ['#22d1ee', '#775ada', '#facf5a'];
-
-const Bullet = ({
-  backgroundColor,
-  size,
-}: {
-  backgroundColor: string;
-  size: string;
-}) => {
-  return (
-    <div
-      className="CirecleBullet"
-      style={{
-        backgroundColor,
-        width: size,
-        height: size,
-      }}
-    ></div>
-  );
-};
-
-const CustomizedLegend = (props: any) => {
-  const { payload } = props;
-  return (
-    <ul className={styles.legendList}>
-      {payload.map((entry: any, index: number) => (
-        <li key={`item-${index}`}>
-          <div className={styles.bulletLabel}>
-            <Bullet backgroundColor={entry.payload.fill} size="10px" />
-            <div className={styles.bulletLabelText}>{entry.value}</div>
-          </div>
-          <div style={{ fontWeight: 500 }}>{entry.payload.value}g</div>
-        </li>
-      ))}
-    </ul>
-  );
-};
-
-const CustomLabel = ({
+const CustomLabelv2 = ({
   viewBox,
-  labelText,
-  value,
+  caloriesRemaining = 0,
 }: {
   viewBox: any;
-  labelText: string;
-  value: string;
+  caloriesRemaining: number;
 }) => {
   const { cx, cy } = viewBox;
   return (
-    <g>
+    <React.Fragment>
       <text
         x={cx}
         y={cy}
@@ -75,10 +41,10 @@ const CustomLabel = ({
         dominantBaseline="central"
         alignmentBaseline="middle"
         //   fill="#0088FE"
-        fontSize="26"
+        fontSize="36"
         fontWeight="600"
       >
-        {labelText}
+        {caloriesRemaining}
       </text>
       <text
         x={cx}
@@ -89,69 +55,40 @@ const CustomLabel = ({
         alignmentBaseline="middle"
         fontSize="14"
       >
-        {value}
+        Remaining
       </text>
-    </g>
+    </React.Fragment>
   );
 };
 
-export const Calories: React.FC<CaloriesProps> = ({}) => {
-  const { data, refetch } = useGetCurrentUsersGoalsQuery();
+const todaysDate = new Date().toISOString();
 
-  const data01 = [
+export const Calories: React.FC<CaloriesProps> = ({}) => {
+  const { data: usersGoals, refetch: refetchUsersGoals } =
+    useGetCurrentUsersGoalsQuery();
+  // const { data: todaysNutrition, refetch: refetchTodaysNutrition } =
+  //   useGetCurrentUsersNutritionByDateQuery({ date: new Date().toISOString() });
+  const { data: todaysNutrition, refetch: refetchTodaysNutrition } =
+    useGetCurrentUsersNutritionByDateQuery({
+      date: todaysDate,
+    });
+
+  const caloriesComsumedVsCaloriesRemainingData = [
     {
-      name: 'Carb',
-      value: Math.round(
-        calculateGramsFromMacronutrient(
-          calculatePercentage(
-            data?.getCurrentUsersGoals.data?.carbohydrate === null ||
-              data?.getCurrentUsersGoals.data?.carbohydrate === undefined
-              ? 0
-              : data?.getCurrentUsersGoals.data?.carbohydrate,
-            data?.getCurrentUsersGoals.data?.calories === null ||
-              data?.getCurrentUsersGoals.data?.calories === undefined
-              ? 0
-              : data?.getCurrentUsersGoals.data?.calories
-          ),
-          'protein'
-        )
-      ),
+      name: 'Calories consumed',
+      value:
+        todaysNutrition?.getCurrentUsersNutritionByDate.data === null
+          ? 0
+          : todaysNutrition?.getCurrentUsersNutritionByDate.data?.calories,
     },
     {
-      name: 'Fat',
-      value: Math.round(
-        calculateGramsFromMacronutrient(
-          calculatePercentage(
-            data?.getCurrentUsersGoals.data?.fat === null ||
-              data?.getCurrentUsersGoals.data?.fat === undefined
-              ? 0
-              : data?.getCurrentUsersGoals.data?.fat,
-            data?.getCurrentUsersGoals.data?.calories === null ||
-              data?.getCurrentUsersGoals.data?.calories === undefined
-              ? 0
-              : data?.getCurrentUsersGoals.data?.calories
-          ),
-          'fat'
-        )
-      ),
-    },
-    {
-      name: 'Protein',
-      value: Math.round(
-        calculateGramsFromMacronutrient(
-          calculatePercentage(
-            data?.getCurrentUsersGoals.data?.protein === null ||
-              data?.getCurrentUsersGoals.data?.protein === undefined
-              ? 0
-              : data?.getCurrentUsersGoals.data?.protein,
-            data?.getCurrentUsersGoals.data?.calories === null ||
-              data?.getCurrentUsersGoals.data?.calories === undefined
-              ? 0
-              : data?.getCurrentUsersGoals.data?.calories
-          ),
-          'protein'
-        )
-      ),
+      name: 'Calories remaining',
+      value:
+        todaysNutrition?.getCurrentUsersNutritionByDate.data === null
+          ? usersGoals?.getCurrentUsersGoals.data?.calories
+          : (usersGoals?.getCurrentUsersGoals.data?.calories as number) -
+            (todaysNutrition?.getCurrentUsersNutritionByDate.data
+              ?.calories as number),
     },
   ];
 
@@ -167,40 +104,62 @@ export const Calories: React.FC<CaloriesProps> = ({}) => {
         style={{ height: 270, width: '100%', display: 'block' }}
       >
         <ResponsiveContainer width="100%" height={270}>
-          <PieChart layout="vertical">
+          <PieChart>
             <Pie
-              data={data01}
+              data={caloriesComsumedVsCaloriesRemainingData}
               dataKey="value"
-              cx={120}
-              cy={128}
+              cx={175}
+              cy={130}
               innerRadius={80}
               outerRadius={100}
             >
-              {data01.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
-                />
-              ))}
+              {caloriesComsumedVsCaloriesRemainingData.map((entry, index) => {
+                if (index === 1) {
+                  // Calories remaining
+                  if ((entry.value as number) < 0) {
+                    return (
+                      <Cell key={`cell-${index}`} fill="#f44336" stroke={'0'} />
+                    );
+                  } else {
+                    return (
+                      <Cell key={`cell-${index}`} fill="#f3f6f9" stroke={'0'} />
+                    );
+                  }
+                }
+                // Calories consumed
+                if (
+                  index === 0 &&
+                  (caloriesComsumedVsCaloriesRemainingData[1].value as number) <
+                    0
+                ) {
+                  return (
+                    <Cell key={`cell-${index}`} fill="#f44336" stroke={'0'} />
+                  );
+                } else {
+                  return (
+                    <Cell key={`cell-${index}`} fill="#2E5DD1" stroke={'0'} />
+                  );
+                }
+              })}
               <Label
                 content={
-                  <CustomLabel
-                    labelText={`${
-                      data?.getCurrentUsersGoals.data?.calories as number
-                    }`}
-                    value={'Remaining'}
+                  <CustomLabelv2
                     viewBox={undefined}
+                    caloriesRemaining={
+                      todaysNutrition?.getCurrentUsersNutritionByDate.data ===
+                      null
+                        ? (usersGoals?.getCurrentUsersGoals.data
+                            ?.calories as number)
+                        : (usersGoals?.getCurrentUsersGoals.data
+                            ?.calories as number) -
+                          (todaysNutrition?.getCurrentUsersNutritionByDate.data
+                            ?.calories as number)
+                    }
                   />
                 }
                 position="center"
               />
             </Pie>
-            <Legend
-              layout="vertical"
-              verticalAlign="middle"
-              align="right"
-              content={<CustomizedLegend />}
-            />
           </PieChart>
         </ResponsiveContainer>
       </div>

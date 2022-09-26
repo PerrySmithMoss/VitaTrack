@@ -211,7 +211,7 @@ export type Query = {
   getCurrentUser?: Maybe<UserResponse>;
   getCurrentUsersGoals: GoalsResponse;
   getCurrentUsersNutrition: NutritionResponseIterable;
-  getCurrentUsersNutritionByDate: NutritionResponseIterable;
+  getCurrentUsersNutritionByDate: NutritionResponse;
   getUsersWorkouts: WorkoutResponseIterable;
 };
 
@@ -394,12 +394,12 @@ export type GetCurrentUsersNutritionQueryVariables = Exact<{ [key: string]: neve
 
 export type GetCurrentUsersNutritionQuery = { __typename?: 'Query', getCurrentUsersNutrition: { __typename?: 'NutritionResponseIterable', errors?: Array<{ __typename?: 'NutritionFieldError', field: string, message: string }> | null, data?: Array<{ __typename?: 'Nutrition', id: string, createdAt: any, updatedAt: any, calories?: number | null, protein?: number | null, fat?: number | null, carbohydrate?: number | null, userId: string }> | null } };
 
-export type QueryQueryVariables = Exact<{
+export type GetCurrentUsersNutritionByDateQueryVariables = Exact<{
   date?: InputMaybe<Scalars['DateTime']>;
 }>;
 
 
-export type QueryQuery = { __typename?: 'Query', getCurrentUsersNutritionByDate: { __typename?: 'NutritionResponseIterable', errors?: Array<{ __typename?: 'NutritionFieldError', field: string, message: string }> | null, data?: Array<{ __typename?: 'Nutrition', id: string, createdAt: any, updatedAt: any, date: any, calories?: number | null, protein?: number | null, fat?: number | null, carbohydrate?: number | null, userId: string }> | null } };
+export type GetCurrentUsersNutritionByDateQuery = { __typename?: 'Query', getCurrentUsersNutritionByDate: { __typename?: 'NutritionResponse', errors?: Array<{ __typename?: 'NutritionFieldError', field: string, message: string }> | null, data?: { __typename?: 'Nutrition', id: string, createdAt: any, updatedAt: any, date: any, calories?: number | null, protein?: number | null, fat?: number | null, carbohydrate?: number | null, userId: string } | null } };
 
 export type GetUsersWorkoutsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -768,8 +768,8 @@ useGetCurrentUsersNutritionQuery.getKey = (variables?: GetCurrentUsersNutritionQ
 ;
 
 useGetCurrentUsersNutritionQuery.fetcher = (variables?: GetCurrentUsersNutritionQueryVariables, options?: RequestInit['headers']) => customFetcher<GetCurrentUsersNutritionQuery, GetCurrentUsersNutritionQueryVariables>(GetCurrentUsersNutritionDocument, variables, options);
-export const QueryDocument = /*#__PURE__*/ `
-    query Query($date: DateTime) {
+export const GetCurrentUsersNutritionByDateDocument = /*#__PURE__*/ `
+    query GetCurrentUsersNutritionByDate($date: DateTime) {
   getCurrentUsersNutritionByDate(date: $date) {
     errors {
       field
@@ -789,25 +789,25 @@ export const QueryDocument = /*#__PURE__*/ `
   }
 }
     `;
-export const useQueryQuery = <
-      TData = QueryQuery,
+export const useGetCurrentUsersNutritionByDateQuery = <
+      TData = GetCurrentUsersNutritionByDateQuery,
       TError = unknown
     >(
-      variables?: QueryQueryVariables,
-      options?: UseQueryOptions<QueryQuery, TError, TData>
+      variables?: GetCurrentUsersNutritionByDateQueryVariables,
+      options?: UseQueryOptions<GetCurrentUsersNutritionByDateQuery, TError, TData>
     ) =>
-    useQuery<QueryQuery, TError, TData>(
-      variables === undefined ? ['Query'] : ['Query', variables],
-      customFetcher<QueryQuery, QueryQueryVariables>(QueryDocument, variables),
+    useQuery<GetCurrentUsersNutritionByDateQuery, TError, TData>(
+      variables === undefined ? ['GetCurrentUsersNutritionByDate'] : ['GetCurrentUsersNutritionByDate', variables],
+      customFetcher<GetCurrentUsersNutritionByDateQuery, GetCurrentUsersNutritionByDateQueryVariables>(GetCurrentUsersNutritionByDateDocument, variables),
       options
     );
-useQueryQuery.document = QueryDocument;
+useGetCurrentUsersNutritionByDateQuery.document = GetCurrentUsersNutritionByDateDocument;
 
 
-useQueryQuery.getKey = (variables?: QueryQueryVariables) => variables === undefined ? ['Query'] : ['Query', variables];
+useGetCurrentUsersNutritionByDateQuery.getKey = (variables?: GetCurrentUsersNutritionByDateQueryVariables) => variables === undefined ? ['GetCurrentUsersNutritionByDate'] : ['GetCurrentUsersNutritionByDate', variables];
 ;
 
-useQueryQuery.fetcher = (variables?: QueryQueryVariables, options?: RequestInit['headers']) => customFetcher<QueryQuery, QueryQueryVariables>(QueryDocument, variables, options);
+useGetCurrentUsersNutritionByDateQuery.fetcher = (variables?: GetCurrentUsersNutritionByDateQueryVariables, options?: RequestInit['headers']) => customFetcher<GetCurrentUsersNutritionByDateQuery, GetCurrentUsersNutritionByDateQueryVariables>(GetCurrentUsersNutritionByDateDocument, variables, options);
 export const GetUsersWorkoutsDocument = /*#__PURE__*/ `
     query GetUsersWorkouts {
   getUsersWorkouts {
