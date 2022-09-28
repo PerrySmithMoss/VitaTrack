@@ -74,21 +74,22 @@ model Nutrition {
 }
 
 model Food {
-  id           Int       @id @default(autoincrement())
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  name         String
-  mealName     String
-  quantity     Float
-  calories     Int?
-  protein      Float?
-  fat          Float?
-  carbohydrate Float?
-  sugar        Float?
-  userId       String
-  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  nutrition    Nutrition @relation(fields: [nutritionId], references: [id], onDelete: Cascade)
-  nutritionId  Int
+  id            Int       @id @default(autoincrement())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  name          String
+  mealName      String
+  servingSize   String
+  numOfServings Float
+  calories      Int
+  protein       Float
+  fat           Float
+  carbohydrate  Float
+  sugar         Float
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nutrition     Nutrition @relation(fields: [nutritionId], references: [id], onDelete: Cascade)
+  nutritionId   Int
 }
 
 model Workout {

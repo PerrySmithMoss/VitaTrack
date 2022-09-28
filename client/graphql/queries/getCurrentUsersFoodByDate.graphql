@@ -1,0 +1,24 @@
+query GetCurrentUsersFoodByDate($date: DateTime) {
+  getCurrentUsersFoodByDate(date: $date) {
+    errors {
+      field
+      message
+    }
+    data {
+      id
+      createdAt
+      updatedAt
+      name
+      mealName
+      calories
+      protein
+      fat
+      carbohydrate
+      sugar
+      numOfServings
+      servingSize
+      userId
+      nutritionId
+    }
+  }
+}

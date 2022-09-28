@@ -1,16 +1,83 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { BiCalendar } from 'react-icons/bi';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { AiFillMinusCircle } from 'react-icons/ai';
 import styles from './Nutrition.module.css';
+import {
+  Food,
+  useGetCurrentUsersFoodByDateQuery,
+  useGetCurrentUsersGoalsQuery,
+} from '../../../graphql/generated/graphql';
+import {
+  calculateGramsFromMacronutrient,
+  calculatePercentage,
+} from '../../../utils/macroCalculations';
 
 interface FoodDiaryProps {}
 
+const todaysDate = new Date();
+const yesterdaysDate = new Date(Date.now() - 86400000);
+
 export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(todaysDate);
   const [isShowingCalendar, setIsShowingCalendar] = useState(false);
+  const { data: usersGoals, refetch: refetchUsersGoals } =
+    useGetCurrentUsersGoalsQuery();
+  const { data: usersFood, refetch: refetchUsersFood } =
+    useGetCurrentUsersFoodByDateQuery({ date: selectedDate });
+  console.log('usersGoals: ', usersGoals);
+
+  const handleChangeDate = (date: Date | null) => {
+    setSelectedDate(date);
+    // refetchUsersFood({date: selectedDate});
+  };
+
+  function sumBy(
+    foodItemValues: Food[],
+    key: 'calories' | 'carbohydrate' | 'protein' | 'fat' | 'sugar',
+    mealName:
+      | 'Breakfast'
+      | 'Lunch'
+      | 'Dinner'
+      | 'Snacks'
+      | 'Meal 5'
+      | 'Meal 6'
+      | 'All'
+  ) {
+    const total = foodItemValues.reduce((acc, cur) => {
+      if (mealName === 'All') {
+        if (cur.servingSize === 'g') {
+          return (acc += cur[key]);
+        } else {
+          return (acc += cur[key] * cur.numOfServings);
+        }
+      }
+      if (cur.mealName === mealName) {
+        if (cur.servingSize === 'g') {
+          return (acc += cur[key]);
+        } else {
+          return (acc += cur[key] * cur.numOfServings);
+        }
+      }
+
+      return acc;
+    }, 0);
+
+    return total;
+  }
+
+  // function totalBy(
+  //   key
+  // ) {
+
+  // }
+
+  // console.log(
+  //   sumBy(usersFood?.getCurrentUsersFoodByDate?.data as Food[], 'calories', "Breakfast")
+  // );
+
   return (
     <div className="mt-10">
       <div className=" border-t-2">
@@ -35,7 +102,7 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
               <ReactDatePicker
                 dateFormat="do, MMMM, yyyy"
                 selected={selectedDate}
-                onChange={(date) => setSelectedDate(date as Date)}
+                onChange={(date) => handleChangeDate(date)}
                 onClickOutside={() => setIsShowingCalendar(!isShowingCalendar)}
                 open={isShowingCalendar}
                 onInputClick={() => setIsShowingCalendar(!isShowingCalendar)}
@@ -106,250 +173,54 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                   <div className={styles.tableCellSubtitle}>g</div>
                 </td>
               </tr>
+              {usersFood?.getCurrentUsersFoodByDate.data?.map((foodEntry) => {
+                if (foodEntry.mealName === 'Breakfast') {
+                  return (
+                    <>
+                      <tr>
+                        <td className={styles.foodName}>
+                          <a
+                            className="js-show-edit-food"
+                            data-food-entry-id="10049060228"
+                            data-locale=""
+                            href="#"
+                          >
+                            {foodEntry.name},{' '}
+                            {`${foodEntry.numOfServings} ${foodEntry.servingSize}`}
+                          </a>
+                        </td>
 
-              <tr>
-                <td className={styles.foodName}>
-                  <a
-                    className="js-show-edit-food"
-                    data-food-entry-id="10049059676"
-                    data-locale=""
-                    href="#"
-                  >
-                    Perdue - Cooked Chicken Breast, 130 gram
-                  </a>
-                </td>
+                        {foodEntry.servingSize === 'g' ? (
+                          <td>{foodEntry.calories}</td>
+                        ) : (
+                          <td>
+                            {(foodEntry.calories as number) *
+                              foodEntry.numOfServings}
+                          </td>
+                        )}
 
-                <td>183</td>
+                        <td>{foodEntry.carbohydrate}</td>
 
-                <td>
-                  <span className="macro-value">0</span>
-                  <span className="macro-percentage">0</span>
-                </td>
+                        <td>{foodEntry.fat}</td>
 
-                <td>
-                  <span className="macro-value">2</span>
-                  <span className="macro-percentage">8</span>
-                </td>
+                        <td>{foodEntry.protein}</td>
 
-                <td>
-                  <span className="macro-value">40</span>
-                  <span className="macro-percentage">92</span>
-                </td>
+                        <td>?</td>
 
-                <td>115</td>
+                        <td>
+                          {foodEntry.sugar === null ? 0 : foodEntry.sugar}
+                        </td>
 
-                <td>0</td>
-
-                <td className="delete">
-                  <div className="flex items-center justify-center">
-                    <AiFillMinusCircle size={24} color="red" />
-                  </div>
-                </td>
-              </tr>
-
-              <tr>
-                <td className={styles.foodName}>
-                  <a
-                    className="js-show-edit-food"
-                    data-food-entry-id="10049059678"
-                    data-locale=""
-                    href="#"
-                  >
-                    Egg - Egg, 2 large
-                  </a>
-                </td>
-
-                <td>143</td>
-
-                <td>
-                  <span className="macro-value">1</span>
-                  <span className="macro-percentage">2</span>
-                </td>
-
-                <td>
-                  <span className="macro-value">10</span>
-                  <span className="macro-percentage">62</span>
-                </td>
-
-                <td>
-                  <span className="macro-value">13</span>
-                  <span className="macro-percentage">36</span>
-                </td>
-
-                <td>142</td>
-
-                <td>0</td>
-
-                <td className="delete">
-                  <div className="flex items-center justify-center">
-                    <AiFillMinusCircle size={24} color="red" />
-                  </div>
-                </td>
-              </tr>
-
-              <tr className={styles.bottom}>
-                <td className={`${styles.foodName}`} style={{ zIndex: 10 }}>
-                  <a
-                    className={styles.addFood}
-                    href="/user/perrysmithmoss/diary/add?meal=0"
-                  >
-                    Add Food
-                  </a>
-                  <div className={styles.quickTools}>
-                    <a href="#quick_tools_0" className="toggle_diary_options">
-                      Quick Tools
-                    </a>
-                  </div>
-                </td>
-
-                <td>326</td>
-
-                <td>
-                  <span className="macro-value">1</span>
-                  <span className="macro-percentage">1</span>
-                </td>
-
-                <td>
-                  <span className="macro-value">12</span>
-                  <span className="macro-percentage">33</span>
-                </td>
-
-                <td>
-                  <span className="macro-value">53</span>
-                  <span className="macro-percentage">66</span>
-                </td>
-
-                <td>257</td>
-
-                <td>0</td>
-
-                <td></td>
-              </tr>
-
-              <tr className="meal_header">
-                <td className={`${styles.mealHeading}`}>Lunch</td>
-              </tr>
-
-              <tr>
-                <td className={styles.foodName}>
-                  <a
-                    className="js-show-edit-food"
-                    data-food-entry-id="10049060228"
-                    data-locale=""
-                    href="#"
-                  >
-                    Perdue - Cooked Chicken Breast, 130 gram
-                  </a>
-                </td>
-
-                <td>183</td>
-
-                <td>
-                  <span className="macro-value">0</span>
-                  <span className="macro-percentage">0</span>
-                </td>
-
-                <td>
-                  <span className="macro-value">2</span>
-                  <span className="macro-percentage">8</span>
-                </td>
-
-                <td>
-                  <span className="macro-value">40</span>
-                  <span className="macro-percentage">92</span>
-                </td>
-
-                <td>115</td>
-
-                <td>0</td>
-
-                <td className="delete">
-                  <div className="flex items-center justify-center">
-                    <AiFillMinusCircle size={24} color="red" />
-                  </div>
-                </td>
-              </tr>
-
-              <tr>
-                <td className={styles.foodName}>
-                  <a
-                    className="js-show-edit-food"
-                    data-food-entry-id="10049060229"
-                    data-locale=""
-                    href="#"
-                  >
-                    Potato, 255 g
-                  </a>
-                </td>
-
-                <td>148</td>
-
-                <td>
-                  <span className="macro-value">32</span>
-                  <span className="macro-percentage">82</span>
-                </td>
-
-                <td>
-                  <span className="macro-value">0</span>
-                  <span className="macro-percentage">1</span>
-                </td>
-
-                <td>
-                  <span className="macro-value">7</span>
-                  <span className="macro-percentage">17</span>
-                </td>
-
-                <td>26</td>
-
-                <td>0</td>
-
-                <td className="delete">
-                  <div className="flex items-center justify-center">
-                    <AiFillMinusCircle size={24} color="red" />
-                  </div>
-                </td>
-              </tr>
-
-              <tr>
-                <td className={styles.foodName}>
-                  <a
-                    className="js-show-edit-food"
-                    data-food-entry-id="10049060232"
-                    data-locale=""
-                    href="#"
-                  >
-                    Kroger - Extra Virgin Olive Oil, 12 milliliter
-                  </a>
-                </td>
-
-                <td>97</td>
-
-                <td>
-                  <span className="macro-value">0</span>
-                  <span className="macro-percentage">0</span>
-                </td>
-
-                <td>
-                  <span className="macro-value">11</span>
-                  <span className="macro-percentage">100</span>
-                </td>
-
-                <td>
-                  <span className="macro-value">0</span>
-                  <span className="macro-percentage">0</span>
-                </td>
-
-                <td>0</td>
-
-                <td>0</td>
-
-                <td className="delete">
-                  <div className="flex items-center justify-center">
-                    <AiFillMinusCircle size={24} color="red" />
-                  </div>
-                </td>
-              </tr>
-
+                        <td className="delete">
+                          <div className="flex items-center justify-center">
+                            <AiFillMinusCircle size={24} color="red" />
+                          </div>
+                        </td>
+                      </tr>
+                    </>
+                  );
+                }
+              })}
               <tr className={styles.bottom}>
                 <td className={styles.foodName} style={{ zIndex: 9 }}>
                   <a
@@ -364,97 +235,106 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                     </a>
                   </div>
                 </td>
-
-                <td>428</td>
-
                 <td>
-                  <span className="macro-value">32</span>
-                  <span className="macro-percentage">30</span>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'calories',
+                      'Breakfast'
+                    )}
                 </td>
 
                 <td>
-                  <span className="macro-value">13</span>
-                  <span className="macro-percentage">27</span>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'carbohydrate',
+                      'Breakfast'
+                    )}
                 </td>
 
                 <td>
-                  <span className="macro-value">47</span>
-                  <span className="macro-percentage">43</span>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'fat',
+                      'Breakfast'
+                    )}
                 </td>
 
-                <td>141</td>
+                <td>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'protein',
+                      'Breakfast'
+                    )}
+                </td>
 
-                <td>0</td>
+                <td>?</td>
 
-                <td></td>
+                <td>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'sugar',
+                      'Breakfast'
+                    )}
+                </td>
               </tr>
 
               <tr className="meal_header">
-                <td className={`${styles.mealHeading}`}>Dinner</td>
+                <td className={`${styles.mealHeading}`}>Lunch</td>
               </tr>
+              {usersFood?.getCurrentUsersFoodByDate.data?.map((foodEntry) => {
+                if (foodEntry.mealName === 'Lunch') {
+                  return (
+                    <>
+                      <tr>
+                        <td className={styles.foodName}>
+                          <a
+                            className="js-show-edit-food"
+                            data-food-entry-id="10049060228"
+                            data-locale=""
+                            href="#"
+                          >
+                            {foodEntry.name},{' '}
+                            {`${foodEntry.numOfServings} ${foodEntry.servingSize}`}
+                          </a>
+                        </td>
 
-              <tr>
-                <td className={styles.foodName}>
-                  <a
-                    className="js-show-edit-food"
-                    data-food-entry-id="10049060591"
-                    data-locale=""
-                    href="#"
-                  >
-                    Tesco - R British Beef Lean Steak Mince, 205 g
-                  </a>
-                </td>
+                        {foodEntry.servingSize === 'g' ? (
+                          <td>{foodEntry.calories}</td>
+                        ) : (
+                          <td>
+                            {(foodEntry.calories as number) *
+                              foodEntry.numOfServings}
+                          </td>
+                        )}
 
-                <td>254</td>
+                        <td>{foodEntry.carbohydrate}</td>
 
-                <td>0</td>
+                        <td>{foodEntry.fat}</td>
 
-                <td>9</td>
+                        <td>{foodEntry.protein}</td>
 
-                <td>43</td>
+                        <td>115</td>
 
-                <td>246</td>
+                        <td>
+                          {' '}
+                          {foodEntry.sugar === null ? 0 : foodEntry.sugar}
+                        </td>
 
-                <td>0</td>
-
-                <td className="delete">
-                  <div className="flex items-center justify-center">
-                    <AiFillMinusCircle size={24} color="red" />
-                  </div>
-                </td>
-              </tr>
-
-              <tr>
-                <td className={styles.foodName}>
-                  <a
-                    className="js-show-edit-food"
-                    data-food-entry-id="10049060592"
-                    data-locale=""
-                    href="#"
-                  >
-                    Riviana - Basmatti Rice, Cooked, 190 g cooked
-                  </a>
-                </td>
-
-                <td>203</td>
-
-                <td>43</td>
-
-                <td>1</td>
-
-                <td>5</td>
-
-                <td>14</td>
-
-                <td>0</td>
-
-                <td className="delete">
-                  <div className="flex items-center justify-center">
-                    <AiFillMinusCircle size={24} color="red" />
-                  </div>
-                </td>
-              </tr>
-
+                        <td className="delete">
+                          <div className="flex items-center justify-center">
+                            <AiFillMinusCircle size={24} color="red" />
+                          </div>
+                        </td>
+                      </tr>
+                    </>
+                  );
+                }
+              })}
               <tr className={styles.bottom}>
                 <td className={styles.foodName} style={{ zIndex: 8 }}>
                   <a
@@ -469,27 +349,167 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                     </a>
                   </div>
                 </td>
-
-                <td>457</td>
-
                 <td>
-                  <span className="macro-value">43</span>
-                  <span className="macro-percentage">38</span>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'calories',
+                      'Lunch'
+                    )}
                 </td>
 
                 <td>
-                  <span className="macro-value">10</span>
-                  <span className="macro-percentage">20</span>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'carbohydrate',
+                      'Lunch'
+                    )}
                 </td>
 
                 <td>
-                  <span className="macro-value">48</span>
-                  <span className="macro-percentage">42</span>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'fat',
+                      'Lunch'
+                    )}
                 </td>
 
-                <td>260</td>
+                <td>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'protein',
+                      'Lunch'
+                    )}
+                </td>
 
-                <td>0</td>
+                <td>?</td>
+
+                <td>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'sugar',
+                      'Lunch'
+                    )}
+                </td>
+
+                <td></td>
+              </tr>
+              <tr className="meal_header">
+                <td className={`${styles.mealHeading}`}>Dinner</td>
+              </tr>
+              {usersFood?.getCurrentUsersFoodByDate.data?.map((foodEntry) => {
+                if (foodEntry.mealName === 'Dinner') {
+                  return (
+                    <>
+                      <tr>
+                        <td className={styles.foodName}>
+                          <a
+                            className="js-show-edit-food"
+                            data-food-entry-id="10049060228"
+                            data-locale=""
+                            href="#"
+                          >
+                            {foodEntry.name},{' '}
+                            {`${foodEntry.numOfServings} ${foodEntry.servingSize}`}
+                          </a>
+                        </td>
+
+                        {foodEntry.servingSize === 'g' ? (
+                          <td>{foodEntry.calories}</td>
+                        ) : (
+                          <td>
+                            {(foodEntry.calories as number) *
+                              foodEntry.numOfServings}
+                          </td>
+                        )}
+
+                        <td>{foodEntry.carbohydrate}</td>
+
+                        <td>{foodEntry.fat}</td>
+
+                        <td>{foodEntry.protein}</td>
+
+                        <td>115</td>
+
+                        <td>
+                          {' '}
+                          {foodEntry.sugar === null ? 0 : foodEntry.sugar}
+                        </td>
+
+                        <td className="delete">
+                          <div className="flex items-center justify-center">
+                            <AiFillMinusCircle size={24} color="red" />
+                          </div>
+                        </td>
+                      </tr>
+                    </>
+                  );
+                }
+              })}
+              <tr className={styles.bottom}>
+                <td className={styles.foodName} style={{ zIndex: 9 }}>
+                  <a
+                    className={styles.addFood}
+                    href="/user/perrysmithmoss/diary/add?meal=1"
+                  >
+                    Add Food
+                  </a>
+                  <div className={styles.quickTools}>
+                    <a href="#quick_tools_1" className="toggle_diary_options">
+                      Quick Tools
+                    </a>
+                  </div>
+                </td>
+                <td>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'calories',
+                      'Dinner'
+                    )}
+                </td>
+
+                <td>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'carbohydrate',
+                      'Dinner'
+                    )}
+                </td>
+
+                <td>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'fat',
+                      'Dinner'
+                    )}
+                </td>
+
+                <td>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'protein',
+                      'Dinner'
+                    )}
+                </td>
+
+                <td>?</td>
+
+                <td>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'sugar',
+                      'Dinner'
+                    )}
+                </td>
 
                 <td></td>
               </tr>
@@ -498,246 +518,55 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                 <td className={`${styles.mealHeading}`}>Snacks</td>
               </tr>
 
-              <tr>
-                <td className={styles.foodName}>
-                  <a
-                    className="js-show-edit-food"
-                    data-food-entry-id="10049039234"
-                    data-locale=""
-                    href="#"
-                  >
-                    Per4m&nbsp;Whey - Choc&nbsp;Brownie&nbsp;Battet, 50 g
-                  </a>
-                </td>
+              {usersFood?.getCurrentUsersFoodByDate.data?.map((foodEntry) => {
+                if (foodEntry.mealName === 'Snacks') {
+                  return (
+                    <>
+                      <tr>
+                        <td className={styles.foodName}>
+                          <a
+                            className="js-show-edit-food"
+                            data-food-entry-id="10049060228"
+                            data-locale=""
+                            href="#"
+                          >
+                            {foodEntry.name},{' '}
+                            {`${foodEntry.numOfServings} ${foodEntry.servingSize}`}
+                          </a>
+                        </td>
 
-                <td>175</td>
+                        {foodEntry.servingSize === 'g' ? (
+                          <td>{foodEntry.calories}</td>
+                        ) : (
+                          <td>
+                            {(foodEntry.calories as number) *
+                              foodEntry.numOfServings}
+                          </td>
+                        )}
 
-                <td>
-                  <span className="macro-value">6</span>
-                  <span className="macro-percentage">13</span>
-                </td>
+                        <td>{foodEntry.carbohydrate}</td>
 
-                <td>
-                  <span className="macro-value">2</span>
-                  <span className="macro-percentage">8</span>
-                </td>
+                        <td>{foodEntry.fat}</td>
 
-                <td>
-                  <span className="macro-value">35</span>
-                  <span className="macro-percentage">79</span>
-                </td>
+                        <td>{foodEntry.protein}</td>
 
-                <td>0</td>
+                        <td>115</td>
 
-                <td>6</td>
+                        <td>
+                          {' '}
+                          {foodEntry.sugar === null ? 0 : foodEntry.sugar}
+                        </td>
 
-                <td className="delete">
-                  <div className="flex items-center justify-center">
-                    <AiFillMinusCircle size={24} color="red" />
-                  </div>
-                </td>
-              </tr>
-
-              <tr>
-                <td className={styles.foodName}>
-                  <a
-                    className="js-show-edit-food"
-                    data-food-entry-id="10049039241"
-                    data-locale=""
-                    href="#"
-                  >
-                    Raspberry, 100 gram(s)
-                  </a>
-                </td>
-
-                <td>52</td>
-
-                <td>
-                  <span className="macro-value">12</span>
-                  <span className="macro-percentage">82</span>
-                </td>
-
-                <td>
-                  <span className="macro-value">1</span>
-                  <span className="macro-percentage">10</span>
-                </td>
-
-                <td>
-                  <span className="macro-value">1</span>
-                  <span className="macro-percentage">8</span>
-                </td>
-
-                <td>1</td>
-
-                <td>4</td>
-
-                <td className="delete">
-                  <div className="flex items-center justify-center">
-                    <AiFillMinusCircle size={24} color="red" />
-                  </div>
-                </td>
-              </tr>
-
-              <tr>
-                <td className={styles.foodName}>
-                  <a
-                    className="js-show-edit-food"
-                    data-food-entry-id="10049060980"
-                    data-locale=""
-                    href="#"
-                  >
-                    Lind Excellence - 90% Cacao, 25 g
-                  </a>
-                </td>
-
-                <td>148</td>
-
-                <td>
-                  <span className="macro-value">4</span>
-                  <span className="macro-percentage">9</span>
-                </td>
-
-                <td>
-                  <span className="macro-value">14</span>
-                  <span className="macro-percentage">84</span>
-                </td>
-
-                <td>
-                  <span className="macro-value">3</span>
-                  <span className="macro-percentage">7</span>
-                </td>
-
-                <td>0</td>
-
-                <td>2</td>
-
-                <td className="delete">
-                  <div className="flex items-center justify-center">
-                    <AiFillMinusCircle size={24} color="red" />
-                  </div>
-                </td>
-              </tr>
-
-              <tr>
-                <td className={styles.foodName}>
-                  <a
-                    className="js-show-edit-food"
-                    data-food-entry-id="10049061101"
-                    data-locale=""
-                    href="#"
-                  >
-                    helcom - pinaple, 100 g
-                  </a>
-                </td>
-
-                <td>64</td>
-
-                <td>
-                  <span className="macro-value">16</span>
-                  <span className="macro-percentage">100</span>
-                </td>
-
-                <td>
-                  <span className="macro-value">0</span>
-                  <span className="macro-percentage">0</span>
-                </td>
-
-                <td>
-                  <span className="macro-value">0</span>
-                  <span className="macro-percentage">0</span>
-                </td>
-
-                <td>0</td>
-
-                <td>0</td>
-
-                <td className="delete">
-                  <div className="flex items-center justify-center">
-                    <AiFillMinusCircle size={24} color="red" />
-                  </div>
-                </td>
-              </tr>
-
-              <tr>
-                <td className={styles.foodName}>
-                  <a
-                    className="js-show-edit-food"
-                    data-food-entry-id="10049061655"
-                    data-locale=""
-                    href="#"
-                  >
-                    Whitworths - Ground Rice, 125 g
-                  </a>
-                </td>
-
-                <td>449</td>
-
-                <td>
-                  <span className="macro-value">102</span>
-                  <span className="macro-percentage">91</span>
-                </td>
-
-                <td>
-                  <span className="macro-value">0</span>
-                  <span className="macro-percentage">1</span>
-                </td>
-
-                <td>
-                  <span className="macro-value">9</span>
-                  <span className="macro-percentage">8</span>
-                </td>
-
-                <td>0</td>
-
-                <td>1</td>
-
-                <td className="delete">
-                  <div className="flex items-center justify-center">
-                    <AiFillMinusCircle size={24} color="red" />
-                  </div>
-                </td>
-              </tr>
-
-              <tr>
-                <td className={styles.foodName}>
-                  <a
-                    className="js-show-edit-food"
-                    data-food-entry-id="10049062724"
-                    data-locale=""
-                    href="#"
-                  >
-                    Blueberries, 175 g
-                  </a>
-                </td>
-
-                <td>149</td>
-
-                <td>
-                  <span className="macro-value">37</span>
-                  <span className="macro-percentage">90</span>
-                </td>
-
-                <td>
-                  <span className="macro-value">1</span>
-                  <span className="macro-percentage">5</span>
-                </td>
-
-                <td>
-                  <span className="macro-value">2</span>
-                  <span className="macro-percentage">5</span>
-                </td>
-
-                <td>2</td>
-
-                <td>26</td>
-
-                <td className="delete">
-                  <div className="flex items-center justify-center">
-                    <AiFillMinusCircle size={24} color="red" />
-                  </div>
-                </td>
-              </tr>
-
+                        <td className="delete">
+                          <div className="flex items-center justify-center">
+                            <AiFillMinusCircle size={24} color="red" />
+                          </div>
+                        </td>
+                      </tr>
+                    </>
+                  );
+                }
+              })}
               <tr className={styles.bottom}>
                 <td className={styles.foodName} style={{ zIndex: 7 }}>
                   <a
@@ -753,23 +582,52 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                   </div>
                 </td>
 
-                <td>1,037</td>
-
                 <td>
-                  <span className="macro-value">177</span>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'calories',
+                      'Snacks'
+                    )}
                 </td>
 
                 <td>
-                  <span className="macro-value">18</span>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'carbohydrate',
+                      'Snacks'
+                    )}
                 </td>
 
                 <td>
-                  <span className="macro-value">50</span>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'fat',
+                      'Snacks'
+                    )}
                 </td>
 
-                <td>3</td>
+                <td>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'protein',
+                      'Snacks'
+                    )}
+                </td>
 
-                <td>39</td>
+                <td>?</td>
+
+                <td>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'sugar',
+                      'Snacks'
+                    )}
+                </td>
 
                 <td></td>
               </tr>
@@ -777,39 +635,55 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
               <tr className="meal_header">
                 <td className={`${styles.mealHeading}`}>Meal&nbsp;5</td>
               </tr>
+              {usersFood?.getCurrentUsersFoodByDate.data?.map((foodEntry) => {
+                if (foodEntry.mealName === 'Meal 5') {
+                  return (
+                    <>
+                      <tr>
+                        <td className={styles.foodName}>
+                          <a
+                            className="js-show-edit-food"
+                            data-food-entry-id="10049060228"
+                            data-locale=""
+                            href="#"
+                          >
+                            {foodEntry.name},{' '}
+                            {`${foodEntry.numOfServings} ${foodEntry.servingSize}`}
+                          </a>
+                        </td>
 
-              <tr>
-                <td className={styles.foodName}>
-                  <a
-                    className="js-show-edit-food"
-                    data-food-entry-id="10049061885"
-                    data-locale=""
-                    href="#"
-                  >
-                    Sainsbury's - Boneless Scottish Salmon Fillet - Correct, 180
-                    g
-                  </a>
-                </td>
+                        {foodEntry.servingSize === 'g' ? (
+                          <td>{foodEntry.calories}</td>
+                        ) : (
+                          <td>
+                            {(foodEntry.calories as number) *
+                              foodEntry.numOfServings}
+                          </td>
+                        )}
 
-                <td>410</td>
+                        <td>{foodEntry.carbohydrate}</td>
 
-                <td>1</td>
+                        <td>{foodEntry.fat}</td>
 
-                <td>27</td>
+                        <td>{foodEntry.protein}</td>
 
-                <td>47</td>
+                        <td>115</td>
 
-                <td>94</td>
+                        <td>
+                          {' '}
+                          {foodEntry.sugar === null ? 0 : foodEntry.sugar}
+                        </td>
 
-                <td>1</td>
-
-                <td className="delete">
-                  <div className="flex items-center justify-center">
-                    <AiFillMinusCircle size={24} color="red" />
-                  </div>
-                </td>
-              </tr>
-
+                        <td className="delete">
+                          <div className="flex items-center justify-center">
+                            <AiFillMinusCircle size={24} color="red" />
+                          </div>
+                        </td>
+                      </tr>
+                    </>
+                  );
+                }
+              })}
               <tr className={styles.bottom}>
                 <td className={styles.foodName} style={{ zIndex: 6 }}>
                   <a
@@ -825,17 +699,52 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                   </div>
                 </td>
 
-                <td>410</td>
+                <td>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'calories',
+                      'Meal 5'
+                    )}
+                </td>
 
-                <td>1</td>
+                <td>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'carbohydrate',
+                      'Meal 5'
+                    )}
+                </td>
 
-                <td>27</td>
+                <td>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'fat',
+                      'Meal 5'
+                    )}
+                </td>
 
-                <td>42</td>
+                <td>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'protein',
+                      'Meal 5'
+                    )}
+                </td>
 
-                <td>94</td>
+                <td>?</td>
 
-                <td>1</td>
+                <td>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'sugar',
+                      'Meal 5'
+                    )}
+                </td>
 
                 <td></td>
               </tr>
@@ -843,7 +752,55 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
               <tr className="meal_header">
                 <td className={`${styles.mealHeading}`}>Meal&nbsp;6</td>
               </tr>
+              {usersFood?.getCurrentUsersFoodByDate.data?.map((foodEntry) => {
+                if (foodEntry.mealName === 'Meal 6') {
+                  return (
+                    <>
+                      <tr>
+                        <td className={styles.foodName}>
+                          <a
+                            className="js-show-edit-food"
+                            data-food-entry-id="10049060228"
+                            data-locale=""
+                            href="#"
+                          >
+                            {foodEntry.name},{' '}
+                            {`${foodEntry.numOfServings} ${foodEntry.servingSize}`}
+                          </a>
+                        </td>
 
+                        {foodEntry.servingSize === 'g' ? (
+                          <td>{foodEntry.calories}</td>
+                        ) : (
+                          <td>
+                            {(foodEntry.calories as number) *
+                              foodEntry.numOfServings}
+                          </td>
+                        )}
+
+                        <td>{foodEntry.carbohydrate}</td>
+
+                        <td>{foodEntry.fat}</td>
+
+                        <td>{foodEntry.protein}</td>
+
+                        <td>115</td>
+
+                        <td>
+                          {' '}
+                          {foodEntry.sugar === null ? 0 : foodEntry.sugar}
+                        </td>
+
+                        <td className="delete">
+                          <div className="flex items-center justify-center">
+                            <AiFillMinusCircle size={24} color="red" />
+                          </div>
+                        </td>
+                      </tr>
+                    </>
+                  );
+                }
+              })}
               <tr className={styles.bottom}>
                 <td className={styles.foodName} style={{ zIndex: 5 }}>
                   <a
@@ -858,27 +815,52 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                     </a>
                   </div>
                 </td>
-
-                <td>&nbsp;</td>
-
                 <td>
-                  <span className="macro-value">&nbsp;</span>
-                  <span className="macro-percentage">&nbsp;</span>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'calories',
+                      'Meal 6'
+                    )}
                 </td>
 
                 <td>
-                  <span className="macro-value">&nbsp;</span>
-                  <span className="macro-percentage">&nbsp;</span>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'carbohydrate',
+                      'Meal 6'
+                    )}
                 </td>
 
                 <td>
-                  <span className="macro-value">&nbsp;</span>
-                  <span className="macro-percentage">&nbsp;</span>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'fat',
+                      'Meal 6'
+                    )}
                 </td>
 
-                <td>&nbsp;</td>
+                <td>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'protein',
+                      'Meal 6'
+                    )}
+                </td>
 
-                <td>&nbsp;</td>
+                <td>?</td>
+
+                <td>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'sugar',
+                      'Meal 6'
+                    )}
+                </td>
 
                 <td></td>
               </tr>
@@ -893,17 +875,52 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
               <tr className={styles.totals}>
                 <td className={styles.totalsFirstCell}>Totals</td>
 
-                <td>2,658</td>
+                <td>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'calories',
+                      'All'
+                    )}
+                </td>
 
-                <td>254</td>
+                <td>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'carbohydrate',
+                      'All'
+                    )}
+                </td>
 
-                <td>80</td>
+                <td>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'fat',
+                      'All'
+                    )}
+                </td>
 
-                <td>240</td>
+                <td>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'protein',
+                      'All'
+                    )}
+                </td>
 
-                <td>755</td>
+                <td>?</td>
 
-                <td>40</td>
+                <td>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'sugar',
+                      'All'
+                    )}
+                </td>
 
                 <td className={styles.emptyCell}></td>
               </tr>
@@ -911,26 +928,118 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
               <tr className={styles.totals}>
                 <td className={styles.totalsFirstCell}>Your Daily Goal </td>
 
-                <td>2,850</td>
-                <td>321</td>
-                <td>63</td>
-                <td>249</td>
-                <td>2,300</td>
-                <td>74</td>
+                <td>{usersGoals?.getCurrentUsersGoals.data?.calories}</td>
+                <td>
+                  {Math.round(
+                    calculateGramsFromMacronutrient(
+                      calculatePercentage(
+                        usersGoals?.getCurrentUsersGoals.data
+                          ?.carbohydrate as number,
+                        usersGoals?.getCurrentUsersGoals.data
+                          ?.calories as number
+                      ),
+                      'carbohydrate'
+                    )
+                  )}
+                </td>
+                <td>
+                  {Math.round(
+                    calculateGramsFromMacronutrient(
+                      calculatePercentage(
+                        usersGoals?.getCurrentUsersGoals.data?.fat as number,
+                        usersGoals?.getCurrentUsersGoals.data
+                          ?.calories as number
+                      ),
+                      'fat'
+                    )
+                  )}
+                </td>
+                <td>
+                  {Math.round(
+                    calculateGramsFromMacronutrient(
+                      calculatePercentage(
+                        usersGoals?.getCurrentUsersGoals.data
+                          ?.protein as number,
+                        usersGoals?.getCurrentUsersGoals.data
+                          ?.calories as number
+                      ),
+                      'protein'
+                    )
+                  )}
+                </td>
+                <td>?</td>
+                <td>?</td>
                 <td className={styles.emptyCell}></td>
               </tr>
 
               <tr className={styles.totals}>
                 <td className={styles.totalsFirstCell}>Remaining</td>
 
-                <td className={styles.possitive}>192</td>
                 <td className={styles.possitive}>
-                  <span className="macro-value">67</span>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    (usersGoals?.getCurrentUsersGoals.data
+                      ?.calories as number) -
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'calories',
+                        'All'
+                      )}
                 </td>
-                <td className={styles.negative}>-17</td>
-                <td className={styles.possitive}>9</td>
-                <td className={styles.possitive}>1,545</td>
-                <td className={styles.possitive}>34</td>
+                <td className={styles.possitive}>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    Math.round(
+                      calculateGramsFromMacronutrient(
+                        calculatePercentage(
+                          usersGoals?.getCurrentUsersGoals.data
+                            ?.carbohydrate as number,
+                          usersGoals?.getCurrentUsersGoals.data
+                            ?.calories as number
+                        ),
+                        'carbohydrate'
+                      )
+                    ) -
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'carbohydrate',
+                        'All'
+                      )}
+                </td>
+                <td className={styles.negative}>{usersFood?.getCurrentUsersFoodByDate.data &&
+                    Math.round(
+                      calculateGramsFromMacronutrient(
+                        calculatePercentage(
+                          usersGoals?.getCurrentUsersGoals.data
+                            ?.fat as number,
+                          usersGoals?.getCurrentUsersGoals.data
+                            ?.calories as number
+                        ),
+                        'fat'
+                      )
+                    ) -
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'fat',
+                        'All'
+                      )}</td>
+                <td className={styles.possitive}>{usersFood?.getCurrentUsersFoodByDate.data &&
+                    Math.round(
+                      calculateGramsFromMacronutrient(
+                        calculatePercentage(
+                          usersGoals?.getCurrentUsersGoals.data
+                            ?.protein as number,
+                          usersGoals?.getCurrentUsersGoals.data
+                            ?.calories as number
+                        ),
+                        'protein'
+                      )
+                    ) -
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'protein',
+                        'All'
+                      )}</td>
+                <td className={styles.possitive}>?</td>
+                <td className={styles.possitive}>?</td>
                 <td className={styles.emptyCell}></td>
               </tr>
             </tbody>

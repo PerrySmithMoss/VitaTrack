@@ -63,6 +63,56 @@ export type ExercisesInput = {
   unilateral?: InputMaybe<Scalars['Boolean']>;
 };
 
+export type Food = {
+  __typename?: 'Food';
+  calories: Scalars['Int'];
+  carbohydrate: Scalars['Float'];
+  createdAt: Scalars['DateTime'];
+  fat: Scalars['Float'];
+  id: Scalars['ID'];
+  mealName: Scalars['String'];
+  name: Scalars['String'];
+  numOfServings: Scalars['Float'];
+  nutrition: Array<Nutrition>;
+  nutritionId: Scalars['ID'];
+  protein: Scalars['Float'];
+  servingSize: Scalars['String'];
+  sugar: Scalars['Float'];
+  updatedAt: Scalars['DateTime'];
+  user: User;
+  userId: Scalars['String'];
+};
+
+export type FoodFieldError = {
+  __typename?: 'FoodFieldError';
+  field: Scalars['String'];
+  message: Scalars['String'];
+};
+
+export type FoodInput = {
+  calories: Scalars['Int'];
+  carbohydrate: Scalars['Float'];
+  fat: Scalars['Float'];
+  mealName: Scalars['String'];
+  name: Scalars['String'];
+  numOfServings: Scalars['Float'];
+  protein: Scalars['Float'];
+  servingSize: Scalars['String'];
+  sugar: Scalars['Float'];
+};
+
+export type FoodResponse = {
+  __typename?: 'FoodResponse';
+  data?: Maybe<Food>;
+  errors?: Maybe<Array<FoodFieldError>>;
+};
+
+export type FoodResponseIterable = {
+  __typename?: 'FoodResponseIterable';
+  data?: Maybe<Array<Food>>;
+  errors?: Maybe<Array<FoodFieldError>>;
+};
+
 export type Goals = {
   __typename?: 'Goals';
   calories?: Maybe<Scalars['Int']>;
@@ -109,6 +159,7 @@ export type LogoutUserResponse = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addFood: FoodResponse;
   addNutrition: NutritionResponse;
   createUser: UserResponse;
   createWorkout: WorkoutResponse;
@@ -116,6 +167,13 @@ export type Mutation = {
   loginUserWithEmailAndPassword: UserResponse;
   logoutUser: LogoutUserResponse;
   upsertUserGoals: GoalsResponse;
+};
+
+
+export type MutationAddFoodArgs = {
+  date: Scalars['DateTime'];
+  foodInput: FoodInput;
+  nutritionId: Scalars['Int'];
 };
 
 
@@ -163,6 +221,7 @@ export type Nutrition = {
   createdAt: Scalars['DateTime'];
   date: Scalars['DateTime'];
   fat?: Maybe<Scalars['Int']>;
+  foods: Array<Food>;
   id: Scalars['ID'];
   protein?: Maybe<Scalars['Int']>;
   updatedAt: Scalars['DateTime'];
@@ -209,10 +268,17 @@ export type Profile = {
 export type Query = {
   __typename?: 'Query';
   getCurrentUser?: Maybe<UserResponse>;
+  getCurrentUsersFood: FoodResponseIterable;
+  getCurrentUsersFoodByDate: FoodResponseIterable;
   getCurrentUsersGoals: GoalsResponse;
   getCurrentUsersNutrition: NutritionResponseIterable;
   getCurrentUsersNutritionByDate: NutritionResponse;
   getUsersWorkouts: WorkoutResponseIterable;
+};
+
+
+export type QueryGetCurrentUsersFoodByDateArgs = {
+  date?: InputMaybe<Scalars['DateTime']>;
 };
 
 
@@ -324,6 +390,15 @@ export type WorkoutResponseIterable = {
   errors?: Maybe<Array<WorkoutFieldError>>;
 };
 
+export type MutationMutationVariables = Exact<{
+  foodInput: FoodInput;
+  date: Scalars['DateTime'];
+  nutritionId: Scalars['Int'];
+}>;
+
+
+export type MutationMutation = { __typename?: 'Mutation', addFood: { __typename?: 'FoodResponse', errors?: Array<{ __typename?: 'FoodFieldError', field: string, message: string }> | null, data?: { __typename?: 'Food', id: string, createdAt: any, updatedAt: any, name: string, mealName: string, numOfServings: number, servingSize: string, calories: number, protein: number, fat: number, carbohydrate: number, sugar: number, userId: string, nutritionId: string } | null } };
+
 export type AddNutritionMutationVariables = Exact<{
   nutritionInput: NutritionInput;
 }>;
@@ -384,6 +459,13 @@ export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetCurrentUserQuery = { __typename?: 'Query', getCurrentUser?: { __typename?: 'UserResponse', data?: { __typename?: 'User', id: string, email: string, username: string, profile?: { __typename?: 'Profile', avatar?: string | null, bio?: string | null, id: string } | null, session?: { __typename?: 'Session', userId: string, valid: boolean, userAgent: string, createdAt: any, updatedAt: any } | null } | null } | null };
 
+export type GetCurrentUsersFoodByDateQueryVariables = Exact<{
+  date?: InputMaybe<Scalars['DateTime']>;
+}>;
+
+
+export type GetCurrentUsersFoodByDateQuery = { __typename?: 'Query', getCurrentUsersFoodByDate: { __typename?: 'FoodResponseIterable', errors?: Array<{ __typename?: 'FoodFieldError', field: string, message: string }> | null, data?: Array<{ __typename?: 'Food', id: string, createdAt: any, updatedAt: any, name: string, mealName: string, calories: number, protein: number, fat: number, carbohydrate: number, sugar: number, numOfServings: number, servingSize: string, userId: string, nutritionId: string }> | null } };
+
 export type GetCurrentUsersGoalsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -407,6 +489,42 @@ export type GetUsersWorkoutsQueryVariables = Exact<{ [key: string]: never; }>;
 export type GetUsersWorkoutsQuery = { __typename?: 'Query', getUsersWorkouts: { __typename?: 'WorkoutResponseIterable', errors?: Array<{ __typename?: 'WorkoutFieldError', field: string, message: string }> | null, data?: Array<{ __typename?: 'Workout', id: string, createdAt: any, updatedAt: any, name: string, startTime: string, endTime: string, bodyweight?: number | null, notes?: string | null, userId: string, exercises: Array<{ __typename?: 'Exercise', id: string, createdAt: any, updatedAt: any, name: string, category: string, exerciseType: string, unilateral?: boolean | null, workoutId: number, strengthSets: Array<{ __typename?: 'StrengthSet', id: string, createdAt: any, updatedAt: any, setNumber?: number | null, weight?: string | null, reps?: string | null, notes?: string | null, exerciseId: string }>, cardioSets: Array<{ __typename?: 'CardioSet', id: string, createdAt: any, updatedAt: any, setNumber?: number | null, minutes?: string | null, seconds?: string | null, distance?: string | null, caloriesBurned?: string | null, notes?: string | null, exerciseId: string }> }> }> | null } };
 
 
+export const MutationDocument = /*#__PURE__*/ `
+    mutation Mutation($foodInput: FoodInput!, $date: DateTime!, $nutritionId: Int!) {
+  addFood(foodInput: $foodInput, date: $date, nutritionId: $nutritionId) {
+    errors {
+      field
+      message
+    }
+    data {
+      id
+      createdAt
+      updatedAt
+      name
+      mealName
+      numOfServings
+      servingSize
+      calories
+      protein
+      fat
+      carbohydrate
+      sugar
+      userId
+      nutritionId
+    }
+  }
+}
+    `;
+export const useMutationMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<MutationMutation, TError, MutationMutationVariables, TContext>) =>
+    useMutation<MutationMutation, TError, MutationMutationVariables, TContext>(
+      ['Mutation'],
+      (variables?: MutationMutationVariables) => customFetcher<MutationMutation, MutationMutationVariables>(MutationDocument, variables)(),
+      options
+    );
+useMutationMutation.fetcher = (variables: MutationMutationVariables, options?: RequestInit['headers']) => customFetcher<MutationMutation, MutationMutationVariables>(MutationDocument, variables, options);
 export const AddNutritionDocument = /*#__PURE__*/ `
     mutation AddNutrition($nutritionInput: NutritionInput!) {
   addNutrition(nutritionInput: $nutritionInput) {
@@ -688,6 +806,51 @@ useGetCurrentUserQuery.getKey = (variables?: GetCurrentUserQueryVariables) => va
 ;
 
 useGetCurrentUserQuery.fetcher = (variables?: GetCurrentUserQueryVariables, options?: RequestInit['headers']) => customFetcher<GetCurrentUserQuery, GetCurrentUserQueryVariables>(GetCurrentUserDocument, variables, options);
+export const GetCurrentUsersFoodByDateDocument = /*#__PURE__*/ `
+    query GetCurrentUsersFoodByDate($date: DateTime) {
+  getCurrentUsersFoodByDate(date: $date) {
+    errors {
+      field
+      message
+    }
+    data {
+      id
+      createdAt
+      updatedAt
+      name
+      mealName
+      calories
+      protein
+      fat
+      carbohydrate
+      sugar
+      numOfServings
+      servingSize
+      userId
+      nutritionId
+    }
+  }
+}
+    `;
+export const useGetCurrentUsersFoodByDateQuery = <
+      TData = GetCurrentUsersFoodByDateQuery,
+      TError = unknown
+    >(
+      variables?: GetCurrentUsersFoodByDateQueryVariables,
+      options?: UseQueryOptions<GetCurrentUsersFoodByDateQuery, TError, TData>
+    ) =>
+    useQuery<GetCurrentUsersFoodByDateQuery, TError, TData>(
+      variables === undefined ? ['GetCurrentUsersFoodByDate'] : ['GetCurrentUsersFoodByDate', variables],
+      customFetcher<GetCurrentUsersFoodByDateQuery, GetCurrentUsersFoodByDateQueryVariables>(GetCurrentUsersFoodByDateDocument, variables),
+      options
+    );
+useGetCurrentUsersFoodByDateQuery.document = GetCurrentUsersFoodByDateDocument;
+
+
+useGetCurrentUsersFoodByDateQuery.getKey = (variables?: GetCurrentUsersFoodByDateQueryVariables) => variables === undefined ? ['GetCurrentUsersFoodByDate'] : ['GetCurrentUsersFoodByDate', variables];
+;
+
+useGetCurrentUsersFoodByDateQuery.fetcher = (variables?: GetCurrentUsersFoodByDateQueryVariables, options?: RequestInit['headers']) => customFetcher<GetCurrentUsersFoodByDateQuery, GetCurrentUsersFoodByDateQueryVariables>(GetCurrentUsersFoodByDateDocument, variables, options);
 export const GetCurrentUsersGoalsDocument = /*#__PURE__*/ `
     query GetCurrentUsersGoals {
   getCurrentUsersGoals {

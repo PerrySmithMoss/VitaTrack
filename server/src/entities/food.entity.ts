@@ -20,21 +20,24 @@ export class Food {
   mealName: string;
 
   @Field(() => Float)
-  quantity: number;
+  numOfServings: number;
 
-  @Field(() => Int, { nullable: true })
+  @Field(() => String)
+  servingSize: string;
+
+  @Field(() => Int)
   calories: number;
 
-  @Field(() => Float, { nullable: true })
+  @Field(() => Float)
   protein: number;
 
-  @Field(() => Float, { nullable: true })
+  @Field(() => Float)
   fat: number;
 
-  @Field(() => Float, { nullable: true })
+  @Field(() => Float)
   carbohydrate: number;
 
-  @Field(() => Float, { nullable: true })
+  @Field(() => Float)
   sugar: number;
 
   @Field(() => User)

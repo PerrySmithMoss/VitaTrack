@@ -1,0 +1,24 @@
+mutation Mutation($foodInput: FoodInput!, $date: DateTime!, $nutritionId: Int!) {
+  addFood(foodInput: $foodInput, date: $date, nutritionId: $nutritionId) {
+    errors {
+      field
+      message
+    }
+    data {
+      id
+      createdAt
+      updatedAt
+      name
+      mealName
+      numOfServings
+      servingSize
+      calories
+      protein
+      fat
+      carbohydrate
+      sugar
+      userId
+      nutritionId
+    }
+  }
+}
