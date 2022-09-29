@@ -34,6 +34,24 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
     // refetchUsersFood({date: selectedDate});
   };
 
+  function convertFloatToOneDecimalPlace(number: number) {
+    const isDecimal = number - Math.floor(number) !== 0;
+
+    if (isDecimal) {
+      return parseFloat(((Math.round(number * 100) / 100).toFixed(1)));
+    } else {
+      return number;
+    }
+  }
+
+  function isNumberPositive(num: number) {
+    if(isNaN(Number(num)) || Number(num) < 0) {
+      return false;
+    } else {
+      return true
+    }
+  }
+
   function sumBy(
     foodItemValues: Food[],
     key: 'calories' | 'carbohydrate' | 'protein' | 'fat' | 'sugar',
@@ -67,16 +85,6 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
 
     return total;
   }
-
-  // function totalBy(
-  //   key
-  // ) {
-
-  // }
-
-  // console.log(
-  //   sumBy(usersFood?.getCurrentUsersFoodByDate?.data as Food[], 'calories', "Breakfast")
-  // );
 
   return (
     <div className="mt-10">
@@ -191,24 +199,36 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         </td>
 
                         {foodEntry.servingSize === 'g' ? (
-                          <td>{foodEntry.calories}</td>
+                          <td>
+                            {convertFloatToOneDecimalPlace(foodEntry.calories)}
+                          </td>
                         ) : (
                           <td>
-                            {(foodEntry.calories as number) *
-                              foodEntry.numOfServings}
+                            {convertFloatToOneDecimalPlace(
+                              (foodEntry.calories as number) *
+                                foodEntry.numOfServings
+                            )}
                           </td>
                         )}
 
-                        <td>{foodEntry.carbohydrate}</td>
+                        <td>
+                          {convertFloatToOneDecimalPlace(
+                            foodEntry.carbohydrate
+                          )}
+                        </td>
 
-                        <td>{foodEntry.fat}</td>
+                        <td>{convertFloatToOneDecimalPlace(foodEntry.fat)}</td>
 
-                        <td>{foodEntry.protein}</td>
+                        <td>
+                          {convertFloatToOneDecimalPlace(foodEntry.protein)}
+                        </td>
 
                         <td>?</td>
 
                         <td>
-                          {foodEntry.sugar === null ? 0 : foodEntry.sugar}
+                          {foodEntry.sugar === null
+                            ? 0
+                            : convertFloatToOneDecimalPlace(foodEntry.sugar)}
                         </td>
 
                         <td className="delete">
@@ -237,37 +257,45 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                 </td>
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'calories',
-                      'Breakfast'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'calories',
+                        'Breakfast'
+                      )
                     )}
                 </td>
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'carbohydrate',
-                      'Breakfast'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'carbohydrate',
+                        'Breakfast'
+                      )
                     )}
                 </td>
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'fat',
-                      'Breakfast'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'fat',
+                        'Breakfast'
+                      )
                     )}
                 </td>
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'protein',
-                      'Breakfast'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'protein',
+                        'Breakfast'
+                      )
                     )}
                 </td>
 
@@ -275,10 +303,12 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'sugar',
-                      'Breakfast'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'sugar',
+                        'Breakfast'
+                      )
                     )}
                 </td>
               </tr>
@@ -304,25 +334,37 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         </td>
 
                         {foodEntry.servingSize === 'g' ? (
-                          <td>{foodEntry.calories}</td>
+                          <td>
+                            {convertFloatToOneDecimalPlace(foodEntry.calories)}
+                          </td>
                         ) : (
                           <td>
-                            {(foodEntry.calories as number) *
-                              foodEntry.numOfServings}
+                            {convertFloatToOneDecimalPlace(
+                              (foodEntry.calories as number) *
+                                foodEntry.numOfServings
+                            )}
                           </td>
                         )}
 
-                        <td>{foodEntry.carbohydrate}</td>
+                        <td>
+                          {convertFloatToOneDecimalPlace(
+                            foodEntry.carbohydrate
+                          )}
+                        </td>
 
-                        <td>{foodEntry.fat}</td>
+                        <td>{convertFloatToOneDecimalPlace(foodEntry.fat)}</td>
 
-                        <td>{foodEntry.protein}</td>
+                        <td>
+                          {convertFloatToOneDecimalPlace(foodEntry.protein)}
+                        </td>
 
-                        <td>115</td>
+                        <td>?</td>
 
                         <td>
                           {' '}
-                          {foodEntry.sugar === null ? 0 : foodEntry.sugar}
+                          {foodEntry.sugar === null
+                            ? 0
+                            : convertFloatToOneDecimalPlace(foodEntry.sugar)}
                         </td>
 
                         <td className="delete">
@@ -351,37 +393,45 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                 </td>
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'calories',
-                      'Lunch'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'calories',
+                        'Lunch'
+                      )
                     )}
                 </td>
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'carbohydrate',
-                      'Lunch'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'carbohydrate',
+                        'Lunch'
+                      )
                     )}
                 </td>
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'fat',
-                      'Lunch'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'fat',
+                        'Lunch'
+                      )
                     )}
                 </td>
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'protein',
-                      'Lunch'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'protein',
+                        'Lunch'
+                      )
                     )}
                 </td>
 
@@ -389,10 +439,12 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'sugar',
-                      'Lunch'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'sugar',
+                        'Lunch'
+                      )
                     )}
                 </td>
 
@@ -419,25 +471,37 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         </td>
 
                         {foodEntry.servingSize === 'g' ? (
-                          <td>{foodEntry.calories}</td>
+                          <td>
+                            {convertFloatToOneDecimalPlace(foodEntry.calories)}
+                          </td>
                         ) : (
                           <td>
-                            {(foodEntry.calories as number) *
-                              foodEntry.numOfServings}
+                            {convertFloatToOneDecimalPlace(
+                              (foodEntry.calories as number) *
+                                foodEntry.numOfServings
+                            )}
                           </td>
                         )}
 
-                        <td>{foodEntry.carbohydrate}</td>
+                        <td>
+                          {convertFloatToOneDecimalPlace(
+                            foodEntry.carbohydrate
+                          )}
+                        </td>
 
-                        <td>{foodEntry.fat}</td>
+                        <td>{convertFloatToOneDecimalPlace(foodEntry.fat)}</td>
 
-                        <td>{foodEntry.protein}</td>
+                        <td>
+                          {convertFloatToOneDecimalPlace(foodEntry.protein)}
+                        </td>
 
-                        <td>115</td>
+                        <td>?</td>
 
                         <td>
                           {' '}
-                          {foodEntry.sugar === null ? 0 : foodEntry.sugar}
+                          {foodEntry.sugar === null
+                            ? 0
+                            : convertFloatToOneDecimalPlace(foodEntry.sugar)}
                         </td>
 
                         <td className="delete">
@@ -466,37 +530,45 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                 </td>
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'calories',
-                      'Dinner'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'calories',
+                        'Dinner'
+                      )
                     )}
                 </td>
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'carbohydrate',
-                      'Dinner'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'carbohydrate',
+                        'Dinner'
+                      )
                     )}
                 </td>
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'fat',
-                      'Dinner'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'fat',
+                        'Dinner'
+                      )
                     )}
                 </td>
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'protein',
-                      'Dinner'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'protein',
+                        'Dinner'
+                      )
                     )}
                 </td>
 
@@ -504,10 +576,12 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'sugar',
-                      'Dinner'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'sugar',
+                        'Dinner'
+                      )
                     )}
                 </td>
 
@@ -536,25 +610,37 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         </td>
 
                         {foodEntry.servingSize === 'g' ? (
-                          <td>{foodEntry.calories}</td>
+                          <td>
+                            {convertFloatToOneDecimalPlace(foodEntry.calories)}
+                          </td>
                         ) : (
                           <td>
-                            {(foodEntry.calories as number) *
-                              foodEntry.numOfServings}
+                            {convertFloatToOneDecimalPlace(
+                              (foodEntry.calories as number) *
+                                foodEntry.numOfServings
+                            )}
                           </td>
                         )}
 
-                        <td>{foodEntry.carbohydrate}</td>
+                        <td>
+                          {convertFloatToOneDecimalPlace(
+                            foodEntry.carbohydrate
+                          )}
+                        </td>
 
-                        <td>{foodEntry.fat}</td>
+                        <td>{convertFloatToOneDecimalPlace(foodEntry.fat)}</td>
 
-                        <td>{foodEntry.protein}</td>
+                        <td>
+                          {convertFloatToOneDecimalPlace(foodEntry.protein)}
+                        </td>
 
-                        <td>115</td>
+                        <td>?</td>
 
                         <td>
                           {' '}
-                          {foodEntry.sugar === null ? 0 : foodEntry.sugar}
+                          {foodEntry.sugar === null
+                            ? 0
+                            : convertFloatToOneDecimalPlace(foodEntry.sugar)}
                         </td>
 
                         <td className="delete">
@@ -584,37 +670,45 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'calories',
-                      'Snacks'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'calories',
+                        'Snacks'
+                      )
                     )}
                 </td>
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'carbohydrate',
-                      'Snacks'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'carbohydrate',
+                        'Snacks'
+                      )
                     )}
                 </td>
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'fat',
-                      'Snacks'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'fat',
+                        'Snacks'
+                      )
                     )}
                 </td>
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'protein',
-                      'Snacks'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'protein',
+                        'Snacks'
+                      )
                     )}
                 </td>
 
@@ -622,10 +716,12 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'sugar',
-                      'Snacks'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'sugar',
+                        'Snacks'
+                      )
                     )}
                 </td>
 
@@ -653,25 +749,37 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         </td>
 
                         {foodEntry.servingSize === 'g' ? (
-                          <td>{foodEntry.calories}</td>
+                          <td>
+                            {convertFloatToOneDecimalPlace(foodEntry.calories)}
+                          </td>
                         ) : (
                           <td>
-                            {(foodEntry.calories as number) *
-                              foodEntry.numOfServings}
+                            {convertFloatToOneDecimalPlace(
+                              (foodEntry.calories as number) *
+                                foodEntry.numOfServings
+                            )}
                           </td>
                         )}
 
-                        <td>{foodEntry.carbohydrate}</td>
+                        <td>
+                          {convertFloatToOneDecimalPlace(
+                            foodEntry.carbohydrate
+                          )}
+                        </td>
 
-                        <td>{foodEntry.fat}</td>
+                        <td>{convertFloatToOneDecimalPlace(foodEntry.fat)}</td>
 
-                        <td>{foodEntry.protein}</td>
+                        <td>
+                          {convertFloatToOneDecimalPlace(foodEntry.protein)}
+                        </td>
 
-                        <td>115</td>
+                        <td>?</td>
 
                         <td>
                           {' '}
-                          {foodEntry.sugar === null ? 0 : foodEntry.sugar}
+                          {foodEntry.sugar === null
+                            ? 0
+                            : convertFloatToOneDecimalPlace(foodEntry.sugar)}
                         </td>
 
                         <td className="delete">
@@ -701,37 +809,45 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'calories',
-                      'Meal 5'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'calories',
+                        'Meal 5'
+                      )
                     )}
                 </td>
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'carbohydrate',
-                      'Meal 5'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'carbohydrate',
+                        'Meal 5'
+                      )
                     )}
                 </td>
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'fat',
-                      'Meal 5'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'fat',
+                        'Meal 5'
+                      )
                     )}
                 </td>
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'protein',
-                      'Meal 5'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'protein',
+                        'Meal 5'
+                      )
                     )}
                 </td>
 
@@ -739,10 +855,12 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'sugar',
-                      'Meal 5'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'sugar',
+                        'Meal 5'
+                      )
                     )}
                 </td>
 
@@ -770,25 +888,37 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         </td>
 
                         {foodEntry.servingSize === 'g' ? (
-                          <td>{foodEntry.calories}</td>
+                          <td>
+                            {convertFloatToOneDecimalPlace(foodEntry.calories)}
+                          </td>
                         ) : (
                           <td>
-                            {(foodEntry.calories as number) *
-                              foodEntry.numOfServings}
+                            {convertFloatToOneDecimalPlace(
+                              (foodEntry.calories as number) *
+                                foodEntry.numOfServings
+                            )}
                           </td>
                         )}
 
-                        <td>{foodEntry.carbohydrate}</td>
+                        <td>
+                          {convertFloatToOneDecimalPlace(
+                            foodEntry.carbohydrate
+                          )}
+                        </td>
 
-                        <td>{foodEntry.fat}</td>
+                        <td>{convertFloatToOneDecimalPlace(foodEntry.fat)}</td>
 
-                        <td>{foodEntry.protein}</td>
+                        <td>
+                          {convertFloatToOneDecimalPlace(foodEntry.protein)}
+                        </td>
 
-                        <td>115</td>
+                        <td>?</td>
 
                         <td>
                           {' '}
-                          {foodEntry.sugar === null ? 0 : foodEntry.sugar}
+                          {foodEntry.sugar === null
+                            ? 0
+                            : convertFloatToOneDecimalPlace(foodEntry.sugar)}
                         </td>
 
                         <td className="delete">
@@ -817,37 +947,45 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                 </td>
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'calories',
-                      'Meal 6'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'calories',
+                        'Meal 6'
+                      )
                     )}
                 </td>
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'carbohydrate',
-                      'Meal 6'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'carbohydrate',
+                        'Meal 6'
+                      )
                     )}
                 </td>
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'fat',
-                      'Meal 6'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'fat',
+                        'Meal 6'
+                      )
                     )}
                 </td>
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'protein',
-                      'Meal 6'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'protein',
+                        'Meal 6'
+                      )
                     )}
                 </td>
 
@@ -855,10 +993,12 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'sugar',
-                      'Meal 6'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'sugar',
+                        'Meal 6'
+                      )
                     )}
                 </td>
 
@@ -877,37 +1017,45 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'calories',
-                      'All'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'calories',
+                        'All'
+                      )
                     )}
                 </td>
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'carbohydrate',
-                      'All'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'carbohydrate',
+                        'All'
+                      )
                     )}
                 </td>
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'fat',
-                      'All'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'fat',
+                        'All'
+                      )
                     )}
                 </td>
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'protein',
-                      'All'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'protein',
+                        'All'
+                      )
                     )}
                 </td>
 
@@ -915,10 +1063,12 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    sumBy(
-                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                      'sugar',
-                      'All'
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'sugar',
+                        'All'
+                      )
                     )}
                 </td>
 
@@ -930,40 +1080,46 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
 
                 <td>{usersGoals?.getCurrentUsersGoals.data?.calories}</td>
                 <td>
-                  {Math.round(
-                    calculateGramsFromMacronutrient(
-                      calculatePercentage(
-                        usersGoals?.getCurrentUsersGoals.data
-                          ?.carbohydrate as number,
-                        usersGoals?.getCurrentUsersGoals.data
-                          ?.calories as number
-                      ),
-                      'carbohydrate'
+                  {convertFloatToOneDecimalPlace(
+                    Math.round(
+                      calculateGramsFromMacronutrient(
+                        calculatePercentage(
+                          usersGoals?.getCurrentUsersGoals.data
+                            ?.carbohydrate as number,
+                          usersGoals?.getCurrentUsersGoals.data
+                            ?.calories as number
+                        ),
+                        'carbohydrate'
+                      )
                     )
                   )}
                 </td>
                 <td>
-                  {Math.round(
-                    calculateGramsFromMacronutrient(
-                      calculatePercentage(
-                        usersGoals?.getCurrentUsersGoals.data?.fat as number,
-                        usersGoals?.getCurrentUsersGoals.data
-                          ?.calories as number
-                      ),
-                      'fat'
+                  {convertFloatToOneDecimalPlace(
+                    Math.round(
+                      calculateGramsFromMacronutrient(
+                        calculatePercentage(
+                          usersGoals?.getCurrentUsersGoals.data?.fat as number,
+                          usersGoals?.getCurrentUsersGoals.data
+                            ?.calories as number
+                        ),
+                        'fat'
+                      )
                     )
                   )}
                 </td>
                 <td>
-                  {Math.round(
-                    calculateGramsFromMacronutrient(
-                      calculatePercentage(
-                        usersGoals?.getCurrentUsersGoals.data
-                          ?.protein as number,
-                        usersGoals?.getCurrentUsersGoals.data
-                          ?.calories as number
-                      ),
-                      'protein'
+                  {convertFloatToOneDecimalPlace(
+                    Math.round(
+                      calculateGramsFromMacronutrient(
+                        calculatePercentage(
+                          usersGoals?.getCurrentUsersGoals.data
+                            ?.protein as number,
+                          usersGoals?.getCurrentUsersGoals.data
+                            ?.calories as number
+                        ),
+                        'protein'
+                      )
                     )
                   )}
                 </td>
@@ -975,69 +1131,144 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
               <tr className={styles.totals}>
                 <td className={styles.totalsFirstCell}>Remaining</td>
 
-                <td className={styles.possitive}>
+                <td className={`${usersFood?.getCurrentUsersFoodByDate.data && isNumberPositive(
+                    convertFloatToOneDecimalPlace(
+                      (usersGoals?.getCurrentUsersGoals.data
+                        ?.calories as number) -
+                        sumBy(
+                          usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                          'calories',
+                          'All'
+                        )
+                    )) ? styles.possitive : styles.negative}`}>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    (usersGoals?.getCurrentUsersGoals.data
-                      ?.calories as number) -
-                      sumBy(
-                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                        'calories',
-                        'All'
-                      )}
+                    convertFloatToOneDecimalPlace(
+                      (usersGoals?.getCurrentUsersGoals.data
+                        ?.calories as number) -
+                        sumBy(
+                          usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                          'calories',
+                          'All'
+                        )
+                    )}
                 </td>
-                <td className={styles.possitive}>
+                <td className={`${usersFood?.getCurrentUsersFoodByDate.data && isNumberPositive(
+                    convertFloatToOneDecimalPlace(
+                      Math.round(
+                        calculateGramsFromMacronutrient(
+                          calculatePercentage(
+                            usersGoals?.getCurrentUsersGoals.data
+                              ?.carbohydrate as number,
+                            usersGoals?.getCurrentUsersGoals.data
+                              ?.calories as number
+                          ),
+                          'carbohydrate'
+                        )
+                      ) -
+                        sumBy(
+                          usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                          'carbohydrate',
+                          'All'
+                        )
+                    )) ? styles.possitive : styles.negative}`}>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
-                    Math.round(
-                      calculateGramsFromMacronutrient(
-                        calculatePercentage(
-                          usersGoals?.getCurrentUsersGoals.data
-                            ?.carbohydrate as number,
-                          usersGoals?.getCurrentUsersGoals.data
-                            ?.calories as number
-                        ),
-                        'carbohydrate'
-                      )
-                    ) -
-                      sumBy(
-                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                        'carbohydrate',
-                        'All'
-                      )}
+                    convertFloatToOneDecimalPlace(
+                      Math.round(
+                        calculateGramsFromMacronutrient(
+                          calculatePercentage(
+                            usersGoals?.getCurrentUsersGoals.data
+                              ?.carbohydrate as number,
+                            usersGoals?.getCurrentUsersGoals.data
+                              ?.calories as number
+                          ),
+                          'carbohydrate'
+                        )
+                      ) -
+                        sumBy(
+                          usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                          'carbohydrate',
+                          'All'
+                        )
+                    )}
                 </td>
-                <td className={styles.negative}>{usersFood?.getCurrentUsersFoodByDate.data &&
-                    Math.round(
-                      calculateGramsFromMacronutrient(
-                        calculatePercentage(
-                          usersGoals?.getCurrentUsersGoals.data
-                            ?.fat as number,
-                          usersGoals?.getCurrentUsersGoals.data
-                            ?.calories as number
-                        ),
-                        'fat'
-                      )
-                    ) -
-                      sumBy(
-                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                        'fat',
-                        'All'
-                      )}</td>
-                <td className={styles.possitive}>{usersFood?.getCurrentUsersFoodByDate.data &&
-                    Math.round(
-                      calculateGramsFromMacronutrient(
-                        calculatePercentage(
-                          usersGoals?.getCurrentUsersGoals.data
-                            ?.protein as number,
-                          usersGoals?.getCurrentUsersGoals.data
-                            ?.calories as number
-                        ),
-                        'protein'
-                      )
-                    ) -
-                      sumBy(
-                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                        'protein',
-                        'All'
-                      )}</td>
+                <td className={`${usersFood?.getCurrentUsersFoodByDate.data && isNumberPositive(
+                    convertFloatToOneDecimalPlace(
+                      Math.round(
+                        calculateGramsFromMacronutrient(
+                          calculatePercentage(
+                            usersGoals?.getCurrentUsersGoals.data
+                              ?.fat as number,
+                            usersGoals?.getCurrentUsersGoals.data
+                              ?.calories as number
+                          ),
+                          'fat'
+                        )
+                      ) -
+                        sumBy(
+                          usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                          'fat',
+                          'All'
+                        )
+                    )) ? styles.possitive : styles.negative}`}>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    convertFloatToOneDecimalPlace(
+                      Math.round(
+                        calculateGramsFromMacronutrient(
+                          calculatePercentage(
+                            usersGoals?.getCurrentUsersGoals.data
+                              ?.fat as number,
+                            usersGoals?.getCurrentUsersGoals.data
+                              ?.calories as number
+                          ),
+                          'fat'
+                        )
+                      ) -
+                        sumBy(
+                          usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                          'fat',
+                          'All'
+                        )
+                    )}
+                </td>
+                <td className={`${usersFood?.getCurrentUsersFoodByDate.data && isNumberPositive(
+                    convertFloatToOneDecimalPlace(
+                      Math.round(
+                        calculateGramsFromMacronutrient(
+                          calculatePercentage(
+                            usersGoals?.getCurrentUsersGoals.data
+                              ?.protein as number,
+                            usersGoals?.getCurrentUsersGoals.data
+                              ?.calories as number
+                          ),
+                          'protein'
+                        )
+                      ) -
+                        sumBy(
+                          usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                          'protein',
+                          'All'
+                        )
+                    )) ? styles.possitive : styles.negative}`}>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    convertFloatToOneDecimalPlace(
+                      Math.round(
+                        calculateGramsFromMacronutrient(
+                          calculatePercentage(
+                            usersGoals?.getCurrentUsersGoals.data
+                              ?.protein as number,
+                            usersGoals?.getCurrentUsersGoals.data
+                              ?.calories as number
+                          ),
+                          'protein'
+                        )
+                      ) -
+                        sumBy(
+                          usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                          'protein',
+                          'All'
+                        )
+                    )}
+                </td>
                 <td className={styles.possitive}>?</td>
                 <td className={styles.possitive}>?</td>
                 <td className={styles.emptyCell}></td>
