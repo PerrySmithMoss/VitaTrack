@@ -14,6 +14,8 @@ import {
   calculateGramsFromMacronutrient,
   calculatePercentage,
 } from '../../../utils/macroCalculations';
+import { isNumberPositive } from '../../../utils/isNumberPositive';
+import { convertFloatToOneDecimalPlace } from '../../../utils/convertFloatToOneDecimalPlace';
 
 interface FoodDiaryProps {}
 
@@ -21,36 +23,17 @@ const todaysDate = new Date();
 const yesterdaysDate = new Date(Date.now() - 86400000);
 
 export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
-  const [selectedDate, setSelectedDate] = useState<Date | null>(todaysDate);
+  const [selectedDate, setSelectedDate] = useState<Date>(todaysDate);
   const [isShowingCalendar, setIsShowingCalendar] = useState(false);
   const { data: usersGoals, refetch: refetchUsersGoals } =
     useGetCurrentUsersGoalsQuery();
   const { data: usersFood, refetch: refetchUsersFood } =
     useGetCurrentUsersFoodByDateQuery({ date: selectedDate });
-  console.log('usersGoals: ', usersGoals);
 
-  const handleChangeDate = (date: Date | null) => {
+  const handleChangeDate = (date: Date) => {
     setSelectedDate(date);
     // refetchUsersFood({date: selectedDate});
   };
-
-  function convertFloatToOneDecimalPlace(number: number) {
-    const isDecimal = number - Math.floor(number) !== 0;
-
-    if (isDecimal) {
-      return parseFloat(((Math.round(number * 100) / 100).toFixed(1)));
-    } else {
-      return number;
-    }
-  }
-
-  function isNumberPositive(num: number) {
-    if(isNaN(Number(num)) || Number(num) < 0) {
-      return false;
-    } else {
-      return true
-    }
-  }
 
   function sumBy(
     foodItemValues: Food[],
@@ -86,6 +69,16 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
     return total;
   }
 
+  const handleGoForwardOneDay = () => {
+    const tomorowsDate = selectedDate.setDate(selectedDate.getDate() + 1);
+    setSelectedDate(new Date(tomorowsDate));
+  };
+
+  const handleGoBackOneDay = () => {
+    const tomorowsDate = selectedDate.setDate(selectedDate.getDate() - 1);
+    setSelectedDate(new Date(tomorowsDate));
+  };
+
   return (
     <div className="mt-10">
       <div className=" border-t-2">
@@ -99,8 +92,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
             <div className="flex items-center">
               <button
                 type="button"
-                onClick={() => setIsShowingCalendar(!isShowingCalendar)}
-                aria-label="Choose Date"
+                onClick={handleGoBackOneDay}
+                aria-label="Go to yesterday's date"
                 className="p-2 m-0 outline-none bg-[#00548F] rounded-l"
               >
                 <FaChevronLeft size={24} color="white" />
@@ -110,7 +103,7 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
               <ReactDatePicker
                 dateFormat="do, MMMM, yyyy"
                 selected={selectedDate}
-                onChange={(date) => handleChangeDate(date)}
+                onChange={(date) => handleChangeDate(date as Date)}
                 onClickOutside={() => setIsShowingCalendar(!isShowingCalendar)}
                 open={isShowingCalendar}
                 onInputClick={() => setIsShowingCalendar(!isShowingCalendar)}
@@ -120,8 +113,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
             <div className="flex items-center">
               <button
                 type="button"
-                onClick={() => setIsShowingCalendar(!isShowingCalendar)}
-                aria-label="Choose Date"
+                onClick={handleGoForwardOneDay}
+                aria-label="Go to tomorrow's date"
                 className="p-2 m-0 outline-none bg-[#00548F]"
               >
                 <FaChevronRight size={24} color="white" />
@@ -184,60 +177,56 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
               {usersFood?.getCurrentUsersFoodByDate.data?.map((foodEntry) => {
                 if (foodEntry.mealName === 'Breakfast') {
                   return (
-                    <>
-                      <tr>
-                        <td className={styles.foodName}>
-                          <a
-                            className="js-show-edit-food"
-                            data-food-entry-id="10049060228"
-                            data-locale=""
-                            href="#"
-                          >
-                            {foodEntry.name},{' '}
-                            {`${foodEntry.numOfServings} ${foodEntry.servingSize}`}
-                          </a>
+                    <tr key={foodEntry.id}>
+                      <td className={styles.foodName}>
+                        <a
+                          className="js-show-edit-food"
+                          data-food-entry-id="10049060228"
+                          data-locale=""
+                          href="#"
+                        >
+                          {foodEntry.name},{' '}
+                          {`${foodEntry.numOfServings} ${foodEntry.servingSize}`}
+                        </a>
+                      </td>
+
+                      {foodEntry.servingSize === 'g' ? (
+                        <td>
+                          {convertFloatToOneDecimalPlace(foodEntry.calories)}
                         </td>
-
-                        {foodEntry.servingSize === 'g' ? (
-                          <td>
-                            {convertFloatToOneDecimalPlace(foodEntry.calories)}
-                          </td>
-                        ) : (
-                          <td>
-                            {convertFloatToOneDecimalPlace(
-                              (foodEntry.calories as number) *
-                                foodEntry.numOfServings
-                            )}
-                          </td>
-                        )}
-
+                      ) : (
                         <td>
                           {convertFloatToOneDecimalPlace(
-                            foodEntry.carbohydrate
+                            (foodEntry.calories as number) *
+                              foodEntry.numOfServings
                           )}
                         </td>
+                      )}
 
-                        <td>{convertFloatToOneDecimalPlace(foodEntry.fat)}</td>
+                      <td>
+                        {convertFloatToOneDecimalPlace(foodEntry.carbohydrate)}
+                      </td>
 
-                        <td>
-                          {convertFloatToOneDecimalPlace(foodEntry.protein)}
-                        </td>
+                      <td>{convertFloatToOneDecimalPlace(foodEntry.fat)}</td>
 
-                        <td>?</td>
+                      <td>
+                        {convertFloatToOneDecimalPlace(foodEntry.protein)}
+                      </td>
 
-                        <td>
-                          {foodEntry.sugar === null
-                            ? 0
-                            : convertFloatToOneDecimalPlace(foodEntry.sugar)}
-                        </td>
+                      <td>?</td>
 
-                        <td className="delete">
-                          <div className="flex items-center justify-center">
-                            <AiFillMinusCircle size={24} color="red" />
-                          </div>
-                        </td>
-                      </tr>
-                    </>
+                      <td>
+                        {foodEntry.sugar === null
+                          ? 0
+                          : convertFloatToOneDecimalPlace(foodEntry.sugar)}
+                      </td>
+
+                      <td className="delete">
+                        <div className="flex items-center justify-center">
+                          <AiFillMinusCircle size={24} color="red" />
+                        </div>
+                      </td>
+                    </tr>
                   );
                 }
               })}
@@ -319,61 +308,57 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
               {usersFood?.getCurrentUsersFoodByDate.data?.map((foodEntry) => {
                 if (foodEntry.mealName === 'Lunch') {
                   return (
-                    <>
-                      <tr>
-                        <td className={styles.foodName}>
-                          <a
-                            className="js-show-edit-food"
-                            data-food-entry-id="10049060228"
-                            data-locale=""
-                            href="#"
-                          >
-                            {foodEntry.name},{' '}
-                            {`${foodEntry.numOfServings} ${foodEntry.servingSize}`}
-                          </a>
+                    <tr key={foodEntry.id}>
+                      <td className={styles.foodName}>
+                        <a
+                          className="js-show-edit-food"
+                          data-food-entry-id="10049060228"
+                          data-locale=""
+                          href="#"
+                        >
+                          {foodEntry.name},{' '}
+                          {`${foodEntry.numOfServings} ${foodEntry.servingSize}`}
+                        </a>
+                      </td>
+
+                      {foodEntry.servingSize === 'g' ? (
+                        <td>
+                          {convertFloatToOneDecimalPlace(foodEntry.calories)}
                         </td>
-
-                        {foodEntry.servingSize === 'g' ? (
-                          <td>
-                            {convertFloatToOneDecimalPlace(foodEntry.calories)}
-                          </td>
-                        ) : (
-                          <td>
-                            {convertFloatToOneDecimalPlace(
-                              (foodEntry.calories as number) *
-                                foodEntry.numOfServings
-                            )}
-                          </td>
-                        )}
-
+                      ) : (
                         <td>
                           {convertFloatToOneDecimalPlace(
-                            foodEntry.carbohydrate
+                            (foodEntry.calories as number) *
+                              foodEntry.numOfServings
                           )}
                         </td>
+                      )}
 
-                        <td>{convertFloatToOneDecimalPlace(foodEntry.fat)}</td>
+                      <td>
+                        {convertFloatToOneDecimalPlace(foodEntry.carbohydrate)}
+                      </td>
 
-                        <td>
-                          {convertFloatToOneDecimalPlace(foodEntry.protein)}
-                        </td>
+                      <td>{convertFloatToOneDecimalPlace(foodEntry.fat)}</td>
 
-                        <td>?</td>
+                      <td>
+                        {convertFloatToOneDecimalPlace(foodEntry.protein)}
+                      </td>
 
-                        <td>
-                          {' '}
-                          {foodEntry.sugar === null
-                            ? 0
-                            : convertFloatToOneDecimalPlace(foodEntry.sugar)}
-                        </td>
+                      <td>?</td>
 
-                        <td className="delete">
-                          <div className="flex items-center justify-center">
-                            <AiFillMinusCircle size={24} color="red" />
-                          </div>
-                        </td>
-                      </tr>
-                    </>
+                      <td>
+                        {' '}
+                        {foodEntry.sugar === null
+                          ? 0
+                          : convertFloatToOneDecimalPlace(foodEntry.sugar)}
+                      </td>
+
+                      <td className="delete">
+                        <div className="flex items-center justify-center">
+                          <AiFillMinusCircle size={24} color="red" />
+                        </div>
+                      </td>
+                    </tr>
                   );
                 }
               })}
@@ -456,61 +441,57 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
               {usersFood?.getCurrentUsersFoodByDate.data?.map((foodEntry) => {
                 if (foodEntry.mealName === 'Dinner') {
                   return (
-                    <>
-                      <tr>
-                        <td className={styles.foodName}>
-                          <a
-                            className="js-show-edit-food"
-                            data-food-entry-id="10049060228"
-                            data-locale=""
-                            href="#"
-                          >
-                            {foodEntry.name},{' '}
-                            {`${foodEntry.numOfServings} ${foodEntry.servingSize}`}
-                          </a>
+                    <tr key={foodEntry.id}>
+                      <td className={styles.foodName}>
+                        <a
+                          className="js-show-edit-food"
+                          data-food-entry-id="10049060228"
+                          data-locale=""
+                          href="#"
+                        >
+                          {foodEntry.name},{' '}
+                          {`${foodEntry.numOfServings} ${foodEntry.servingSize}`}
+                        </a>
+                      </td>
+
+                      {foodEntry.servingSize === 'g' ? (
+                        <td>
+                          {convertFloatToOneDecimalPlace(foodEntry.calories)}
                         </td>
-
-                        {foodEntry.servingSize === 'g' ? (
-                          <td>
-                            {convertFloatToOneDecimalPlace(foodEntry.calories)}
-                          </td>
-                        ) : (
-                          <td>
-                            {convertFloatToOneDecimalPlace(
-                              (foodEntry.calories as number) *
-                                foodEntry.numOfServings
-                            )}
-                          </td>
-                        )}
-
+                      ) : (
                         <td>
                           {convertFloatToOneDecimalPlace(
-                            foodEntry.carbohydrate
+                            (foodEntry.calories as number) *
+                              foodEntry.numOfServings
                           )}
                         </td>
+                      )}
 
-                        <td>{convertFloatToOneDecimalPlace(foodEntry.fat)}</td>
+                      <td>
+                        {convertFloatToOneDecimalPlace(foodEntry.carbohydrate)}
+                      </td>
 
-                        <td>
-                          {convertFloatToOneDecimalPlace(foodEntry.protein)}
-                        </td>
+                      <td>{convertFloatToOneDecimalPlace(foodEntry.fat)}</td>
 
-                        <td>?</td>
+                      <td>
+                        {convertFloatToOneDecimalPlace(foodEntry.protein)}
+                      </td>
 
-                        <td>
-                          {' '}
-                          {foodEntry.sugar === null
-                            ? 0
-                            : convertFloatToOneDecimalPlace(foodEntry.sugar)}
-                        </td>
+                      <td>?</td>
 
-                        <td className="delete">
-                          <div className="flex items-center justify-center">
-                            <AiFillMinusCircle size={24} color="red" />
-                          </div>
-                        </td>
-                      </tr>
-                    </>
+                      <td>
+                        {' '}
+                        {foodEntry.sugar === null
+                          ? 0
+                          : convertFloatToOneDecimalPlace(foodEntry.sugar)}
+                      </td>
+
+                      <td className="delete">
+                        <div className="flex items-center justify-center">
+                          <AiFillMinusCircle size={24} color="red" />
+                        </div>
+                      </td>
+                    </tr>
                   );
                 }
               })}
@@ -595,61 +576,57 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
               {usersFood?.getCurrentUsersFoodByDate.data?.map((foodEntry) => {
                 if (foodEntry.mealName === 'Snacks') {
                   return (
-                    <>
-                      <tr>
-                        <td className={styles.foodName}>
-                          <a
-                            className="js-show-edit-food"
-                            data-food-entry-id="10049060228"
-                            data-locale=""
-                            href="#"
-                          >
-                            {foodEntry.name},{' '}
-                            {`${foodEntry.numOfServings} ${foodEntry.servingSize}`}
-                          </a>
+                    <tr key={foodEntry.id}>
+                      <td className={styles.foodName}>
+                        <a
+                          className="js-show-edit-food"
+                          data-food-entry-id="10049060228"
+                          data-locale=""
+                          href="#"
+                        >
+                          {foodEntry.name},{' '}
+                          {`${foodEntry.numOfServings} ${foodEntry.servingSize}`}
+                        </a>
+                      </td>
+
+                      {foodEntry.servingSize === 'g' ? (
+                        <td>
+                          {convertFloatToOneDecimalPlace(foodEntry.calories)}
                         </td>
-
-                        {foodEntry.servingSize === 'g' ? (
-                          <td>
-                            {convertFloatToOneDecimalPlace(foodEntry.calories)}
-                          </td>
-                        ) : (
-                          <td>
-                            {convertFloatToOneDecimalPlace(
-                              (foodEntry.calories as number) *
-                                foodEntry.numOfServings
-                            )}
-                          </td>
-                        )}
-
+                      ) : (
                         <td>
                           {convertFloatToOneDecimalPlace(
-                            foodEntry.carbohydrate
+                            (foodEntry.calories as number) *
+                              foodEntry.numOfServings
                           )}
                         </td>
+                      )}
 
-                        <td>{convertFloatToOneDecimalPlace(foodEntry.fat)}</td>
+                      <td>
+                        {convertFloatToOneDecimalPlace(foodEntry.carbohydrate)}
+                      </td>
 
-                        <td>
-                          {convertFloatToOneDecimalPlace(foodEntry.protein)}
-                        </td>
+                      <td>{convertFloatToOneDecimalPlace(foodEntry.fat)}</td>
 
-                        <td>?</td>
+                      <td>
+                        {convertFloatToOneDecimalPlace(foodEntry.protein)}
+                      </td>
 
-                        <td>
-                          {' '}
-                          {foodEntry.sugar === null
-                            ? 0
-                            : convertFloatToOneDecimalPlace(foodEntry.sugar)}
-                        </td>
+                      <td>?</td>
 
-                        <td className="delete">
-                          <div className="flex items-center justify-center">
-                            <AiFillMinusCircle size={24} color="red" />
-                          </div>
-                        </td>
-                      </tr>
-                    </>
+                      <td>
+                        {' '}
+                        {foodEntry.sugar === null
+                          ? 0
+                          : convertFloatToOneDecimalPlace(foodEntry.sugar)}
+                      </td>
+
+                      <td className="delete">
+                        <div className="flex items-center justify-center">
+                          <AiFillMinusCircle size={24} color="red" />
+                        </div>
+                      </td>
+                    </tr>
                   );
                 }
               })}
@@ -734,61 +711,57 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
               {usersFood?.getCurrentUsersFoodByDate.data?.map((foodEntry) => {
                 if (foodEntry.mealName === 'Meal 5') {
                   return (
-                    <>
-                      <tr>
-                        <td className={styles.foodName}>
-                          <a
-                            className="js-show-edit-food"
-                            data-food-entry-id="10049060228"
-                            data-locale=""
-                            href="#"
-                          >
-                            {foodEntry.name},{' '}
-                            {`${foodEntry.numOfServings} ${foodEntry.servingSize}`}
-                          </a>
+                    <tr key={foodEntry.id}>
+                      <td className={styles.foodName}>
+                        <a
+                          className="js-show-edit-food"
+                          data-food-entry-id="10049060228"
+                          data-locale=""
+                          href="#"
+                        >
+                          {foodEntry.name},{' '}
+                          {`${foodEntry.numOfServings} ${foodEntry.servingSize}`}
+                        </a>
+                      </td>
+
+                      {foodEntry.servingSize === 'g' ? (
+                        <td>
+                          {convertFloatToOneDecimalPlace(foodEntry.calories)}
                         </td>
-
-                        {foodEntry.servingSize === 'g' ? (
-                          <td>
-                            {convertFloatToOneDecimalPlace(foodEntry.calories)}
-                          </td>
-                        ) : (
-                          <td>
-                            {convertFloatToOneDecimalPlace(
-                              (foodEntry.calories as number) *
-                                foodEntry.numOfServings
-                            )}
-                          </td>
-                        )}
-
+                      ) : (
                         <td>
                           {convertFloatToOneDecimalPlace(
-                            foodEntry.carbohydrate
+                            (foodEntry.calories as number) *
+                              foodEntry.numOfServings
                           )}
                         </td>
+                      )}
 
-                        <td>{convertFloatToOneDecimalPlace(foodEntry.fat)}</td>
+                      <td>
+                        {convertFloatToOneDecimalPlace(foodEntry.carbohydrate)}
+                      </td>
 
-                        <td>
-                          {convertFloatToOneDecimalPlace(foodEntry.protein)}
-                        </td>
+                      <td>{convertFloatToOneDecimalPlace(foodEntry.fat)}</td>
 
-                        <td>?</td>
+                      <td>
+                        {convertFloatToOneDecimalPlace(foodEntry.protein)}
+                      </td>
 
-                        <td>
-                          {' '}
-                          {foodEntry.sugar === null
-                            ? 0
-                            : convertFloatToOneDecimalPlace(foodEntry.sugar)}
-                        </td>
+                      <td>?</td>
 
-                        <td className="delete">
-                          <div className="flex items-center justify-center">
-                            <AiFillMinusCircle size={24} color="red" />
-                          </div>
-                        </td>
-                      </tr>
-                    </>
+                      <td>
+                        {' '}
+                        {foodEntry.sugar === null
+                          ? 0
+                          : convertFloatToOneDecimalPlace(foodEntry.sugar)}
+                      </td>
+
+                      <td className="delete">
+                        <div className="flex items-center justify-center">
+                          <AiFillMinusCircle size={24} color="red" />
+                        </div>
+                      </td>
+                    </tr>
                   );
                 }
               })}
@@ -873,61 +846,57 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
               {usersFood?.getCurrentUsersFoodByDate.data?.map((foodEntry) => {
                 if (foodEntry.mealName === 'Meal 6') {
                   return (
-                    <>
-                      <tr>
-                        <td className={styles.foodName}>
-                          <a
-                            className="js-show-edit-food"
-                            data-food-entry-id="10049060228"
-                            data-locale=""
-                            href="#"
-                          >
-                            {foodEntry.name},{' '}
-                            {`${foodEntry.numOfServings} ${foodEntry.servingSize}`}
-                          </a>
+                    <tr key={foodEntry.id}>
+                      <td className={styles.foodName}>
+                        <a
+                          className="js-show-edit-food"
+                          data-food-entry-id="10049060228"
+                          data-locale=""
+                          href="#"
+                        >
+                          {foodEntry.name},{' '}
+                          {`${foodEntry.numOfServings} ${foodEntry.servingSize}`}
+                        </a>
+                      </td>
+
+                      {foodEntry.servingSize === 'g' ? (
+                        <td>
+                          {convertFloatToOneDecimalPlace(foodEntry.calories)}
                         </td>
-
-                        {foodEntry.servingSize === 'g' ? (
-                          <td>
-                            {convertFloatToOneDecimalPlace(foodEntry.calories)}
-                          </td>
-                        ) : (
-                          <td>
-                            {convertFloatToOneDecimalPlace(
-                              (foodEntry.calories as number) *
-                                foodEntry.numOfServings
-                            )}
-                          </td>
-                        )}
-
+                      ) : (
                         <td>
                           {convertFloatToOneDecimalPlace(
-                            foodEntry.carbohydrate
+                            (foodEntry.calories as number) *
+                              foodEntry.numOfServings
                           )}
                         </td>
+                      )}
 
-                        <td>{convertFloatToOneDecimalPlace(foodEntry.fat)}</td>
+                      <td>
+                        {convertFloatToOneDecimalPlace(foodEntry.carbohydrate)}
+                      </td>
 
-                        <td>
-                          {convertFloatToOneDecimalPlace(foodEntry.protein)}
-                        </td>
+                      <td>{convertFloatToOneDecimalPlace(foodEntry.fat)}</td>
 
-                        <td>?</td>
+                      <td>
+                        {convertFloatToOneDecimalPlace(foodEntry.protein)}
+                      </td>
 
-                        <td>
-                          {' '}
-                          {foodEntry.sugar === null
-                            ? 0
-                            : convertFloatToOneDecimalPlace(foodEntry.sugar)}
-                        </td>
+                      <td>?</td>
 
-                        <td className="delete">
-                          <div className="flex items-center justify-center">
-                            <AiFillMinusCircle size={24} color="red" />
-                          </div>
-                        </td>
-                      </tr>
-                    </>
+                      <td>
+                        {' '}
+                        {foodEntry.sugar === null
+                          ? 0
+                          : convertFloatToOneDecimalPlace(foodEntry.sugar)}
+                      </td>
+
+                      <td className="delete">
+                        <div className="flex items-center justify-center">
+                          <AiFillMinusCircle size={24} color="red" />
+                        </div>
+                      </td>
+                    </tr>
                   );
                 }
               })}
@@ -1080,8 +1049,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
 
                 <td>{usersGoals?.getCurrentUsersGoals.data?.calories}</td>
                 <td>
-                  {convertFloatToOneDecimalPlace(
-                    Math.round(
+                  {usersGoals?.getCurrentUsersGoals.data && Math.round(
+                    convertFloatToOneDecimalPlace(
                       calculateGramsFromMacronutrient(
                         calculatePercentage(
                           usersGoals?.getCurrentUsersGoals.data
@@ -1095,8 +1064,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                   )}
                 </td>
                 <td>
-                  {convertFloatToOneDecimalPlace(
-                    Math.round(
+                  {usersGoals?.getCurrentUsersGoals.data &&Math.round(
+                    convertFloatToOneDecimalPlace(
                       calculateGramsFromMacronutrient(
                         calculatePercentage(
                           usersGoals?.getCurrentUsersGoals.data?.fat as number,
@@ -1109,8 +1078,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                   )}
                 </td>
                 <td>
-                  {convertFloatToOneDecimalPlace(
-                    Math.round(
+                  {usersGoals?.getCurrentUsersGoals.data &&Math.round(
+                    convertFloatToOneDecimalPlace(
                       calculateGramsFromMacronutrient(
                         calculatePercentage(
                           usersGoals?.getCurrentUsersGoals.data
@@ -1131,16 +1100,24 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
               <tr className={styles.totals}>
                 <td className={styles.totalsFirstCell}>Remaining</td>
 
-                <td className={`${usersFood?.getCurrentUsersFoodByDate.data && isNumberPositive(
-                    convertFloatToOneDecimalPlace(
-                      (usersGoals?.getCurrentUsersGoals.data
-                        ?.calories as number) -
-                        sumBy(
-                          usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                          'calories',
-                          'All'
-                        )
-                    )) ? styles.possitive : styles.negative}`}>
+                <td
+                  className={`${
+                    usersFood?.getCurrentUsersFoodByDate.data &&
+                    isNumberPositive(
+                      convertFloatToOneDecimalPlace(
+                        (usersGoals?.getCurrentUsersGoals.data
+                          ?.calories as number) -
+                          sumBy(
+                            usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                            'calories',
+                            'All'
+                          )
+                      )
+                    )
+                      ? styles.possitive
+                      : styles.negative
+                  }`}
+                >
                   {usersFood?.getCurrentUsersFoodByDate.data &&
                     convertFloatToOneDecimalPlace(
                       (usersGoals?.getCurrentUsersGoals.data
@@ -1152,7 +1129,34 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         )
                     )}
                 </td>
-                <td className={`${usersFood?.getCurrentUsersFoodByDate.data && isNumberPositive(
+                <td
+                  className={`${
+                    usersFood?.getCurrentUsersFoodByDate.data &&
+                    isNumberPositive(
+                      convertFloatToOneDecimalPlace(
+                        Math.round(
+                          calculateGramsFromMacronutrient(
+                            calculatePercentage(
+                              usersGoals?.getCurrentUsersGoals.data
+                                ?.carbohydrate as number,
+                              usersGoals?.getCurrentUsersGoals.data
+                                ?.calories as number
+                            ),
+                            'carbohydrate'
+                          )
+                        ) -
+                          sumBy(
+                            usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                            'carbohydrate',
+                            'All'
+                          )
+                      )
+                    )
+                      ? styles.possitive
+                      : styles.negative
+                  }`}
+                >
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
                     convertFloatToOneDecimalPlace(
                       Math.round(
                         calculateGramsFromMacronutrient(
@@ -1170,46 +1174,35 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                           'carbohydrate',
                           'All'
                         )
-                    )) ? styles.possitive : styles.negative}`}>
-                  {usersFood?.getCurrentUsersFoodByDate.data &&
-                    convertFloatToOneDecimalPlace(
-                      Math.round(
-                        calculateGramsFromMacronutrient(
-                          calculatePercentage(
-                            usersGoals?.getCurrentUsersGoals.data
-                              ?.carbohydrate as number,
-                            usersGoals?.getCurrentUsersGoals.data
-                              ?.calories as number
-                          ),
-                          'carbohydrate'
-                        )
-                      ) -
-                        sumBy(
-                          usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                          'carbohydrate',
-                          'All'
-                        )
                     )}
                 </td>
-                <td className={`${usersFood?.getCurrentUsersFoodByDate.data && isNumberPositive(
-                    convertFloatToOneDecimalPlace(
-                      Math.round(
-                        calculateGramsFromMacronutrient(
-                          calculatePercentage(
-                            usersGoals?.getCurrentUsersGoals.data
-                              ?.fat as number,
-                            usersGoals?.getCurrentUsersGoals.data
-                              ?.calories as number
-                          ),
-                          'fat'
-                        )
-                      ) -
-                        sumBy(
-                          usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                          'fat',
-                          'All'
-                        )
-                    )) ? styles.possitive : styles.negative}`}>
+                <td
+                  className={`${
+                    usersFood?.getCurrentUsersFoodByDate.data &&
+                    isNumberPositive(
+                      convertFloatToOneDecimalPlace(
+                        Math.round(
+                          calculateGramsFromMacronutrient(
+                            calculatePercentage(
+                              usersGoals?.getCurrentUsersGoals.data
+                                ?.fat as number,
+                              usersGoals?.getCurrentUsersGoals.data
+                                ?.calories as number
+                            ),
+                            'fat'
+                          )
+                        ) -
+                          sumBy(
+                            usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                            'fat',
+                            'All'
+                          )
+                      )
+                    )
+                      ? styles.possitive
+                      : styles.negative
+                  }`}
+                >
                   {usersFood?.getCurrentUsersFoodByDate.data &&
                     convertFloatToOneDecimalPlace(
                       Math.round(
@@ -1230,25 +1223,33 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         )
                     )}
                 </td>
-                <td className={`${usersFood?.getCurrentUsersFoodByDate.data && isNumberPositive(
-                    convertFloatToOneDecimalPlace(
-                      Math.round(
-                        calculateGramsFromMacronutrient(
-                          calculatePercentage(
-                            usersGoals?.getCurrentUsersGoals.data
-                              ?.protein as number,
-                            usersGoals?.getCurrentUsersGoals.data
-                              ?.calories as number
-                          ),
-                          'protein'
-                        )
-                      ) -
-                        sumBy(
-                          usersFood?.getCurrentUsersFoodByDate.data as Food[],
-                          'protein',
-                          'All'
-                        )
-                    )) ? styles.possitive : styles.negative}`}>
+                <td
+                  className={`${
+                    usersFood?.getCurrentUsersFoodByDate.data &&
+                    isNumberPositive(
+                      convertFloatToOneDecimalPlace(
+                        Math.round(
+                          calculateGramsFromMacronutrient(
+                            calculatePercentage(
+                              usersGoals?.getCurrentUsersGoals.data
+                                ?.protein as number,
+                              usersGoals?.getCurrentUsersGoals.data
+                                ?.calories as number
+                            ),
+                            'protein'
+                          )
+                        ) -
+                          sumBy(
+                            usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                            'protein',
+                            'All'
+                          )
+                      )
+                    )
+                      ? styles.possitive
+                      : styles.negative
+                  }`}
+                >
                   {usersFood?.getCurrentUsersFoodByDate.data &&
                     convertFloatToOneDecimalPlace(
                       Math.round(
