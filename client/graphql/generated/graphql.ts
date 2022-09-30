@@ -113,6 +113,12 @@ export type FoodResponseIterable = {
   errors?: Maybe<Array<FoodFieldError>>;
 };
 
+export type FoodResponseSuccess = {
+  __typename?: 'FoodResponseSuccess';
+  errors?: Maybe<Array<FoodFieldError>>;
+  message?: Maybe<Scalars['String']>;
+};
+
 export type Goals = {
   __typename?: 'Goals';
   calories?: Maybe<Scalars['Int']>;
@@ -163,6 +169,7 @@ export type Mutation = {
   addNutrition: NutritionResponse;
   createUser: UserResponse;
   createWorkout: WorkoutResponse;
+  deleteFoodFromMealByDate: FoodResponseSuccess;
   googleOauthHandler: SessionResponse;
   loginUserWithEmailAndPassword: UserResponse;
   logoutUser: LogoutUserResponse;
@@ -196,6 +203,13 @@ export type MutationCreateWorkoutArgs = {
   name: Scalars['String'];
   notes?: InputMaybe<Scalars['String']>;
   startTime: Scalars['String'];
+};
+
+
+export type MutationDeleteFoodFromMealByDateArgs = {
+  date?: InputMaybe<Scalars['DateTime']>;
+  foodId: Scalars['Int'];
+  mealName: Scalars['String'];
 };
 
 
@@ -390,14 +404,14 @@ export type WorkoutResponseIterable = {
   errors?: Maybe<Array<WorkoutFieldError>>;
 };
 
-export type MutationMutationVariables = Exact<{
+export type AddFoodMutationVariables = Exact<{
   foodInput: FoodInput;
   date: Scalars['DateTime'];
   nutritionId: Scalars['Int'];
 }>;
 
 
-export type MutationMutation = { __typename?: 'Mutation', addFood: { __typename?: 'FoodResponse', errors?: Array<{ __typename?: 'FoodFieldError', field: string, message: string }> | null, data?: { __typename?: 'Food', id: string, createdAt: any, updatedAt: any, name: string, mealName: string, numOfServings: number, servingSize: string, calories: number, protein: number, fat: number, carbohydrate: number, sugar: number, userId: string, nutritionId: string } | null } };
+export type AddFoodMutation = { __typename?: 'Mutation', addFood: { __typename?: 'FoodResponse', errors?: Array<{ __typename?: 'FoodFieldError', field: string, message: string }> | null, data?: { __typename?: 'Food', id: string, createdAt: any, updatedAt: any, name: string, mealName: string, numOfServings: number, servingSize: string, calories: number, protein: number, fat: number, carbohydrate: number, sugar: number, userId: string, nutritionId: string } | null } };
 
 export type AddNutritionMutationVariables = Exact<{
   nutritionInput: NutritionInput;
@@ -426,6 +440,15 @@ export type CreateWorkoutMutationVariables = Exact<{
 
 
 export type CreateWorkoutMutation = { __typename?: 'Mutation', createWorkout: { __typename?: 'WorkoutResponse', errors?: Array<{ __typename?: 'WorkoutFieldError', field: string, message: string }> | null, data?: { __typename?: 'Workout', id: string, createdAt: any, updatedAt: any, name: string, startTime: string, endTime: string, bodyweight?: number | null, notes?: string | null, userId: string, exercises: Array<{ __typename?: 'Exercise', id: string, createdAt: any, updatedAt: any, name: string, category: string, exerciseType: string, unilateral?: boolean | null, workoutId: number, strengthSets: Array<{ __typename?: 'StrengthSet', id: string, createdAt: any, updatedAt: any, setNumber?: number | null, weight?: string | null, reps?: string | null, notes?: string | null, exerciseId: string }>, cardioSets: Array<{ __typename?: 'CardioSet', id: string, createdAt: any, updatedAt: any, setNumber?: number | null, minutes?: string | null, seconds?: string | null, distance?: string | null, caloriesBurned?: string | null, notes?: string | null, exerciseId: string }> }> } | null } };
+
+export type DeleteFoodFromMealByDateMutationVariables = Exact<{
+  mealName: Scalars['String'];
+  foodId: Scalars['Int'];
+  date?: InputMaybe<Scalars['DateTime']>;
+}>;
+
+
+export type DeleteFoodFromMealByDateMutation = { __typename?: 'Mutation', deleteFoodFromMealByDate: { __typename?: 'FoodResponseSuccess', message?: string | null, errors?: Array<{ __typename?: 'FoodFieldError', field: string, message: string }> | null } };
 
 export type GoogleOauthHandlerMutationVariables = Exact<{
   code: Scalars['String'];
@@ -489,8 +512,8 @@ export type GetUsersWorkoutsQueryVariables = Exact<{ [key: string]: never; }>;
 export type GetUsersWorkoutsQuery = { __typename?: 'Query', getUsersWorkouts: { __typename?: 'WorkoutResponseIterable', errors?: Array<{ __typename?: 'WorkoutFieldError', field: string, message: string }> | null, data?: Array<{ __typename?: 'Workout', id: string, createdAt: any, updatedAt: any, name: string, startTime: string, endTime: string, bodyweight?: number | null, notes?: string | null, userId: string, exercises: Array<{ __typename?: 'Exercise', id: string, createdAt: any, updatedAt: any, name: string, category: string, exerciseType: string, unilateral?: boolean | null, workoutId: number, strengthSets: Array<{ __typename?: 'StrengthSet', id: string, createdAt: any, updatedAt: any, setNumber?: number | null, weight?: string | null, reps?: string | null, notes?: string | null, exerciseId: string }>, cardioSets: Array<{ __typename?: 'CardioSet', id: string, createdAt: any, updatedAt: any, setNumber?: number | null, minutes?: string | null, seconds?: string | null, distance?: string | null, caloriesBurned?: string | null, notes?: string | null, exerciseId: string }> }> }> | null } };
 
 
-export const MutationDocument = /*#__PURE__*/ `
-    mutation Mutation($foodInput: FoodInput!, $date: DateTime!, $nutritionId: Int!) {
+export const AddFoodDocument = /*#__PURE__*/ `
+    mutation AddFood($foodInput: FoodInput!, $date: DateTime!, $nutritionId: Int!) {
   addFood(foodInput: $foodInput, date: $date, nutritionId: $nutritionId) {
     errors {
       field
@@ -515,16 +538,16 @@ export const MutationDocument = /*#__PURE__*/ `
   }
 }
     `;
-export const useMutationMutation = <
+export const useAddFoodMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<MutationMutation, TError, MutationMutationVariables, TContext>) =>
-    useMutation<MutationMutation, TError, MutationMutationVariables, TContext>(
-      ['Mutation'],
-      (variables?: MutationMutationVariables) => customFetcher<MutationMutation, MutationMutationVariables>(MutationDocument, variables)(),
+    >(options?: UseMutationOptions<AddFoodMutation, TError, AddFoodMutationVariables, TContext>) =>
+    useMutation<AddFoodMutation, TError, AddFoodMutationVariables, TContext>(
+      ['AddFood'],
+      (variables?: AddFoodMutationVariables) => customFetcher<AddFoodMutation, AddFoodMutationVariables>(AddFoodDocument, variables)(),
       options
     );
-useMutationMutation.fetcher = (variables: MutationMutationVariables, options?: RequestInit['headers']) => customFetcher<MutationMutation, MutationMutationVariables>(MutationDocument, variables, options);
+useAddFoodMutation.fetcher = (variables: AddFoodMutationVariables, options?: RequestInit['headers']) => customFetcher<AddFoodMutation, AddFoodMutationVariables>(AddFoodDocument, variables, options);
 export const AddNutritionDocument = /*#__PURE__*/ `
     mutation AddNutrition($nutritionInput: NutritionInput!) {
   addNutrition(nutritionInput: $nutritionInput) {
@@ -656,6 +679,27 @@ export const useCreateWorkoutMutation = <
       options
     );
 useCreateWorkoutMutation.fetcher = (variables: CreateWorkoutMutationVariables, options?: RequestInit['headers']) => customFetcher<CreateWorkoutMutation, CreateWorkoutMutationVariables>(CreateWorkoutDocument, variables, options);
+export const DeleteFoodFromMealByDateDocument = /*#__PURE__*/ `
+    mutation DeleteFoodFromMealByDate($mealName: String!, $foodId: Int!, $date: DateTime) {
+  deleteFoodFromMealByDate(mealName: $mealName, foodId: $foodId, date: $date) {
+    errors {
+      field
+      message
+    }
+    message
+  }
+}
+    `;
+export const useDeleteFoodFromMealByDateMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteFoodFromMealByDateMutation, TError, DeleteFoodFromMealByDateMutationVariables, TContext>) =>
+    useMutation<DeleteFoodFromMealByDateMutation, TError, DeleteFoodFromMealByDateMutationVariables, TContext>(
+      ['DeleteFoodFromMealByDate'],
+      (variables?: DeleteFoodFromMealByDateMutationVariables) => customFetcher<DeleteFoodFromMealByDateMutation, DeleteFoodFromMealByDateMutationVariables>(DeleteFoodFromMealByDateDocument, variables)(),
+      options
+    );
+useDeleteFoodFromMealByDateMutation.fetcher = (variables: DeleteFoodFromMealByDateMutationVariables, options?: RequestInit['headers']) => customFetcher<DeleteFoodFromMealByDateMutation, DeleteFoodFromMealByDateMutationVariables>(DeleteFoodFromMealByDateDocument, variables, options);
 export const GoogleOauthHandlerDocument = /*#__PURE__*/ `
     mutation googleOauthHandler($code: String!) {
   googleOauthHandler(code: $code) {

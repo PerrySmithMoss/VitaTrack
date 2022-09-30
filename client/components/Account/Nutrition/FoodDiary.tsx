@@ -7,6 +7,7 @@ import { AiFillMinusCircle } from 'react-icons/ai';
 import styles from './Nutrition.module.css';
 import {
   Food,
+  useDeleteFoodFromMealByDateMutation,
   useGetCurrentUsersFoodByDateQuery,
   useGetCurrentUsersGoalsQuery,
 } from '../../../graphql/generated/graphql';
@@ -29,6 +30,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
     useGetCurrentUsersGoalsQuery();
   const { data: usersFood, refetch: refetchUsersFood } =
     useGetCurrentUsersFoodByDateQuery({ date: selectedDate });
+
+  const { mutate: deleteFood } = useDeleteFoodFromMealByDateMutation({onSuccess: () => refetchUsersFood()});
 
   const handleChangeDate = (date: Date) => {
     setSelectedDate(date);
@@ -79,6 +82,11 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
     setSelectedDate(new Date(tomorowsDate));
   };
 
+  const handleDeleteFood = (id: number, mealName: string) => {
+    deleteFood({ foodId: id, mealName: mealName, date: selectedDate });
+  };
+
+  console.log(usersFood?.getCurrentUsersFoodByDate.data)
   return (
     <div className="mt-10">
       <div className=" border-t-2">
@@ -223,7 +231,13 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
 
                       <td className="delete">
                         <div className="flex items-center justify-center">
-                          <AiFillMinusCircle size={24} color="red" />
+                          <AiFillMinusCircle
+                            size={24}
+                            onClick={() =>
+                              handleDeleteFood(parseInt(foodEntry.id), foodEntry.mealName)
+                            }
+                            className="cursor-pointer text-[red] hover:text-red-700"
+                          />
                         </div>
                       </td>
                     </tr>
@@ -355,7 +369,13 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
 
                       <td className="delete">
                         <div className="flex items-center justify-center">
-                          <AiFillMinusCircle size={24} color="red" />
+                          <AiFillMinusCircle
+                            size={24}
+                            onClick={() =>
+                              handleDeleteFood(parseInt(foodEntry.id), foodEntry.mealName)
+                            }
+                            className="cursor-pointer text-[red] hover:text-red-700"
+                          />
                         </div>
                       </td>
                     </tr>
@@ -488,7 +508,14 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
 
                       <td className="delete">
                         <div className="flex items-center justify-center">
-                          <AiFillMinusCircle size={24} color="red" />
+                          <AiFillMinusCircle
+                            size={24}
+                            onClick={() => handleDeleteFood(
+                              parseInt(foodEntry.id),
+                              foodEntry.mealName
+                            )}
+                            className="cursor-pointer text-[red] hover:text-red-700"
+                          />
                         </div>
                       </td>
                     </tr>
@@ -623,7 +650,13 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
 
                       <td className="delete">
                         <div className="flex items-center justify-center">
-                          <AiFillMinusCircle size={24} color="red" />
+                          <AiFillMinusCircle
+                            size={24}
+                            onClick={() =>
+                              handleDeleteFood(parseInt(foodEntry.id), foodEntry.mealName)
+                            }
+                            className="cursor-pointer text-[red] hover:text-red-700"
+                          />
                         </div>
                       </td>
                     </tr>
@@ -758,7 +791,13 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
 
                       <td className="delete">
                         <div className="flex items-center justify-center">
-                          <AiFillMinusCircle size={24} color="red" />
+                          <AiFillMinusCircle
+                            size={24}
+                            onClick={() =>
+                              handleDeleteFood(parseInt(foodEntry.id), foodEntry.mealName)
+                            }
+                            className="cursor-pointer text-[red] hover:text-red-700"
+                          />
                         </div>
                       </td>
                     </tr>
@@ -893,7 +932,13 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
 
                       <td className="delete">
                         <div className="flex items-center justify-center">
-                          <AiFillMinusCircle size={24} color="red" />
+                          <AiFillMinusCircle
+                            size={24}
+                            onClick={() =>
+                              handleDeleteFood(parseInt(foodEntry.id), foodEntry.mealName)
+                            }
+                            className="cursor-pointer text-[red] hover:text-red-700"
+                          />
                         </div>
                       </td>
                     </tr>
@@ -1049,48 +1094,52 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
 
                 <td>{usersGoals?.getCurrentUsersGoals.data?.calories}</td>
                 <td>
-                  {usersGoals?.getCurrentUsersGoals.data && Math.round(
-                    convertFloatToOneDecimalPlace(
-                      calculateGramsFromMacronutrient(
-                        calculatePercentage(
-                          usersGoals?.getCurrentUsersGoals.data
-                            ?.carbohydrate as number,
-                          usersGoals?.getCurrentUsersGoals.data
-                            ?.calories as number
-                        ),
-                        'carbohydrate'
+                  {usersGoals?.getCurrentUsersGoals.data &&
+                    Math.round(
+                      convertFloatToOneDecimalPlace(
+                        calculateGramsFromMacronutrient(
+                          calculatePercentage(
+                            usersGoals?.getCurrentUsersGoals.data
+                              ?.carbohydrate as number,
+                            usersGoals?.getCurrentUsersGoals.data
+                              ?.calories as number
+                          ),
+                          'carbohydrate'
+                        )
                       )
-                    )
-                  )}
+                    )}
                 </td>
                 <td>
-                  {usersGoals?.getCurrentUsersGoals.data &&Math.round(
-                    convertFloatToOneDecimalPlace(
-                      calculateGramsFromMacronutrient(
-                        calculatePercentage(
-                          usersGoals?.getCurrentUsersGoals.data?.fat as number,
-                          usersGoals?.getCurrentUsersGoals.data
-                            ?.calories as number
-                        ),
-                        'fat'
+                  {usersGoals?.getCurrentUsersGoals.data &&
+                    Math.round(
+                      convertFloatToOneDecimalPlace(
+                        calculateGramsFromMacronutrient(
+                          calculatePercentage(
+                            usersGoals?.getCurrentUsersGoals.data
+                              ?.fat as number,
+                            usersGoals?.getCurrentUsersGoals.data
+                              ?.calories as number
+                          ),
+                          'fat'
+                        )
                       )
-                    )
-                  )}
+                    )}
                 </td>
                 <td>
-                  {usersGoals?.getCurrentUsersGoals.data &&Math.round(
-                    convertFloatToOneDecimalPlace(
-                      calculateGramsFromMacronutrient(
-                        calculatePercentage(
-                          usersGoals?.getCurrentUsersGoals.data
-                            ?.protein as number,
-                          usersGoals?.getCurrentUsersGoals.data
-                            ?.calories as number
-                        ),
-                        'protein'
+                  {usersGoals?.getCurrentUsersGoals.data &&
+                    Math.round(
+                      convertFloatToOneDecimalPlace(
+                        calculateGramsFromMacronutrient(
+                          calculatePercentage(
+                            usersGoals?.getCurrentUsersGoals.data
+                              ?.protein as number,
+                            usersGoals?.getCurrentUsersGoals.data
+                              ?.calories as number
+                          ),
+                          'protein'
+                        )
                       )
-                    )
-                  )}
+                    )}
                 </td>
                 <td>?</td>
                 <td>?</td>

@@ -1,0 +1,9 @@
+mutation DeleteFoodFromMealByDate($mealName: String!, $foodId: Int!, $date: DateTime) {
+  deleteFoodFromMealByDate(mealName: $mealName, foodId: $foodId, date: $date) {
+    errors {
+      field
+      message
+    }
+    message
+  }
+}

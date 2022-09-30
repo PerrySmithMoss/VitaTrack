@@ -1,4 +1,4 @@
-mutation Mutation($foodInput: FoodInput!, $date: DateTime!, $nutritionId: Int!) {
+mutation AddFood($foodInput: FoodInput!, $date: DateTime!, $nutritionId: Int!) {
   addFood(foodInput: $foodInput, date: $date, nutritionId: $nutritionId) {
     errors {
       field
