@@ -139,6 +139,12 @@
   font-size: 13px;
   color: #0072bf;
 }
+.addFood:hover {
+  color: #00548f;
+}
+.quickTools:hover {
+  color: #00548f;
+}
 
 .quickTools {
   line-height: 1.5em;
@@ -267,4 +273,29 @@
 }
 .negative {
   color: #ff0000 !important;
+}
+
+.addFoodDrawerTable {
+  width: 100%;
+}
+.addFoodDrawerTable tbody td {
+  color: #222;
+  line-height: 1.5em;
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-size: 100%;
+  font-style: inherit;
+  font-weight: inherit;
+  margin: 0;
+  outline: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  margin-top: 2px;
+  vertical-align: middle;
+  background: #f6f6f6;
+  border: none;
+  border-bottom: 1px solid #e6e6e6;
+  border-top: 1px solid #e6e6e6;
+  text-align: left;
+  padding: 10px 0 10px 10px;
+  font-size: 15px;
 }
