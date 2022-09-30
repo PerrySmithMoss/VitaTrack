@@ -42,6 +42,15 @@ class FoodResponse {
   data?: Food;
 }
 
+@ObjectType()
+class FoodResponseSuccess {
+  @Field(() => [FoodFieldError], { nullable: true })
+  errors?: FoodFieldError[];
+
+  @Field(() => String, { nullable: true })
+  message!: string;
+}
+
 @InputType()
 class FoodInput {
   @Field(() => String)
@@ -339,7 +348,7 @@ export class FoodResolver {
 
         // const endOfDay = new Date(date);
         // const endOfTheDay = date.setHours(24, 59, 59, 999);
-        const endDate = new Date(date); 
+        const endDate = new Date(date);
         const endOfDayDate = new Date(
           endDate.getFullYear(),
           endDate.getMonth(),
@@ -377,6 +386,153 @@ export class FoodResolver {
         errors: [
           {
             field: "Error while trying to fetch user's food.",
+            message: err,
+          },
+        ],
+      };
+    }
+  }
+
+  @Mutation(() => FoodResponseSuccess)
+  @UseMiddleware(deserializeUser)
+  async deleteFoodFromMealByDate(
+    @Ctx() ctx: PrismaContext,
+    @Arg("foodId", () => Int) foodId: number,
+    @Arg("mealName", () => String) mealName: string,
+    @Arg("date", () => Date, { nullable: true }) date: Date | null
+  ) {
+    try {
+      const userId = ctx.res.locals.user.id;
+
+      if (!userId) {
+        return {
+          errors: [
+            {
+              field: "Bad Request",
+              message: "You must login to see this resourse.",
+            },
+          ],
+        };
+      }
+
+      let foodItem;
+
+      if (date == null) {
+        const startDate = new Date();
+        const startOfDayDate = new Date(
+          startDate.getFullYear(),
+          startDate.getMonth(),
+          startDate.getDate(),
+          0,
+          0,
+          0
+        );
+
+        const endDate = new Date();
+        const endOfDayDate = new Date(
+          endDate.getFullYear(),
+          endDate.getMonth(),
+          endDate.getDate(),
+          23,
+          59,
+          59
+        );
+
+        foodItem = await ctx.prisma.food.findFirst({
+          where: {
+            AND: [
+              {
+                userId: userId,
+              },
+              {
+                createdAt: {
+                  lte: endOfDayDate,
+                  gte: startOfDayDate,
+                },
+              },
+              {
+                mealName: mealName,
+              },
+              {
+                id: foodId,
+              },
+            ],
+          },
+          orderBy: {
+            createdAt: "asc",
+          },
+        });
+      } else {
+        const startDate = new Date(date);
+        const startOfDayDate = new Date(
+          startDate.getFullYear(),
+          startDate.getMonth(),
+          startDate.getDate(),
+          0,
+          0,
+          0
+        );
+
+        const endDate = new Date(date);
+        const endOfDayDate = new Date(
+          endDate.getFullYear(),
+          endDate.getMonth(),
+          endDate.getDate(),
+          23,
+          59,
+          59
+        );
+
+        foodItem = await ctx.prisma.food.findFirst({
+          where: {
+            AND: [
+              {
+                userId: userId,
+              },
+              {
+                createdAt: {
+                  lte: endOfDayDate,
+                  gte: startOfDayDate,
+                },
+              },
+              {
+                mealName: mealName,
+              },
+              {
+                id: foodId,
+              },
+            ],
+          },
+          orderBy: {
+            createdAt: "asc",
+          },
+        });
+      }
+
+      if (foodItem) {
+        await ctx.prisma.food.delete({
+          where: {
+            id: foodItem.id,
+          },
+        });
+        return {
+          message: "Successfully deleted food item.",
+        };
+      } else {
+        return {
+          errors: [
+            {
+              field: `Food ID`,
+              message: `Error while trying to delete food item with ID ${foodId}`,
+            },
+          ],
+        };
+      }
+    } catch (err) {
+      return {
+        errors: [
+          {
+            field: "Error while trying to delete food item.",
             message: err,
           },
         ],
