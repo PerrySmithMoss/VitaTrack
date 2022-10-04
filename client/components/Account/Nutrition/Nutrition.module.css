@@ -299,3 +299,72 @@
   padding: 10px 0 10px 10px;
   font-size: 15px;
 }
+
+.basketMacroBreakdown {
+  margin: 0;
+  border: 1px solid #ddd;
+  overflow: hidden;
+}
+.basketMacroBreakdown .basketMacroBreakdownCol:first-child {
+  border-left: none;
+}
+.basketMacroBreakdown .basketMacroBreakdownCol {
+  width: 25%;
+  text-align: center;
+  padding: 4px 0;
+  float: left;
+  color: #0073e6;
+  font-size: 12px;
+  background-color: #eee;
+  line-height: 14px;
+  cursor: pointer;
+  border-left: 1px solid #ddd;
+}
+.basketMacroBreakdown::before {
+  display: table;
+  content: ' ';
+}
+.basketMacroBreakdown .basketMacroBreakdownCol span {
+  color: #002e5c;
+  display: block;
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+@media (min-width: 992px) {
+  .basketMacroBreakdown .basketMacroBreakdownCol span {
+    display: inline;
+  }
+}
+
+.foodChoicesList {
+  overflow: hidden;
+  max-height: 610px;
+  width: 100%;
+  height: auto;
+  display: block;
+
+  position: absolute;
+  top: 100%;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  float: left;
+  min-width: 160px;
+  margin: 2px 0 0;
+  list-style: none;
+  font-size: 14px;
+  text-align: left;
+  background-color: #fff;
+  border: 1px solid rgba(0,0,0,.15);
+  border-radius: 4px;
+  box-shadow: 0 6px 12px rgba(0,0,0,.175);
+  background-clip: padding-box;
+  padding: 0;
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: -1px;
+  max-height: 610px;
+  overflow: auto;
+}
