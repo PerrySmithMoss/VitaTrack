@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -41,7 +41,6 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [foods, setFoods] = useState<any>([]);
   const [selectedFoods, setSelectedFoods] = useState<any[]>([]);
-  const [selectedFoodNutrients, setSelectedFoodNutrients] = useState<any>(null);
 
   const { data: usersGoals, refetch: refetchUsersGoals } =
     useGetCurrentUsersGoalsQuery();
@@ -91,6 +90,44 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
     return total;
   }
 
+  function sumOfSelectedFoodsMacros() {
+    const sum = selectedFoods.reduce(
+      (acc, curr) => {
+        return {
+          total_calories: convertFloatToOneDecimalPlacev2(
+            acc.total_calories + curr.nf_calories
+          ),
+          total_fat: convertFloatToOneDecimalPlacev2(
+            acc.total_fat + curr.nf_total_fat
+          ),
+          total_carbs: convertFloatToOneDecimalPlacev2(
+            acc.total_carbs + curr.nf_total_carbohydrate
+          ),
+          total_protein: convertFloatToOneDecimalPlacev2(
+            acc.total_protein + curr.nf_protein
+          ),
+          total_sodium: convertFloatToOneDecimalPlacev2(
+            acc.total_sodium + curr.nf_sodium
+          ),
+        };
+      },
+      {
+        total_calories: 0,
+        total_fat: 0,
+        total_carbs: 0,
+        total_protein: 0,
+        total_sodium: 0,
+      }
+    );
+
+    return sum;
+  }
+
+  const memoizedSumOfSelectedFoodsMacros = useMemo(
+    () => sumOfSelectedFoodsMacros(),
+    [selectedFoods]
+  );
+
   const handleGoForwardOneDay = () => {
     const tomorowsDate = selectedDate.setDate(selectedDate.getDate() + 1);
     setSelectedDate(new Date(tomorowsDate));
@@ -133,44 +170,55 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
 
     const foodsJSON = await res.json();
 
-    console.log('nutritionJSON: ', foodsJSON);
-
     setFoods(foodsJSON ?? []);
     setIsSearching(false);
   }
 
-  const handleSelectFood = async (food: any) => {
-    // setSelectedFoods((prevState: any) => [...prevState, food]);
+  const handleSelectFood = async (food: any, type: 'branded' | 'common') => {
+    if (type === 'branded') {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_NUTRITIONIX_API_URL}/search/item?nix_item_id=${food.nix_item_id}`,
+        {
+          headers: {
+            'x-app-id': process.env.NEXT_PUBLIC_NUTRITIONIX_APP_ID as string,
+            'x-app-KEY': process.env.NEXT_PUBLIC_NUTRITIONIX_APP_KEY as string,
+            'x-remote-user-id': '0',
+          },
+        }
+      );
 
-    const body = {
-      query: food['food_name'],
-    };
+      const nutritionForBrandedFood = await res.json();
 
-    console.log(JSON.stringify(body));
+      setSelectedFoods((prevState: any) => [
+        ...prevState,
+        nutritionForBrandedFood.foods[0],
+      ]);
+    } else {
+      const body = {
+        query: food['food_name'],
+      };
 
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_NUTRITIONIX_API_URL}/natural/nutrients`,
-      {
-        method: 'POST',
-        body: JSON.stringify(body),
-        headers: {
-          'x-app-id': process.env.NEXT_PUBLIC_NUTRITIONIX_APP_ID as string,
-          'x-app-KEY': process.env.NEXT_PUBLIC_NUTRITIONIX_APP_KEY as string,
-          'x-remote-user-id': '0',
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_NUTRITIONIX_API_URL}/natural/nutrients`,
+        {
+          method: 'POST',
+          body: JSON.stringify(body),
+          headers: {
+            'x-app-id': process.env.NEXT_PUBLIC_NUTRITIONIX_APP_ID as string,
+            'x-app-KEY': process.env.NEXT_PUBLIC_NUTRITIONIX_APP_KEY as string,
+            'x-remote-user-id': '0',
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
-    const nutritionForFood = await res.json();
+      const nutritionForCommonFood = await res.json();
 
-    console.log('nutritionForFood: ', nutritionForFood.foods[0]);
-
-    setSelectedFoods((prevState: any) => [
-      ...prevState,
-      nutritionForFood.foods[0],
-    ]);
-
+      setSelectedFoods((prevState: any) => [
+        ...prevState,
+        nutritionForCommonFood.foods[0],
+      ]);
+    }
     setSearchInput('');
   };
 
@@ -202,9 +250,6 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
 
     setIsSearching(true);
   }, [searchInput]);
-
-  console.log('foods: ', foods);
-  console.log('selectedFoods: ', selectedFoods);
 
   return (
     <div className="mt-10">
@@ -1520,8 +1565,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                   Search by food name
                 </h3>
               </div>
-              <div className="flex w-full justify-center items-center pt-1">
-                <div className="relative mt-1 w-full">
+              <div className="flex w-full relative justify-center items-center pt-1">
+                <div className="static mt-1 w-full">
                   <input
                     type="text"
                     id="searchExercises"
@@ -1544,79 +1589,106 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                       ></path>
                     </svg>
                   </div>
+                  {!isSearching && debouncedSearchTerm.length > 0 && foods && (
+                    <div
+                      className={`border rounded-bl rounded-br absolute ${styles.foodChoicesList}`}
+                    >
+                      <div>
+                        <p className="text-gray-500 font-semibold py-1  text-sm mt-2 pl-3 border-b">
+                          Common Foods {`(${foods['common'].length})`}
+                        </p>
+                        {!isSearching &&
+                          debouncedSearchTerm.length > 0 &&
+                          foods &&
+                          Object.keys(foods).length > 0 && (
+                            <div>
+                              {foods['common'].slice(0, 5).map((food: any) => (
+                                <div
+                                  onClick={() =>
+                                    handleSelectFood(food, 'common')
+                                  }
+                                  className="border-b px-4 p-1 flex items-center space-x-2 hover:bg-gray-100 cursor-pointer"
+                                >
+                                  <div>
+                                    <Image
+                                      src={food['photo']['thumb']}
+                                      height={30}
+                                      width={30}
+                                    />
+                                  </div>
+                                  <div>
+                                    <p>{food.food_name}</p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                      </div>
+                      <div className="mt-3">
+                        <p className="text-gray-500 font-semibold py-1  text-sm mt-1 pl-3 border-b">
+                          Branded Foods {`(${foods['branded'].length})`}
+                        </p>
+                        {!isSearching &&
+                          debouncedSearchTerm.length > 0 &&
+                          foods &&
+                          Object.keys(foods).length > 0 && (
+                            <div>
+                              {foods['branded'].slice(0, 5).map((food: any) => (
+                                <div
+                                  onClick={() =>
+                                    handleSelectFood(food, 'branded')
+                                  }
+                                  className="border-b px-4 p-1 flex items-center justify-between space-x-2 hover:bg-gray-100 cursor-pointer"
+                                >
+                                  <div className="flex items-center space-x-2 ">
+                                    <div>
+                                      <Image
+                                        src={food['photo']['thumb']}
+                                        height={30}
+                                        width={30}
+                                      />
+                                    </div>
+                                    <div>
+                                      <p>{food.food_name}</p>
+                                    </div>
+                                  </div>
+                                  <div className="flex flex-col items-center pr-1">
+                                    <div className="font-medium text-green-500">
+                                      {Math.round(food.nf_calories)}
+                                    </div>
+                                    <div>cal</div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-              {!isSearching && debouncedSearchTerm.length > 0 && foods && (
-                <div className={`border rounded-bl rounded-br `}>
-                  <div>
-                    <p className="text-gray-500 font-semibold py-1  text-sm mt-2 pl-3 border-b">
-                      Common Foods {`(${foods['common'].length})`}
-                    </p>
-                    {!isSearching &&
-                      debouncedSearchTerm.length > 0 &&
-                      foods &&
-                      Object.keys(foods).length > 0 && (
-                        <div>
-                          {foods['common'].slice(0, 5).map((food: any) => (
-                            <div
-                              onClick={() => handleSelectFood(food)}
-                              className="border-b pl-3 p-1 flex items-center space-x-2 hover:bg-gray-100 cursor-pointer"
-                            >
-                              <div>
-                                <Image
-                                  src={food['photo']['thumb']}
-                                  height={30}
-                                  width={30}
-                                />
-                              </div>
-                              <div>
-                                <p>{food.food_name}</p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                  </div>
-                  <div className="mt-3">
-                    <p className="text-gray-500 font-semibold py-1  text-sm mt-1 pl-3 border-b">
-                      Branded Foods {`(${foods['branded'].length})`}
-                    </p>
-                    {!isSearching &&
-                      debouncedSearchTerm.length > 0 &&
-                      foods &&
-                      Object.keys(foods).length > 0 && (
-                        <div>
-                          {foods['branded'].slice(0, 5).map((food: any) => (
-                            <div
-                              onClick={() => handleSelectFood(food)}
-                              className="border-b pl-3 p-1 flex items-center space-x-2 hover:bg-gray-100 cursor-pointer"
-                            >
-                              <div>
-                                <Image
-                                  src={food['photo']['thumb']}
-                                  height={30}
-                                  width={30}
-                                />
-                              </div>
-                              <div>
-                                <p>{food.food_name}</p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                  </div>
-                </div>
-              )}
               {selectedFoods.length > 0 && (
                 <ul className="mt-4">
                   {selectedFoods.map((food: any) => (
                     <li className="p-3 border-t border-b flex flow-row items-center space-x-3">
-                      <div>
-                        <Image src={food.photo.thumb} height={30} width={30} />
-                      </div>
-                      <div className="flex-grow ">
-                        <span>{food.food_name}</span>
+                      <Image src={food.photo.thumb} height={30} width={30} />
+                      <div className="flex-grow w-full max-w-[280px]">
+                        {food.brand_name ? (
+                          <div className="flex-col flex">
+                            <div>
+                              <span className="text-sm text-gray-500">
+                                {food.brand_name}
+                              </span>
+                            </div>
+                            <div>
+                              <span>{food.food_name}</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div>
+                            <span>{food.food_name}</span>
+                          </div>
+                        )}
                       </div>
                       <div className="float-left w-[150px] pl-3">
                         <input
@@ -1636,16 +1708,20 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                           <option value={food.serving_unit}>
                             {food.serving_unit}
                           </option>
-                          {food.alt_measures
-                            .filter(
-                              (measurement: any) =>
-                                measurement.measure !== food.serving_unit
-                            )
-                            .map((measurement: any) => (
-                              <option value={measurement.measure}>
-                                {measurement.measure}
-                              </option>
-                            ))}
+                          {food.alt_measures && (
+                            <>
+                              {food.alt_measures
+                                .filter(
+                                  (measurement: any) =>
+                                    measurement.measure !== food.serving_unit
+                                )
+                                .map((measurement: any) => (
+                                  <option value={measurement.measure}>
+                                    {measurement.measure}
+                                  </option>
+                                ))}
+                            </>
+                          )}
                         </select>
                       </div>
                       <div className="flex flex-col items-center text-sm px-4">
@@ -1676,50 +1752,39 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
 
               {selectedFoods.length > 0 ? (
                 <div>
-                  <div className="bg-gray-300 flex justify-between items-center py-2 px-4">
+                  <div className="bg-gray-200 flex justify-between items-center py-2 px-4">
                     <div>
                       <h4>Total Calories</h4>
                     </div>
                     <div>
-                      <span>130</span>
+                      <span className="text-green-500">
+                        {Math.round(
+                          memoizedSumOfSelectedFoodsMacros.total_calories
+                        )}
+                      </span>
                     </div>
                   </div>
-                  {/* <div className="flex items-center justify-evenly  py-1 border-b-2 overflow-hidden">
-                    <div>
-                      <p>9g Protein</p>
-                    </div>
-                    <div className='border-l'>
-                      <p>1g Carbs</p>
-                    </div>
-                    <div>
-                      <p>10g Fat</p>
-                    </div>
-                    <div>
-                      <p>9g Sodium</p>
-                    </div>
-                  </div> */}
-
                   <div className={styles.basketMacroBreakdown}>
                     <div className={`${styles.basketMacroBreakdownCol}`}>
-                      9g
+                      {memoizedSumOfSelectedFoodsMacros.total_protein}g
                       <span>Protein</span>
                     </div>
                     <div className={`${styles.basketMacroBreakdownCol}`}>
-                      1g
+                      {memoizedSumOfSelectedFoodsMacros.total_carbs}g
                       <span>Carbs</span>
                     </div>
                     <div className={`${styles.basketMacroBreakdownCol}`}>
-                      10g
+                      {memoizedSumOfSelectedFoodsMacros.total_fat}g
                       <span>Fat</span>
                     </div>
                     <div className={`${styles.basketMacroBreakdownCol}`}>
-                      102mg
+                      {memoizedSumOfSelectedFoodsMacros.total_sodium}mg
                       <span>Sodium</span>
                     </div>
                   </div>
 
                   <div>
-                    <button className="w-full mt-6 py-2 bg-brand-green text-white text-bold rounded hover:bg-brand-green-hover">
+                    <button className="w-full mt-8 py-2 bg-brand-green text-white text-bold rounded hover:bg-brand-green-hover">
                       Log {selectedFoods.length} foods
                     </button>
                   </div>
@@ -1735,7 +1800,7 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                           className="text-[#0073e6] group-hover:text-blue-700"
                         />
                       </div>
-                      <div className="text-[#0073e6] group-hover:text-blue-700">
+                      <div className="mt-1 text-[#0073e6] group-hover:text-blue-700">
                         Clear basket
                       </div>
                     </button>

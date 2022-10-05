@@ -317,7 +317,7 @@
   font-size: 12px;
   background-color: #eee;
   line-height: 14px;
-  cursor: pointer;
+  /* cursor: pointer; */
   border-left: 1px solid #ddd;
 }
 .basketMacroBreakdown::before {
@@ -343,11 +343,9 @@
   width: 100%;
   height: auto;
   display: block;
-
   position: absolute;
   top: 100%;
   left: 0;
-  top: 0;
   z-index: 1000;
   float: left;
   min-width: 160px;
@@ -361,10 +359,5 @@
   box-shadow: 0 6px 12px rgba(0,0,0,.175);
   background-clip: padding-box;
   padding: 0;
-  display: block;
-  width: 100%;
-  height: auto;
   margin-top: -1px;
-  max-height: 610px;
-  overflow: auto;
 }
