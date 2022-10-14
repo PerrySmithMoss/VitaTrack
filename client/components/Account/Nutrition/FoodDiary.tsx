@@ -25,6 +25,7 @@ import { Drawer } from '../../Drawer/Drawer';
 import useDebounce from '../../../hooks/useDebounce';
 import { FiChevronLeft } from 'react-icons/fi';
 import { FaPlus } from 'react-icons/fa';
+import { BasketItem } from './Basket/BasketItem';
 
 interface FoodDiaryProps {}
 
@@ -41,7 +42,6 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [foods, setFoods] = useState<any>([]);
   const [selectedFoods, setSelectedFoods] = useState<any[]>([]);
-
   const { data: usersGoals, refetch: refetchUsersGoals } =
     useGetCurrentUsersGoalsQuery();
   const { data: usersFood, refetch: refetchUsersFood } =
@@ -50,11 +50,6 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
   const { mutate: deleteFood } = useDeleteFoodFromMealByDateMutation({
     onSuccess: () => refetchUsersFood(),
   });
-
-  const handleChangeDate = (date: Date) => {
-    setSelectedDate(date);
-    // refetchUsersFood({date: selectedDate});
-  };
 
   function sumBy(
     foodItemValues: Food[],
@@ -93,23 +88,67 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
   function sumOfSelectedFoodsMacros() {
     const sum = selectedFoods.reduce(
       (acc, curr) => {
-        return {
-          total_calories: convertFloatToOneDecimalPlacev2(
-            acc.total_calories + curr.nf_calories
-          ),
-          total_fat: convertFloatToOneDecimalPlacev2(
-            acc.total_fat + curr.nf_total_fat
-          ),
-          total_carbs: convertFloatToOneDecimalPlacev2(
-            acc.total_carbs + curr.nf_total_carbohydrate
-          ),
-          total_protein: convertFloatToOneDecimalPlacev2(
-            acc.total_protein + curr.nf_protein
-          ),
-          total_sodium: convertFloatToOneDecimalPlacev2(
-            acc.total_sodium + curr.nf_sodium
-          ),
-        };
+        if (
+          curr.userMeasurements.measure === 'g' ||
+          curr.userMeasurements.measure === 'gram' ||
+          curr.userMeasurements.measure === 'grams'
+        ) {
+          return {
+            total_calories: convertFloatToOneDecimalPlacev2(
+              acc.total_calories + curr.userMeasurements.calories
+            ),
+            total_fat: convertFloatToOneDecimalPlacev2(
+              acc.total_fat +
+                (curr.nf_total_fat / curr.serving_weight_grams) *
+                  curr.userMeasurements.quantity
+            ),
+            total_carbs: convertFloatToOneDecimalPlacev2(
+              acc.total_carbs +
+                (curr.nf_total_carbohydrate / curr.serving_weight_grams) *
+                  curr.userMeasurements.quantity
+            ),
+            total_protein: convertFloatToOneDecimalPlacev2(
+              acc.total_protein +
+                (curr.nf_protein / curr.serving_weight_grams) *
+                  curr.userMeasurements.quantity
+            ),
+            total_sodium: convertFloatToOneDecimalPlacev2(
+              acc.total_sodium +
+                (curr.nf_sodium / curr.serving_weight_grams) *
+                  curr.userMeasurements.quantity
+            ),
+          };
+        } else {
+          const fatPerGram = curr.nf_total_fat / curr.serving_weight_grams
+          const carbsPerGram = curr.nf_total_carbohydrate / curr.serving_weight_grams
+          const proteinPerGram = curr.nf_protein / curr.serving_weight_grams
+          const sodiumPerGram = curr.nf_sodium / curr.serving_weight_grams
+          return {
+            total_calories: convertFloatToOneDecimalPlacev2(
+              acc.total_calories + curr.userMeasurements.calories
+            ),
+            total_fat: convertFloatToOneDecimalPlacev2(
+              fatPerGram *
+              curr.userMeasurements.servingWeight *
+              curr.userMeasurements.quantity
+            ),
+            total_carbs: convertFloatToOneDecimalPlacev2(
+              carbsPerGram *
+              curr.userMeasurements.servingWeight *
+              curr.userMeasurements.quantity
+            ),
+            total_protein: convertFloatToOneDecimalPlacev2(
+              proteinPerGram *
+              curr.userMeasurements.servingWeight *
+              curr.userMeasurements.quantity
+            ),
+            total_sodium: convertFloatToOneDecimalPlacev2(
+              sodiumPerGram *
+              curr.userMeasurements.servingWeight *
+              curr.userMeasurements.quantity
+            ),
+          };
+        }
       },
       {
         total_calories: 0,
@@ -122,6 +161,28 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
 
     return sum;
   }
+
+  async function getFoods() {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_NUTRITIONIX_API_URL}/search/instant?query=${debouncedSearchTerm}`,
+      {
+        headers: {
+          'x-app-id': process.env.NEXT_PUBLIC_NUTRITIONIX_APP_ID as string,
+          'x-app-KEY': process.env.NEXT_PUBLIC_NUTRITIONIX_APP_KEY as string,
+          'x-remote-user-id': '0',
+        },
+      }
+    );
+
+    const foodsJSON = await res.json();
+
+    setFoods(foodsJSON ?? []);
+    setIsSearching(false);
+  }
+
+  const handleChangeDate = (date: Date) => {
+    setSelectedDate(date);
+  };
 
   const memoizedSumOfSelectedFoodsMacros = useMemo(
     () => sumOfSelectedFoodsMacros(),
@@ -156,24 +217,6 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
     }
   };
 
-  async function getFoods() {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_NUTRITIONIX_API_URL}/search/instant?query=${debouncedSearchTerm}`,
-      {
-        headers: {
-          'x-app-id': process.env.NEXT_PUBLIC_NUTRITIONIX_APP_ID as string,
-          'x-app-KEY': process.env.NEXT_PUBLIC_NUTRITIONIX_APP_KEY as string,
-          'x-remote-user-id': '0',
-        },
-      }
-    );
-
-    const foodsJSON = await res.json();
-
-    setFoods(foodsJSON ?? []);
-    setIsSearching(false);
-  }
-
   const handleSelectFood = async (food: any, type: 'branded' | 'common') => {
     if (type === 'branded') {
       const res = await fetch(
@@ -187,12 +230,20 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
         }
       );
 
-      const nutritionForBrandedFood = await res.json();
+      const foodJSON = await res.json();
+      const foodItem = foodJSON.foods[0];
 
-      setSelectedFoods((prevState: any) => [
-        ...prevState,
-        nutritionForBrandedFood.foods[0],
-      ]);
+      const defaultFoodItem = {
+        ...foodItem,
+        userMeasurements: {
+          quantity: foodItem.serving_qty,
+          measure: foodItem.serving_unit,
+          servingWeight: foodItem.serving_weight_grams,
+          calories: Math.round(foodItem.nf_calories),
+        },
+      };
+
+      setSelectedFoods((prevState: any) => [...prevState, defaultFoodItem]);
     } else {
       const body = {
         query: food['food_name'],
@@ -212,22 +263,22 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
         }
       );
 
-      const nutritionForCommonFood = await res.json();
+      const foodJSON = await res.json();
+      const foodItem = foodJSON.foods[0];
 
-      setSelectedFoods((prevState: any) => [
-        ...prevState,
-        nutritionForCommonFood.foods[0],
-      ]);
+      const defaultFoodItem = {
+        ...foodItem,
+        userMeasurements: {
+          quantity: foodItem.serving_qty,
+          measure: foodItem.serving_unit,
+          servingWeight: foodItem.serving_weight_grams,
+          calories: Math.round(foodItem.nf_calories),
+        },
+      };
+
+      setSelectedFoods((prevState: any) => [...prevState, defaultFoodItem]);
     }
     setSearchInput('');
-  };
-
-  const handleRemoveFoodFromBasket = (foodName: string) => {
-    const foods = selectedFoods;
-
-    const filtered = foods.filter((food: any) => food.food_name !== foodName);
-
-    setSelectedFoods(filtered);
   };
 
   useEffect(() => {
@@ -238,6 +289,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
 
     setIsSearching(true);
 
+    // @TODO: Change this so that it only searches after
+    // the user has typed a minimum of 3 characters.
     getFoods();
   }, [debouncedSearchTerm]);
 
@@ -1604,6 +1657,7 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                             <div>
                               {foods['common'].slice(0, 5).map((food: any) => (
                                 <div
+                                  key={food.food_name}
                                   onClick={() =>
                                     handleSelectFood(food, 'common')
                                   }
@@ -1635,6 +1689,7 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                             <div>
                               {foods['branded'].slice(0, 5).map((food: any) => (
                                 <div
+                                  key={food.food_name}
                                   onClick={() =>
                                     handleSelectFood(food, 'branded')
                                   }
@@ -1670,82 +1725,12 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
               {selectedFoods.length > 0 && (
                 <ul className="mt-4">
                   {selectedFoods.map((food: any) => (
-                    <li className="p-3 border-t border-b flex flow-row items-center space-x-3">
-                      <Image src={food.photo.thumb} height={30} width={30} />
-                      <div className="flex-grow w-full max-w-[280px]">
-                        {food.brand_name ? (
-                          <div className="flex-col flex">
-                            <div>
-                              <span className="text-sm text-gray-500">
-                                {food.brand_name}
-                              </span>
-                            </div>
-                            <div>
-                              <span>{food.food_name}</span>
-                            </div>
-                          </div>
-                        ) : (
-                          <div>
-                            <span>{food.food_name}</span>
-                          </div>
-                        )}
-                      </div>
-                      <div className="float-left w-[150px] pl-3">
-                        <input
-                          type="text"
-                          name="servingQty"
-                          id="servingQty"
-                          value={food.serving_qty}
-                          className="block p-2 w-full text-center bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded"
-                        />
-                      </div>
-                      <div className="w-[200px] pl-3">
-                        <select
-                          className="block p-2 w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded"
-                          name="measurement"
-                          id="measurement"
-                        >
-                          <option value={food.serving_unit}>
-                            {food.serving_unit}
-                          </option>
-                          {food.alt_measures && (
-                            <>
-                              {food.alt_measures
-                                .filter(
-                                  (measurement: any) =>
-                                    measurement.measure !== food.serving_unit
-                                )
-                                .map((measurement: any) => (
-                                  <option value={measurement.measure}>
-                                    {measurement.measure}
-                                  </option>
-                                ))}
-                            </>
-                          )}
-                        </select>
-                      </div>
-                      <div className="flex flex-col items-center text-sm px-4">
-                        <div>{Math.round(food.nf_calories)}</div>
-                        <div>Cal</div>
-                      </div>
-                      <div>
-                        <button
-                          onClick={() =>
-                            handleRemoveFoodFromBasket(food.food_name)
-                          }
-                          type="button"
-                          className="relative cursor-pointer flex text-center items-center justify-center "
-                          data-modal-toggle="default-modal"
-                        >
-                          <FaPlus
-                            // onClick={handleShowAddFoodDrawer}
-                            style={{ transform: 'rotate(45deg)' }}
-                            size={24}
-                            className="text-[red] hover:text-red-700"
-                          />
-                        </button>
-                      </div>
-                    </li>
+                    <BasketItem
+                      key={food.food_name}
+                      food={food}
+                      selectedFoods={selectedFoods}
+                      setSelectedFoods={setSelectedFoods}
+                    />
                   ))}
                 </ul>
               )}
@@ -1760,25 +1745,26 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                       <span className="text-green-500">
                         {Math.round(
                           memoizedSumOfSelectedFoodsMacros.total_calories
-                        )}
+                        ).toLocaleString()}
                       </span>
                     </div>
                   </div>
                   <div className={styles.basketMacroBreakdown}>
                     <div className={`${styles.basketMacroBreakdownCol}`}>
-                      {memoizedSumOfSelectedFoodsMacros.total_protein}g
-                      <span>Protein</span>
+                      {memoizedSumOfSelectedFoodsMacros.total_protein.toLocaleString()}
+                      g<span>Protein</span>
                     </div>
                     <div className={`${styles.basketMacroBreakdownCol}`}>
-                      {memoizedSumOfSelectedFoodsMacros.total_carbs}g
-                      <span>Carbs</span>
+                      {memoizedSumOfSelectedFoodsMacros.total_carbs.toLocaleString()}
+                      g<span>Carbs</span>
                     </div>
                     <div className={`${styles.basketMacroBreakdownCol}`}>
-                      {memoizedSumOfSelectedFoodsMacros.total_fat}g
-                      <span>Fat</span>
+                      {memoizedSumOfSelectedFoodsMacros.total_fat.toLocaleString()}
+                      g<span>Fat</span>
                     </div>
                     <div className={`${styles.basketMacroBreakdownCol}`}>
-                      {memoizedSumOfSelectedFoodsMacros.total_sodium}mg
+                      {memoizedSumOfSelectedFoodsMacros.total_sodium.toLocaleString()}
+                      mg
                       <span>Sodium</span>
                     </div>
                   </div>
