@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { FiChevronRight, FiMoreHorizontal } from 'react-icons/fi';
+import { FiMoreHorizontal } from 'react-icons/fi';
 import { Exercise } from '../../../graphql/generated/graphql';
 import { useGlobalContext } from '../../../state/context/global.context';
-import { useExercisesContext } from '../../../state/context/exercise.context';
 
 interface ExerciseListProps {}
 
@@ -10,7 +9,6 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({}) => {
   const { selectedMuscleGroup, setWorkoutExercises, workoutExercises } =
     useGlobalContext();
   const [exercises, setExercises] = useState<any>();
-  const { exercisesDispatch, exercisesState } = useExercisesContext();
 
   function findExercisesForSelectedMuscleGroup() {
     const exercise = exerciseList1.find((exercise) =>

@@ -86,6 +86,7 @@ model Food {
   fat           Float
   carbohydrate  Float
   sugar         Float
+  sodium        Float
   userId        String
   user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   nutrition     Nutrition @relation(fields: [nutritionId], references: [id], onDelete: Cascade)

@@ -43,6 +43,15 @@ class FoodResponse {
 }
 
 @ObjectType()
+class FoodResponseSimple {
+  @Field(() => [FoodFieldError], { nullable: true })
+  errors?: FoodFieldError[];
+
+  @Field(() => String, { nullable: true })
+  data?: String;
+}
+
+@ObjectType()
 class FoodResponseSuccess {
   @Field(() => [FoodFieldError], { nullable: true })
   errors?: FoodFieldError[];
@@ -79,6 +88,9 @@ class FoodInput {
 
   @Field(() => Float)
   sugar: number;
+
+  @Field(() => Float)
+  sodium: number;
 }
 
 @Resolver()
@@ -212,6 +224,7 @@ export class FoodResolver {
             fat: foodInput.fat,
             carbohydrate: foodInput.carbohydrate,
             sugar: foodInput.sugar,
+            sodium: foodInput.sodium,
             numOfServings: foodInput.numOfServings,
             servingSize: foodInput.servingSize,
             nutrition: {
@@ -230,6 +243,72 @@ export class FoodResolver {
 
       return {
         data: food,
+      };
+    } catch (err) {
+      return {
+        errors: [
+          {
+            field: "Error while trying to add food to diary.",
+            message: err,
+          },
+        ],
+      };
+    }
+  }
+
+  @Mutation(() => FoodResponseSimple)
+  @UseMiddleware(deserializeUser)
+  async addFoodsv2(
+    @Ctx() ctx: PrismaContext,
+    @Arg("nutritionId", () => Int) nutritionId: number,
+    @Arg("foodInput", () => [FoodInput])
+    foodInput: FoodInput[]
+  ) {
+    try {
+      const userId = ctx.res.locals.user.id;
+
+      if (!userId) {
+        return {
+          errors: [
+            {
+              field: "Bad Request",
+              message: "You must login to see this resourse.",
+            },
+          ],
+        };
+      }
+
+      const foods = await ctx.prisma.$transaction(
+        foodInput.map((food) =>
+          ctx.prisma.food.create({
+            data: {
+              name: food.name,
+              mealName: food.mealName,
+              servingSize: food.servingSize,
+              numOfServings: food.numOfServings,
+              calories: food.calories,
+              protein: food.protein,
+              fat: food.fat,
+              carbohydrate: food.carbohydrate,
+              sugar: food.sugar,
+              sodium: food.sodium,
+              nutrition: {
+                connect: {
+                  id: nutritionId,
+                },
+              },
+              user: {
+                connect: {
+                  id: userId,
+                },
+              },
+            },
+          })
+        )
+      );
+
+      return {
+        data: "Foods logged successfully.",
       };
     } catch (err) {
       return {

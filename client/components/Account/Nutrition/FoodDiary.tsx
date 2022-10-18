@@ -3,11 +3,18 @@ import Image from 'next/image';
 import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { BiCalendar } from 'react-icons/bi';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import {
+  FaChevronLeft,
+  FaChevronRight,
+  FaPlus,
+  FaChevronDown,
+  FaChevronUp,
+} from 'react-icons/fa';
 import { AiFillMinusCircle, AiOutlinePlus } from 'react-icons/ai';
 import styles from './Nutrition.module.css';
 import {
   Food,
+  useAddNutritionWithFoodsMutation,
   useDeleteFoodFromMealByDateMutation,
   useGetCurrentUsersFoodByDateQuery,
   useGetCurrentUsersGoalsQuery,
@@ -24,7 +31,6 @@ import {
 import { Drawer } from '../../Drawer/Drawer';
 import useDebounce from '../../../hooks/useDebounce';
 import { FiChevronLeft } from 'react-icons/fi';
-import { FaPlus } from 'react-icons/fa';
 import { BasketItem } from './Basket/BasketItem';
 
 interface FoodDiaryProps {}
@@ -32,18 +38,30 @@ interface FoodDiaryProps {}
 const todaysDate = new Date();
 const yesterdaysDate = new Date(Date.now() - 86400000);
 
+type mealNames =
+  | 'Breakfast'
+  | 'Lunch'
+  | 'Dinner'
+  | 'Snacks'
+  | 'Meal 5'
+  | 'Meal 6'
+  | undefined;
+
 export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
   const [selectedDate, setSelectedDate] = useState<Date>(todaysDate);
   const [isShowingCalendar, setIsShowingCalendar] = useState(false);
   const [isAddFoodDrawerOpen, setIsAddFoodDrawerOpen] = useState(false);
+  const [mealNameToEdit, setMealNameToEdit] = useState<mealNames>(undefined);
 
   const [searchInput, setSearchInput] = useState('');
   const debouncedSearchTerm = useDebounce(searchInput, 1000);
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [foods, setFoods] = useState<any>([]);
   const [selectedFoods, setSelectedFoods] = useState<any[]>([]);
+
   const { data: usersGoals, refetch: refetchUsersGoals } =
     useGetCurrentUsersGoalsQuery();
+
   const { data: usersFood, refetch: refetchUsersFood } =
     useGetCurrentUsersFoodByDateQuery({ date: selectedDate });
 
@@ -51,9 +69,13 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
     onSuccess: () => refetchUsersFood(),
   });
 
+  const { mutate: logFoods } = useAddNutritionWithFoodsMutation({
+    onSuccess: () => refetchUsersFood(),
+  });
+
   function sumBy(
     foodItemValues: Food[],
-    key: 'calories' | 'carbohydrate' | 'protein' | 'fat' | 'sugar',
+    key: 'calories' | 'carbohydrate' | 'protein' | 'fat' | 'sugar' | 'sodium',
     mealName:
       | 'Breakfast'
       | 'Lunch'
@@ -65,17 +87,25 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
   ) {
     const total = foodItemValues.reduce((acc, cur) => {
       if (mealName === 'All') {
-        if (cur.servingSize === 'g') {
+        if (
+          cur.servingSize === 'g' ||
+          cur.servingSize === 'gram' ||
+          cur.servingSize === 'grams'
+        ) {
           return (acc += cur[key]);
         } else {
-          return (acc += cur[key] * cur.numOfServings);
+          return (acc += cur[key]);
         }
       }
       if (cur.mealName === mealName) {
-        if (cur.servingSize === 'g') {
+        if (
+          cur.servingSize === 'g' ||
+          cur.servingSize === 'gram' ||
+          cur.servingSize === 'grams'
+        ) {
           return (acc += cur[key]);
         } else {
-          return (acc += cur[key] * cur.numOfServings);
+          return (acc += cur[key]);
         }
       }
 
@@ -88,67 +118,14 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
   function sumOfSelectedFoodsMacros() {
     const sum = selectedFoods.reduce(
       (acc, curr) => {
-        if (
-          curr.userMeasurements.measure === 'g' ||
-          curr.userMeasurements.measure === 'gram' ||
-          curr.userMeasurements.measure === 'grams'
-        ) {
-          return {
-            total_calories: convertFloatToOneDecimalPlacev2(
-              acc.total_calories + curr.userMeasurements.calories
-            ),
-            total_fat: convertFloatToOneDecimalPlacev2(
-              acc.total_fat +
-                (curr.nf_total_fat / curr.serving_weight_grams) *
-                  curr.userMeasurements.quantity
-            ),
-            total_carbs: convertFloatToOneDecimalPlacev2(
-              acc.total_carbs +
-                (curr.nf_total_carbohydrate / curr.serving_weight_grams) *
-                  curr.userMeasurements.quantity
-            ),
-            total_protein: convertFloatToOneDecimalPlacev2(
-              acc.total_protein +
-                (curr.nf_protein / curr.serving_weight_grams) *
-                  curr.userMeasurements.quantity
-            ),
-            total_sodium: convertFloatToOneDecimalPlacev2(
-              acc.total_sodium +
-                (curr.nf_sodium / curr.serving_weight_grams) *
-                  curr.userMeasurements.quantity
-            ),
-          };
-        } else {
-          const fatPerGram = curr.nf_total_fat / curr.serving_weight_grams
-          const carbsPerGram = curr.nf_total_carbohydrate / curr.serving_weight_grams
-          const proteinPerGram = curr.nf_protein / curr.serving_weight_grams
-          const sodiumPerGram = curr.nf_sodium / curr.serving_weight_grams
-          return {
-            total_calories: convertFloatToOneDecimalPlacev2(
-              acc.total_calories + curr.userMeasurements.calories
-            ),
-            total_fat: convertFloatToOneDecimalPlacev2(
-              fatPerGram *
-              curr.userMeasurements.servingWeight *
-              curr.userMeasurements.quantity
-            ),
-            total_carbs: convertFloatToOneDecimalPlacev2(
-              carbsPerGram *
-              curr.userMeasurements.servingWeight *
-              curr.userMeasurements.quantity
-            ),
-            total_protein: convertFloatToOneDecimalPlacev2(
-              proteinPerGram *
-              curr.userMeasurements.servingWeight *
-              curr.userMeasurements.quantity
-            ),
-            total_sodium: convertFloatToOneDecimalPlacev2(
-              sodiumPerGram *
-              curr.userMeasurements.servingWeight *
-              curr.userMeasurements.quantity
-            ),
-          };
-        }
+        return {
+          ...acc,
+          total_calories: acc.total_calories + curr.userMeasurements.calories,
+          total_fat: acc.total_fat + curr.userMeasurements.fat,
+          total_carbs: acc.total_carbs + curr.userMeasurements.carbs,
+          total_protein: acc.total_protein + curr.userMeasurements.protein,
+          total_sodium: acc.total_sodium + curr.userMeasurements.sodium,
+        };
       },
       {
         total_calories: 0,
@@ -158,7 +135,6 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
         total_sodium: 0,
       }
     );
-
     return sum;
   }
 
@@ -203,7 +179,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
     deleteFood({ foodId: id, mealName: mealName, date: selectedDate });
   };
 
-  const handleShowAddFoodDrawer = () => {
+  const handleShowAddFoodDrawer = (mealName: mealNames) => {
+    setMealNameToEdit(mealName);
     setIsAddFoodDrawerOpen(!isAddFoodDrawerOpen);
 
     if (isAddFoodDrawerOpen) {
@@ -240,6 +217,11 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
           measure: foodItem.serving_unit,
           servingWeight: foodItem.serving_weight_grams,
           calories: Math.round(foodItem.nf_calories),
+          carbs: Math.round(foodItem.nf_total_carbohydrate),
+          protein: Math.round(foodItem.nf_protein),
+          fat: Math.round(foodItem.nf_total_fat),
+          sodium: Math.round(foodItem.nf_sodium),
+          sugar: Math.round(foodItem.nf_sugars),
         },
       };
 
@@ -247,6 +229,7 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
     } else {
       const body = {
         query: food['food_name'],
+        timezone: 'Europe/London',
       };
 
       const res = await fetch(
@@ -273,12 +256,83 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
           measure: foodItem.serving_unit,
           servingWeight: foodItem.serving_weight_grams,
           calories: Math.round(foodItem.nf_calories),
+          carbs: Math.round(foodItem.nf_total_carbohydrate),
+          protein: Math.round(foodItem.nf_protein),
+          fat: Math.round(foodItem.nf_total_fat),
+          sodium: Math.round(foodItem.nf_sodium),
+          sugar: Math.round(foodItem.nf_sugars),
         },
       };
 
       setSelectedFoods((prevState: any) => [...prevState, defaultFoodItem]);
     }
     setSearchInput('');
+  };
+
+  const handleLogFoods = () => {
+    const loggedFoods = selectedFoods.map((food) => {
+      if (
+        food.userMeasurements.measure === 'g' ||
+        food.userMeasurements.measure === 'gram' ||
+        food.userMeasurements.measure === 'grams'
+      ) {
+        return {
+          calories: convertFloatToOneDecimalPlacev2(
+            food.userMeasurements.calories
+          ),
+          fat: convertFloatToOneDecimalPlacev2(food.userMeasurements.fat),
+          carbohydrate: convertFloatToOneDecimalPlacev2(
+            food.userMeasurements.carbs
+          ),
+          protein: convertFloatToOneDecimalPlacev2(
+            food.userMeasurements.protein
+          ),
+          sodium: convertFloatToOneDecimalPlacev2(food.userMeasurements.sodium),
+          sugar: convertFloatToOneDecimalPlacev2(food.userMeasurements.sugar),
+          servingSize: food.userMeasurements.measure as string,
+          name: food.food_name as string,
+          numOfServings: food.userMeasurements.quantity as number,
+          mealName: mealNameToEdit as string,
+        };
+      } else {
+        return {
+          calories: convertFloatToOneDecimalPlacev2(
+            food.userMeasurements.calories
+          ),
+          fat: convertFloatToOneDecimalPlacev2(food.userMeasurements.fat),
+          carbohydrate: convertFloatToOneDecimalPlacev2(
+            food.userMeasurements.carbs
+          ),
+          protein: convertFloatToOneDecimalPlacev2(
+            food.userMeasurements.protein
+          ),
+          sodium: convertFloatToOneDecimalPlacev2(food.userMeasurements.sodium),
+          sugar: convertFloatToOneDecimalPlacev2(food.userMeasurements.sugar),
+          servingSize: food.userMeasurements.measure as string,
+          name: food.food_name as string,
+          numOfServings: food.userMeasurements.quantity as number,
+          mealName: mealNameToEdit as string,
+        };
+      }
+    });
+
+    logFoods({
+      foods: loggedFoods,
+      nutritionInput: {
+        calories: usersGoals?.getCurrentUsersGoals.data?.calories,
+        carbohydrate: usersGoals?.getCurrentUsersGoals.data?.carbohydrate,
+        fat: usersGoals?.getCurrentUsersGoals.data?.fat,
+        protein: usersGoals?.getCurrentUsersGoals.data?.protein,
+        date: selectedDate.toISOString(),
+      },
+    });
+
+    if (typeof window != 'undefined' && window.document) {
+      document.body.style.overflow = 'scroll';
+    }
+
+    setSelectedFoods([]);
+    setIsAddFoodDrawerOpen(false);
   };
 
   useEffect(() => {
@@ -415,35 +469,39 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         </a>
                       </td>
 
-                      {foodEntry.servingSize === 'g' ? (
-                        <td>
-                          {convertFloatToOneDecimalPlace(foodEntry.calories)}
-                        </td>
-                      ) : (
-                        <td>
-                          {convertFloatToOneDecimalPlace(
-                            (foodEntry.calories as number) *
-                              foodEntry.numOfServings
-                          )}
-                        </td>
-                      )}
-
                       <td>
-                        {convertFloatToOneDecimalPlace(foodEntry.carbohydrate)}
+                        {convertFloatToOneDecimalPlace(
+                          foodEntry.calories,
+                          true
+                        )}
                       </td>
 
-                      <td>{convertFloatToOneDecimalPlace(foodEntry.fat)}</td>
-
                       <td>
-                        {convertFloatToOneDecimalPlace(foodEntry.protein)}
+                        {convertFloatToOneDecimalPlace(
+                          foodEntry.carbohydrate,
+                          true
+                        )}
                       </td>
 
-                      <td>?</td>
+                      <td>
+                        {convertFloatToOneDecimalPlace(foodEntry.fat, true)}
+                      </td>
+
+                      <td>
+                        {convertFloatToOneDecimalPlace(foodEntry.protein, true)}
+                      </td>
+
+                      <td>
+                        {convertFloatToOneDecimalPlace(foodEntry.sodium, true)}
+                      </td>
 
                       <td>
                         {foodEntry.sugar === null
                           ? 0
-                          : convertFloatToOneDecimalPlace(foodEntry.sugar)}
+                          : convertFloatToOneDecimalPlace(
+                              foodEntry.sugar,
+                              true
+                            )}
                       </td>
 
                       <td className="delete">
@@ -467,7 +525,7 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
               <tr className={styles.bottom}>
                 <td className={styles.foodName} style={{ zIndex: 9 }}>
                   <button
-                    onClick={handleShowAddFoodDrawer}
+                    onClick={() => handleShowAddFoodDrawer('Breakfast')}
                     className={styles.addFood}
                   >
                     Add Food
@@ -483,7 +541,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         usersFood?.getCurrentUsersFoodByDate.data as Food[],
                         'calories',
                         'Breakfast'
-                      )
+                      ),
+                      false
                     )}
                 </td>
 
@@ -494,7 +553,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         usersFood?.getCurrentUsersFoodByDate.data as Food[],
                         'carbohydrate',
                         'Breakfast'
-                      )
+                      ),
+                      false
                     )}
                 </td>
 
@@ -505,7 +565,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         usersFood?.getCurrentUsersFoodByDate.data as Food[],
                         'fat',
                         'Breakfast'
-                      )
+                      ),
+                      false
                     )}
                 </td>
 
@@ -516,11 +577,23 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         usersFood?.getCurrentUsersFoodByDate.data as Food[],
                         'protein',
                         'Breakfast'
-                      )
+                      ),
+                      false
                     )}
                 </td>
 
-                <td>?</td>
+                <td>
+                  {' '}
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'sodium',
+                        'Breakfast'
+                      ),
+                      false
+                    )}
+                </td>
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
@@ -529,7 +602,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         usersFood?.getCurrentUsersFoodByDate.data as Food[],
                         'sugar',
                         'Breakfast'
-                      )
+                      ),
+                      false
                     )}
                 </td>
               </tr>
@@ -553,36 +627,40 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         </a>
                       </td>
 
-                      {foodEntry.servingSize === 'g' ? (
-                        <td>
-                          {convertFloatToOneDecimalPlace(foodEntry.calories)}
-                        </td>
-                      ) : (
-                        <td>
-                          {convertFloatToOneDecimalPlace(
-                            (foodEntry.calories as number) *
-                              foodEntry.numOfServings
-                          )}
-                        </td>
-                      )}
-
                       <td>
-                        {convertFloatToOneDecimalPlace(foodEntry.carbohydrate)}
+                        {convertFloatToOneDecimalPlace(
+                          foodEntry.calories,
+                          true
+                        )}
                       </td>
 
-                      <td>{convertFloatToOneDecimalPlace(foodEntry.fat)}</td>
-
                       <td>
-                        {convertFloatToOneDecimalPlace(foodEntry.protein)}
+                        {convertFloatToOneDecimalPlace(
+                          foodEntry.carbohydrate,
+                          true
+                        )}
                       </td>
 
-                      <td>?</td>
+                      <td>
+                        {convertFloatToOneDecimalPlace(foodEntry.fat, true)}
+                      </td>
+
+                      <td>
+                        {convertFloatToOneDecimalPlace(foodEntry.protein, true)}
+                      </td>
+
+                      <td>
+                        {convertFloatToOneDecimalPlace(foodEntry.sodium, true)}
+                      </td>
 
                       <td>
                         {' '}
                         {foodEntry.sugar === null
                           ? 0
-                          : convertFloatToOneDecimalPlace(foodEntry.sugar)}
+                          : convertFloatToOneDecimalPlace(
+                              foodEntry.sugar,
+                              true
+                            )}
                       </td>
 
                       <td className="delete">
@@ -605,7 +683,12 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
               })}
               <tr className={styles.bottom}>
                 <td className={styles.foodName} style={{ zIndex: 8 }}>
-                  <button className={styles.addFood}>Add Food</button>
+                  <button
+                    onClick={() => handleShowAddFoodDrawer('Lunch')}
+                    className={styles.addFood}
+                  >
+                    Add Food
+                  </button>
                   <div className={styles.quickTools}>
                     <a className="toggle_diary_options">Quick Tools</a>
                   </div>
@@ -617,7 +700,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         usersFood?.getCurrentUsersFoodByDate.data as Food[],
                         'calories',
                         'Lunch'
-                      )
+                      ),
+                      false
                     )}
                 </td>
 
@@ -628,7 +712,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         usersFood?.getCurrentUsersFoodByDate.data as Food[],
                         'carbohydrate',
                         'Lunch'
-                      )
+                      ),
+                      false
                     )}
                 </td>
 
@@ -639,7 +724,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         usersFood?.getCurrentUsersFoodByDate.data as Food[],
                         'fat',
                         'Lunch'
-                      )
+                      ),
+                      false
                     )}
                 </td>
 
@@ -650,11 +736,22 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         usersFood?.getCurrentUsersFoodByDate.data as Food[],
                         'protein',
                         'Lunch'
-                      )
+                      ),
+                      false
                     )}
                 </td>
 
-                <td>?</td>
+                <td>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'sodium',
+                        'Lunch'
+                      ),
+                      false
+                    )}
+                </td>
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
@@ -663,7 +760,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         usersFood?.getCurrentUsersFoodByDate.data as Food[],
                         'sugar',
                         'Lunch'
-                      )
+                      ),
+                      false
                     )}
                 </td>
 
@@ -688,36 +786,40 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         </a>
                       </td>
 
-                      {foodEntry.servingSize === 'g' ? (
-                        <td>
-                          {convertFloatToOneDecimalPlace(foodEntry.calories)}
-                        </td>
-                      ) : (
-                        <td>
-                          {convertFloatToOneDecimalPlace(
-                            (foodEntry.calories as number) *
-                              foodEntry.numOfServings
-                          )}
-                        </td>
-                      )}
-
                       <td>
-                        {convertFloatToOneDecimalPlace(foodEntry.carbohydrate)}
+                        {convertFloatToOneDecimalPlace(
+                          foodEntry.calories,
+                          true
+                        )}
                       </td>
 
-                      <td>{convertFloatToOneDecimalPlace(foodEntry.fat)}</td>
-
                       <td>
-                        {convertFloatToOneDecimalPlace(foodEntry.protein)}
+                        {convertFloatToOneDecimalPlace(
+                          foodEntry.carbohydrate,
+                          true
+                        )}
                       </td>
 
-                      <td>?</td>
+                      <td>
+                        {convertFloatToOneDecimalPlace(foodEntry.fat, true)}
+                      </td>
+
+                      <td>
+                        {convertFloatToOneDecimalPlace(foodEntry.protein, true)}
+                      </td>
+
+                      <td>
+                        {convertFloatToOneDecimalPlace(foodEntry.sodium, true)}
+                      </td>
 
                       <td>
                         {' '}
                         {foodEntry.sugar === null
                           ? 0
-                          : convertFloatToOneDecimalPlace(foodEntry.sugar)}
+                          : convertFloatToOneDecimalPlace(
+                              foodEntry.sugar,
+                              true
+                            )}
                       </td>
 
                       <td className="delete">
@@ -740,7 +842,12 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
               })}
               <tr className={styles.bottom}>
                 <td className={styles.foodName} style={{ zIndex: 9 }}>
-                  <a className={styles.addFood}>Add Food</a>
+                  <button
+                    onClick={() => handleShowAddFoodDrawer('Dinner')}
+                    className={styles.addFood}
+                  >
+                    Add Food
+                  </button>
                   <div className={styles.quickTools}>
                     <a className="toggle_diary_options">Quick Tools</a>
                   </div>
@@ -752,7 +859,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         usersFood?.getCurrentUsersFoodByDate.data as Food[],
                         'calories',
                         'Dinner'
-                      )
+                      ),
+                      false
                     )}
                 </td>
 
@@ -763,7 +871,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         usersFood?.getCurrentUsersFoodByDate.data as Food[],
                         'carbohydrate',
                         'Dinner'
-                      )
+                      ),
+                      false
                     )}
                 </td>
 
@@ -774,7 +883,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         usersFood?.getCurrentUsersFoodByDate.data as Food[],
                         'fat',
                         'Dinner'
-                      )
+                      ),
+                      false
                     )}
                 </td>
 
@@ -785,11 +895,22 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         usersFood?.getCurrentUsersFoodByDate.data as Food[],
                         'protein',
                         'Dinner'
-                      )
+                      ),
+                      false
                     )}
                 </td>
 
-                <td>?</td>
+                <td>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'sodium',
+                        'Dinner'
+                      ),
+                      false
+                    )}
+                </td>
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
@@ -798,7 +919,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         usersFood?.getCurrentUsersFoodByDate.data as Food[],
                         'sugar',
                         'Dinner'
-                      )
+                      ),
+                      false
                     )}
                 </td>
 
@@ -825,36 +947,40 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         </a>
                       </td>
 
-                      {foodEntry.servingSize === 'g' ? (
-                        <td>
-                          {convertFloatToOneDecimalPlace(foodEntry.calories)}
-                        </td>
-                      ) : (
-                        <td>
-                          {convertFloatToOneDecimalPlace(
-                            (foodEntry.calories as number) *
-                              foodEntry.numOfServings
-                          )}
-                        </td>
-                      )}
-
                       <td>
-                        {convertFloatToOneDecimalPlace(foodEntry.carbohydrate)}
+                        {convertFloatToOneDecimalPlace(
+                          foodEntry.calories,
+                          true
+                        )}
                       </td>
 
-                      <td>{convertFloatToOneDecimalPlace(foodEntry.fat)}</td>
-
                       <td>
-                        {convertFloatToOneDecimalPlace(foodEntry.protein)}
+                        {convertFloatToOneDecimalPlace(
+                          foodEntry.carbohydrate,
+                          true
+                        )}
                       </td>
 
-                      <td>?</td>
+                      <td>
+                        {convertFloatToOneDecimalPlace(foodEntry.fat, true)}
+                      </td>
+
+                      <td>
+                        {convertFloatToOneDecimalPlace(foodEntry.protein, true)}
+                      </td>
+
+                      <td>
+                        {convertFloatToOneDecimalPlace(foodEntry.sodium, true)}
+                      </td>
 
                       <td>
                         {' '}
                         {foodEntry.sugar === null
                           ? 0
-                          : convertFloatToOneDecimalPlace(foodEntry.sugar)}
+                          : convertFloatToOneDecimalPlace(
+                              foodEntry.sugar,
+                              true
+                            )}
                       </td>
 
                       <td className="delete">
@@ -877,7 +1003,12 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
               })}
               <tr className={styles.bottom}>
                 <td className={styles.foodName} style={{ zIndex: 7 }}>
-                  <a className={styles.addFood}>Add Food</a>
+                  <button
+                    onClick={() => handleShowAddFoodDrawer('Snacks')}
+                    className={styles.addFood}
+                  >
+                    Add Food
+                  </button>
                   <div className={styles.quickTools}>
                     <a className="toggle_diary_options">Quick Tools</a>
                   </div>
@@ -890,7 +1021,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         usersFood?.getCurrentUsersFoodByDate.data as Food[],
                         'calories',
                         'Snacks'
-                      )
+                      ),
+                      false
                     )}
                 </td>
 
@@ -901,7 +1033,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         usersFood?.getCurrentUsersFoodByDate.data as Food[],
                         'carbohydrate',
                         'Snacks'
-                      )
+                      ),
+                      false
                     )}
                 </td>
 
@@ -912,7 +1045,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         usersFood?.getCurrentUsersFoodByDate.data as Food[],
                         'fat',
                         'Snacks'
-                      )
+                      ),
+                      false
                     )}
                 </td>
 
@@ -923,11 +1057,22 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         usersFood?.getCurrentUsersFoodByDate.data as Food[],
                         'protein',
                         'Snacks'
-                      )
+                      ),
+                      false
                     )}
                 </td>
 
-                <td>?</td>
+                <td>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'sodium',
+                        'Snacks'
+                      ),
+                      false
+                    )}
+                </td>
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
@@ -936,7 +1081,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         usersFood?.getCurrentUsersFoodByDate.data as Food[],
                         'sugar',
                         'Snacks'
-                      )
+                      ),
+                      false
                     )}
                 </td>
 
@@ -962,36 +1108,40 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         </a>
                       </td>
 
-                      {foodEntry.servingSize === 'g' ? (
-                        <td>
-                          {convertFloatToOneDecimalPlace(foodEntry.calories)}
-                        </td>
-                      ) : (
-                        <td>
-                          {convertFloatToOneDecimalPlace(
-                            (foodEntry.calories as number) *
-                              foodEntry.numOfServings
-                          )}
-                        </td>
-                      )}
-
                       <td>
-                        {convertFloatToOneDecimalPlace(foodEntry.carbohydrate)}
+                        {convertFloatToOneDecimalPlace(
+                          foodEntry.calories,
+                          true
+                        )}
                       </td>
 
-                      <td>{convertFloatToOneDecimalPlace(foodEntry.fat)}</td>
-
                       <td>
-                        {convertFloatToOneDecimalPlace(foodEntry.protein)}
+                        {convertFloatToOneDecimalPlace(
+                          foodEntry.carbohydrate,
+                          true
+                        )}
                       </td>
 
-                      <td>?</td>
+                      <td>
+                        {convertFloatToOneDecimalPlace(foodEntry.fat, true)}
+                      </td>
+
+                      <td>
+                        {convertFloatToOneDecimalPlace(foodEntry.protein, true)}
+                      </td>
+
+                      <td>
+                        {convertFloatToOneDecimalPlace(foodEntry.sodium, true)}
+                      </td>
 
                       <td>
                         {' '}
                         {foodEntry.sugar === null
                           ? 0
-                          : convertFloatToOneDecimalPlace(foodEntry.sugar)}
+                          : convertFloatToOneDecimalPlace(
+                              foodEntry.sugar,
+                              true
+                            )}
                       </td>
 
                       <td className="delete">
@@ -1014,7 +1164,12 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
               })}
               <tr className={styles.bottom}>
                 <td className={styles.foodName} style={{ zIndex: 6 }}>
-                  <a className={styles.addFood}>Add Food</a>
+                  <button
+                    onClick={() => handleShowAddFoodDrawer('Meal 5')}
+                    className={styles.addFood}
+                  >
+                    Add Food
+                  </button>
                   <div className={styles.quickTools}>
                     <a className="toggle_diary_options">Quick Tools</a>
                   </div>
@@ -1027,7 +1182,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         usersFood?.getCurrentUsersFoodByDate.data as Food[],
                         'calories',
                         'Meal 5'
-                      )
+                      ),
+                      false
                     )}
                 </td>
 
@@ -1038,7 +1194,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         usersFood?.getCurrentUsersFoodByDate.data as Food[],
                         'carbohydrate',
                         'Meal 5'
-                      )
+                      ),
+                      false
                     )}
                 </td>
 
@@ -1049,7 +1206,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         usersFood?.getCurrentUsersFoodByDate.data as Food[],
                         'fat',
                         'Meal 5'
-                      )
+                      ),
+                      false
                     )}
                 </td>
 
@@ -1060,11 +1218,22 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         usersFood?.getCurrentUsersFoodByDate.data as Food[],
                         'protein',
                         'Meal 5'
-                      )
+                      ),
+                      false
                     )}
                 </td>
 
-                <td>?</td>
+                <td>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'sodium',
+                        'Meal 5'
+                      ),
+                      false
+                    )}
+                </td>
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
@@ -1073,7 +1242,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         usersFood?.getCurrentUsersFoodByDate.data as Food[],
                         'sugar',
                         'Meal 5'
-                      )
+                      ),
+                      false
                     )}
                 </td>
 
@@ -1099,36 +1269,40 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         </a>
                       </td>
 
-                      {foodEntry.servingSize === 'g' ? (
-                        <td>
-                          {convertFloatToOneDecimalPlace(foodEntry.calories)}
-                        </td>
-                      ) : (
-                        <td>
-                          {convertFloatToOneDecimalPlace(
-                            (foodEntry.calories as number) *
-                              foodEntry.numOfServings
-                          )}
-                        </td>
-                      )}
-
                       <td>
-                        {convertFloatToOneDecimalPlace(foodEntry.carbohydrate)}
+                        {convertFloatToOneDecimalPlace(
+                          (foodEntry.calories as number) *
+                            foodEntry.numOfServings,
+                          true
+                        )}
                       </td>
 
-                      <td>{convertFloatToOneDecimalPlace(foodEntry.fat)}</td>
-
                       <td>
-                        {convertFloatToOneDecimalPlace(foodEntry.protein)}
+                        {convertFloatToOneDecimalPlace(
+                          foodEntry.carbohydrate,
+                          true
+                        )}
                       </td>
 
-                      <td>?</td>
+                      <td>
+                        {convertFloatToOneDecimalPlace(foodEntry.fat, true)}
+                      </td>
+
+                      <td>
+                        {convertFloatToOneDecimalPlace(foodEntry.protein, true)}
+                      </td>
+                      <td>
+                        {convertFloatToOneDecimalPlace(foodEntry.sodium, true)}
+                      </td>
 
                       <td>
                         {' '}
                         {foodEntry.sugar === null
                           ? 0
-                          : convertFloatToOneDecimalPlace(foodEntry.sugar)}
+                          : convertFloatToOneDecimalPlace(
+                              foodEntry.sugar,
+                              true
+                            )}
                       </td>
 
                       <td className="delete">
@@ -1151,7 +1325,12 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
               })}
               <tr className={styles.bottom}>
                 <td className={styles.foodName} style={{ zIndex: 5 }}>
-                  <a className={styles.addFood}>Add Food</a>
+                  <button
+                    onClick={() => handleShowAddFoodDrawer('Meal 6')}
+                    className={styles.addFood}
+                  >
+                    Add Food
+                  </button>
                   <div className={styles.quickTools}>
                     <a className="toggle_diary_options">Quick Tools</a>
                   </div>
@@ -1163,7 +1342,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         usersFood?.getCurrentUsersFoodByDate.data as Food[],
                         'calories',
                         'Meal 6'
-                      )
+                      ),
+                      false
                     )}
                 </td>
 
@@ -1174,7 +1354,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         usersFood?.getCurrentUsersFoodByDate.data as Food[],
                         'carbohydrate',
                         'Meal 6'
-                      )
+                      ),
+                      false
                     )}
                 </td>
 
@@ -1185,7 +1366,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         usersFood?.getCurrentUsersFoodByDate.data as Food[],
                         'fat',
                         'Meal 6'
-                      )
+                      ),
+                      false
                     )}
                 </td>
 
@@ -1196,11 +1378,22 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         usersFood?.getCurrentUsersFoodByDate.data as Food[],
                         'protein',
                         'Meal 6'
-                      )
+                      ),
+                      false
                     )}
                 </td>
 
-                <td>?</td>
+                <td>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'sodium',
+                        'Meal 6'
+                      ),
+                      false
+                    )}
+                </td>
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
@@ -1209,7 +1402,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                         usersFood?.getCurrentUsersFoodByDate.data as Food[],
                         'sugar',
                         'Meal 6'
-                      )
+                      ),
+                      false
                     )}
                 </td>
 
@@ -1270,7 +1464,16 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                     )}
                 </td>
 
-                <td>?</td>
+                <td>
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    convertFloatToOneDecimalPlacev2(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'sodium',
+                        'All'
+                      )
+                    )}
+                </td>
 
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
@@ -1338,8 +1541,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                       )
                     )}
                 </td>
-                <td>?</td>
-                <td>?</td>
+                <td>2,300</td>
+                <td>74</td>
                 <td className={styles.emptyCell}></td>
               </tr>
 
@@ -1466,7 +1669,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                           usersFood?.getCurrentUsersFoodByDate.data as Food[],
                           'fat',
                           'All'
-                        )
+                        ),
+                      true
                     )}
                 </td>
                 <td
@@ -1513,11 +1717,64 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                           usersFood?.getCurrentUsersFoodByDate.data as Food[],
                           'protein',
                           'All'
+                        ),
+                      true
+                    )}
+                </td>
+                <td
+                  className={`${
+                    usersFood?.getCurrentUsersFoodByDate.data &&
+                    isNumberPositive(
+                      convertFloatToOneDecimalPlacev2(
+                        2300 -
+                          sumBy(
+                            usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                            'sodium',
+                            'All'
+                          )
+                      )
+                    )
+                      ? styles.possitive
+                      : styles.negative
+                  }`}
+                >
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    convertFloatToOneDecimalPlacev2(
+                      2300 -
+                        sumBy(
+                          usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                          'sodium',
+                          'All'
                         )
                     )}
                 </td>
-                <td className={styles.possitive}>?</td>
-                <td className={styles.possitive}>?</td>
+                <td
+                  className={`${
+                    usersFood?.getCurrentUsersFoodByDate.data &&
+                    isNumberPositive(
+                      convertFloatToOneDecimalPlacev2(
+                        74 -
+                          sumBy(
+                            usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                            'sugar',
+                            'All'
+                          )
+                      )
+                    )
+                      ? styles.possitive
+                      : styles.negative
+                  }`}
+                >
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    convertFloatToOneDecimalPlacev2(
+                      74 -
+                        sumBy(
+                          usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                          'sugar',
+                          'All'
+                        )
+                    )}
+                </td>
                 <td className={styles.emptyCell}></td>
               </tr>
             </tbody>
@@ -1568,7 +1825,7 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
         </div>
         <Drawer
           isOpen={isAddFoodDrawerOpen}
-          setIsOpen={handleShowAddFoodDrawer}
+          setIsOpen={() => handleShowAddFoodDrawer(undefined)}
           title="Add Food"
           size="lg"
         >
@@ -1603,7 +1860,7 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                     data-modal-toggle="default-modal"
                   >
                     <AiOutlinePlus
-                      onClick={handleShowAddFoodDrawer}
+                      onClick={() => handleShowAddFoodDrawer(undefined)}
                       style={{ transform: 'rotate(45deg)' }}
                       size={30}
                       color="white"
@@ -1628,19 +1885,21 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-brand-green focus:border-brand-green w-full pl-3 p-2.5"
                     placeholder="Search"
                   />
-                  <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                    <svg
-                      className="w-5 h-5 text-gray-800"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                        clipRule="evenodd"
-                      ></path>
-                    </svg>
+                  <div className="absolute top-[19px] right-0 flex items-center px-3 pointer-events-none">
+                    <div>
+                      <svg
+                        className="w-5 h-5 text-gray-800"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                          clipRule="evenodd"
+                        ></path>
+                      </svg>
+                    </div>
                   </div>
                   {!isSearching && debouncedSearchTerm.length > 0 && foods && (
                     <div
@@ -1769,10 +2028,48 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                     </div>
                   </div>
 
+                  {/* <div className="py-7">
+                    <hr />
+                  </div>
+                  <div className=" flex justify-between pr-2">
+                    <div>
+                      <p>
+                        {' '}
+                        <b>When: </b> {selectedDate.toDateString()}, Breakfast
+                      </p>
+                    </div>
+                    <div>
+                      <FaChevronDown
+                        size={18}
+                        // className="text-[#0073e6] group-hover:text-blue-700"
+                        className="text-gray-700 cursor-pointer"
+                      />
+                    </div>
+                  </div> */}
+
                   <div>
-                    <button className="w-full mt-8 py-2 bg-brand-green text-white text-bold rounded hover:bg-brand-green-hover">
-                      Log {selectedFoods.length} foods
-                    </button>
+                    {selectedFoods.length === 0 ? (
+                      <button
+                        disabled={true}
+                        className="w-full cursor-not-allowed opacity-50 mt-8 py-2 bg-brand-green text-white text-bold rounded hover:bg-brand-green-hover"
+                      >
+                        Log {selectedFoods.length} foods
+                      </button>
+                    ) : selectedFoods.length === 1 ? (
+                      <button
+                        onClick={handleLogFoods}
+                        className="w-full mt-8 py-2 bg-brand-green text-white text-bold rounded hover:bg-brand-green-hover"
+                      >
+                        Log {selectedFoods.length} food
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleLogFoods}
+                        className="w-full mt-8 py-2 bg-brand-green text-white text-bold rounded hover:bg-brand-green-hover"
+                      >
+                        Log {selectedFoods.length} foods
+                      </button>
+                    )}
                   </div>
                   <div className="flex justify-center mt-4 group">
                     <button

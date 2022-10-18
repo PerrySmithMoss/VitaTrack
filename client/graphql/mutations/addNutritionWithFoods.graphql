@@ -1,0 +1,22 @@
+mutation AddNutritionWithFoods(
+  $foods: [FoodsInput!]!
+  $nutritionInput: NutritionInput!
+) {
+  addNutritionWithFoods(foods: $foods, nutritionInput: $nutritionInput) {
+    errors {
+      field
+      message
+    }
+    data {
+      id
+      createdAt
+      updatedAt
+      date
+      calories
+      protein
+      fat
+      carbohydrate
+      userId
+    }
+  }
+}

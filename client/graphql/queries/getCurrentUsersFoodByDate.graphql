@@ -10,13 +10,14 @@ query GetCurrentUsersFoodByDate($date: DateTime) {
       updatedAt
       name
       mealName
+      numOfServings
+      servingSize
       calories
       protein
       fat
       carbohydrate
       sugar
-      numOfServings
-      servingSize
+      sodium
       userId
       nutritionId
     }

@@ -40,6 +40,9 @@ export class Food {
   @Field(() => Float)
   sugar: number;
 
+  @Field(() => Float)
+  sodium: number;
+
   @Field(() => User)
   user: User;
 

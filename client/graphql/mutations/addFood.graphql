@@ -17,6 +17,7 @@ mutation AddFood($foodInput: FoodInput!, $date: DateTime!, $nutritionId: Int!) {
       fat
       carbohydrate
       sugar
+      sodium
       userId
       nutritionId
     }

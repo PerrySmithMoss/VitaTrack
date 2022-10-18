@@ -77,6 +77,7 @@ export type Food = {
   nutritionId: Scalars['ID'];
   protein: Scalars['Float'];
   servingSize: Scalars['String'];
+  sodium: Scalars['Float'];
   sugar: Scalars['Float'];
   updatedAt: Scalars['DateTime'];
   user: User;
@@ -98,6 +99,7 @@ export type FoodInput = {
   numOfServings: Scalars['Float'];
   protein: Scalars['Float'];
   servingSize: Scalars['String'];
+  sodium: Scalars['Float'];
   sugar: Scalars['Float'];
 };
 
@@ -113,10 +115,29 @@ export type FoodResponseIterable = {
   errors?: Maybe<Array<FoodFieldError>>;
 };
 
+export type FoodResponseSimple = {
+  __typename?: 'FoodResponseSimple';
+  data?: Maybe<Scalars['String']>;
+  errors?: Maybe<Array<FoodFieldError>>;
+};
+
 export type FoodResponseSuccess = {
   __typename?: 'FoodResponseSuccess';
   errors?: Maybe<Array<FoodFieldError>>;
   message?: Maybe<Scalars['String']>;
+};
+
+export type FoodsInput = {
+  calories: Scalars['Int'];
+  carbohydrate: Scalars['Float'];
+  fat: Scalars['Float'];
+  mealName: Scalars['String'];
+  name: Scalars['String'];
+  numOfServings: Scalars['Float'];
+  protein: Scalars['Float'];
+  servingSize: Scalars['String'];
+  sodium: Scalars['Float'];
+  sugar: Scalars['Float'];
 };
 
 export type Goals = {
@@ -166,7 +187,10 @@ export type LogoutUserResponse = {
 export type Mutation = {
   __typename?: 'Mutation';
   addFood: FoodResponse;
+  addFoodsv2: FoodResponseSimple;
   addNutrition: NutritionResponse;
+  addNutritionWithFood: NutritionResponse;
+  addNutritionWithFoods: NutritionResponse;
   createUser: UserResponse;
   createWorkout: WorkoutResponse;
   deleteFoodFromMealByDate: FoodResponseSuccess;
@@ -184,7 +208,25 @@ export type MutationAddFoodArgs = {
 };
 
 
+export type MutationAddFoodsv2Args = {
+  foodInput: Array<FoodInput>;
+  nutritionId: Scalars['Int'];
+};
+
+
 export type MutationAddNutritionArgs = {
+  nutritionInput: NutritionInput;
+};
+
+
+export type MutationAddNutritionWithFoodArgs = {
+  foods: FoodsInput;
+  nutritionInput: NutritionInput;
+};
+
+
+export type MutationAddNutritionWithFoodsArgs = {
+  foods: Array<FoodsInput>;
   nutritionInput: NutritionInput;
 };
 
@@ -411,7 +453,7 @@ export type AddFoodMutationVariables = Exact<{
 }>;
 
 
-export type AddFoodMutation = { __typename?: 'Mutation', addFood: { __typename?: 'FoodResponse', errors?: Array<{ __typename?: 'FoodFieldError', field: string, message: string }> | null, data?: { __typename?: 'Food', id: string, createdAt: any, updatedAt: any, name: string, mealName: string, numOfServings: number, servingSize: string, calories: number, protein: number, fat: number, carbohydrate: number, sugar: number, userId: string, nutritionId: string } | null } };
+export type AddFoodMutation = { __typename?: 'Mutation', addFood: { __typename?: 'FoodResponse', errors?: Array<{ __typename?: 'FoodFieldError', field: string, message: string }> | null, data?: { __typename?: 'Food', id: string, createdAt: any, updatedAt: any, name: string, mealName: string, numOfServings: number, servingSize: string, calories: number, protein: number, fat: number, carbohydrate: number, sugar: number, sodium: number, userId: string, nutritionId: string } | null } };
 
 export type AddNutritionMutationVariables = Exact<{
   nutritionInput: NutritionInput;
@@ -419,6 +461,14 @@ export type AddNutritionMutationVariables = Exact<{
 
 
 export type AddNutritionMutation = { __typename?: 'Mutation', addNutrition: { __typename?: 'NutritionResponse', errors?: Array<{ __typename?: 'NutritionFieldError', field: string, message: string }> | null, data?: { __typename?: 'Nutrition', id: string, createdAt: any, updatedAt: any, date: any, calories?: number | null, protein?: number | null, fat?: number | null, carbohydrate?: number | null, userId: string } | null } };
+
+export type AddNutritionWithFoodsMutationVariables = Exact<{
+  foods: Array<FoodsInput> | FoodsInput;
+  nutritionInput: NutritionInput;
+}>;
+
+
+export type AddNutritionWithFoodsMutation = { __typename?: 'Mutation', addNutritionWithFoods: { __typename?: 'NutritionResponse', errors?: Array<{ __typename?: 'NutritionFieldError', field: string, message: string }> | null, data?: { __typename?: 'Nutrition', id: string, createdAt: any, updatedAt: any, date: any, calories?: number | null, protein?: number | null, fat?: number | null, carbohydrate?: number | null, userId: string } | null } };
 
 export type CreateUserMutationVariables = Exact<{
   password: Scalars['String'];
@@ -487,7 +537,7 @@ export type GetCurrentUsersFoodByDateQueryVariables = Exact<{
 }>;
 
 
-export type GetCurrentUsersFoodByDateQuery = { __typename?: 'Query', getCurrentUsersFoodByDate: { __typename?: 'FoodResponseIterable', errors?: Array<{ __typename?: 'FoodFieldError', field: string, message: string }> | null, data?: Array<{ __typename?: 'Food', id: string, createdAt: any, updatedAt: any, name: string, mealName: string, calories: number, protein: number, fat: number, carbohydrate: number, sugar: number, numOfServings: number, servingSize: string, userId: string, nutritionId: string }> | null } };
+export type GetCurrentUsersFoodByDateQuery = { __typename?: 'Query', getCurrentUsersFoodByDate: { __typename?: 'FoodResponseIterable', errors?: Array<{ __typename?: 'FoodFieldError', field: string, message: string }> | null, data?: Array<{ __typename?: 'Food', id: string, createdAt: any, updatedAt: any, name: string, mealName: string, numOfServings: number, servingSize: string, calories: number, protein: number, fat: number, carbohydrate: number, sugar: number, sodium: number, userId: string, nutritionId: string }> | null } };
 
 export type GetCurrentUsersGoalsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -532,6 +582,7 @@ export const AddFoodDocument = /*#__PURE__*/ `
       fat
       carbohydrate
       sugar
+      sodium
       userId
       nutritionId
     }
@@ -579,6 +630,37 @@ export const useAddNutritionMutation = <
       options
     );
 useAddNutritionMutation.fetcher = (variables: AddNutritionMutationVariables, options?: RequestInit['headers']) => customFetcher<AddNutritionMutation, AddNutritionMutationVariables>(AddNutritionDocument, variables, options);
+export const AddNutritionWithFoodsDocument = /*#__PURE__*/ `
+    mutation AddNutritionWithFoods($foods: [FoodsInput!]!, $nutritionInput: NutritionInput!) {
+  addNutritionWithFoods(foods: $foods, nutritionInput: $nutritionInput) {
+    errors {
+      field
+      message
+    }
+    data {
+      id
+      createdAt
+      updatedAt
+      date
+      calories
+      protein
+      fat
+      carbohydrate
+      userId
+    }
+  }
+}
+    `;
+export const useAddNutritionWithFoodsMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<AddNutritionWithFoodsMutation, TError, AddNutritionWithFoodsMutationVariables, TContext>) =>
+    useMutation<AddNutritionWithFoodsMutation, TError, AddNutritionWithFoodsMutationVariables, TContext>(
+      ['AddNutritionWithFoods'],
+      (variables?: AddNutritionWithFoodsMutationVariables) => customFetcher<AddNutritionWithFoodsMutation, AddNutritionWithFoodsMutationVariables>(AddNutritionWithFoodsDocument, variables)(),
+      options
+    );
+useAddNutritionWithFoodsMutation.fetcher = (variables: AddNutritionWithFoodsMutationVariables, options?: RequestInit['headers']) => customFetcher<AddNutritionWithFoodsMutation, AddNutritionWithFoodsMutationVariables>(AddNutritionWithFoodsDocument, variables, options);
 export const CreateUserDocument = /*#__PURE__*/ `
     mutation CreateUser($password: String!, $email: String!, $username: String!) {
   createUser(password: $password, email: $email, username: $username) {
@@ -863,13 +945,14 @@ export const GetCurrentUsersFoodByDateDocument = /*#__PURE__*/ `
       updatedAt
       name
       mealName
+      numOfServings
+      servingSize
       calories
       protein
       fat
       carbohydrate
       sugar
-      numOfServings
-      servingSize
+      sodium
       userId
       nutritionId
     }

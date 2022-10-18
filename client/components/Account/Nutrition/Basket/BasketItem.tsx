@@ -27,6 +27,12 @@ export const BasketItem: React.FC<BasketItemProps> = ({
     if (value !== '') {
       const changedFoods = selectedFoods.map((food: any) => {
         const caloriesPerGram = food.nf_calories / food.serving_weight_grams;
+        const fatPerGram = food.nf_total_fat / food.serving_weight_grams;
+        const carbsPerGram =
+          food.nf_total_carbohydrate / food.serving_weight_grams;
+        const proteinPerGram = food.nf_protein / food.serving_weight_grams;
+        const sodiumPerGram = food.nf_sodium / food.serving_weight_grams;
+        const sugarPerGram = food.nf_sugars / food.serving_weight_grams;
         if (foodName === food.food_name) {
           if (food.userMeasurements) {
             if (
@@ -40,6 +46,11 @@ export const BasketItem: React.FC<BasketItemProps> = ({
                   ...food.userMeasurements,
                   quantity: parseInt(value),
                   calories: Math.round(caloriesPerGram * parseInt(value)),
+                  carbs: Math.round(carbsPerGram * parseInt(value)),
+                  protein: Math.round(proteinPerGram * parseInt(value)),
+                  fat: Math.round(fatPerGram * parseInt(value)),
+                  sodium: Math.round(sodiumPerGram * parseInt(value)),
+                  sugar: Math.round(sugarPerGram * parseInt(value)),
                 },
               };
             } else {
@@ -50,6 +61,31 @@ export const BasketItem: React.FC<BasketItemProps> = ({
                   quantity: parseInt(value),
                   calories: Math.round(
                     caloriesPerGram *
+                      food.userMeasurements.servingWeight *
+                      parseInt(value)
+                  ),
+                  carbs: Math.round(
+                    carbsPerGram *
+                      food.userMeasurements.servingWeight *
+                      parseInt(value)
+                  ),
+                  protein: Math.round(
+                    proteinPerGram *
+                      food.userMeasurements.servingWeight *
+                      parseInt(value)
+                  ),
+                  fat: Math.round(
+                    fatPerGram *
+                      food.userMeasurements.servingWeight *
+                      parseInt(value)
+                  ),
+                  sodium: Math.round(
+                    sodiumPerGram *
+                      food.userMeasurements.servingWeight *
+                      parseInt(value)
+                  ),
+                  sugar: Math.round(
+                    sugarPerGram *
                       food.userMeasurements.servingWeight *
                       parseInt(value)
                   ),
@@ -64,6 +100,21 @@ export const BasketItem: React.FC<BasketItemProps> = ({
                 quantity: parseInt(value),
                 calories: Math.round(
                   caloriesPerGram * quantity * food.userMeasurements.quantity
+                ),
+                carbs: Math.round(
+                  carbsPerGram * quantity * food.userMeasurements.quantity
+                ),
+                protein: Math.round(
+                  proteinPerGram * quantity * food.userMeasurements.quantity
+                ),
+                fat: Math.round(
+                  fatPerGram * quantity * food.userMeasurements.quantity
+                ),
+                sodium: Math.round(
+                  sodiumPerGram * quantity * food.userMeasurements.quantity
+                ),
+                sugar: Math.round(
+                  sugarPerGram * quantity * food.userMeasurements.servingWeight
                 ),
               },
             };
@@ -97,6 +148,26 @@ export const BasketItem: React.FC<BasketItemProps> = ({
             userMeasurements: {
               ...food.userMeasurements,
               calories: Math.round(caloriesPerGram * quantity),
+              carbs: Math.round(
+                (food.nf_total_fat / food.serving_weight_grams) *
+                  food.userMeasurements.quantity
+              ),
+              protein: Math.round(
+                (food.nf_protein / food.serving_weight_grams) *
+                  food.userMeasurements.quantity
+              ),
+              fat: Math.round(
+                (food.nf_total_fat / food.serving_weight_grams) *
+                  food.userMeasurements.quantity
+              ),
+              sodium: Math.round(
+                (food.nf_sodium / food.serving_weight_grams) *
+                  food.userMeasurements.quantity
+              ),
+              sugar: Math.round(
+                (food.nf_sugars / food.serving_weight_grams) *
+                  food.userMeasurements.quantity
+              ),
               measure: value,
               quantity: quantity,
               servingWeight: quantity,
@@ -110,6 +181,12 @@ export const BasketItem: React.FC<BasketItemProps> = ({
       const changedFoods = selectedFoods.map((food: any) => {
         if (foodName === food.food_name) {
           const caloriesPerGram = food.nf_calories / food.serving_weight_grams;
+          const fatPerGram = food.nf_total_fat / food.serving_weight_grams;
+          const carbsPerGram =
+            food.nf_total_carbohydrate / food.serving_weight_grams;
+          const proteinPerGram = food.nf_protein / food.serving_weight_grams;
+          const sodiumPerGram = food.nf_sodium / food.serving_weight_grams;
+          const sugarPerGram = food.nf_sugars / food.serving_weight_grams;
           return {
             ...food,
             userMeasurements: {
@@ -117,6 +194,31 @@ export const BasketItem: React.FC<BasketItemProps> = ({
               calories: Math.round(
                 caloriesPerGram *
                   altMeasure.serving_weight *
+                  food.userMeasurements.quantity
+              ),
+              carbs: Math.round(
+                carbsPerGram *
+                  food.userMeasurements.servingWeight *
+                  food.userMeasurements.quantity
+              ),
+              protein: Math.round(
+                proteinPerGram *
+                  food.userMeasurements.servingWeight *
+                  food.userMeasurements.quantity
+              ),
+              fat: Math.round(
+                fatPerGram *
+                  food.userMeasurements.servingWeight *
+                  food.userMeasurements.quantity
+              ),
+              sodium: Math.round(
+                sodiumPerGram *
+                  food.userMeasurements.servingWeight *
+                  food.userMeasurements.quantity
+              ),
+              sugar: Math.round(
+                sugarPerGram *
+                  food.userMeasurements.servingWeight *
                   food.userMeasurements.quantity
               ),
               measure: value,
@@ -163,6 +265,7 @@ export const BasketItem: React.FC<BasketItemProps> = ({
       <div className="float-left w-[150px] pl-3">
         <input
           type="number"
+          // step="0.01"
           onKeyPress={(event) => {
             if (!/[0-9]/.test(event.key)) {
               event.preventDefault();
@@ -184,12 +287,11 @@ export const BasketItem: React.FC<BasketItemProps> = ({
         >
           {food.alt_measures ? (
             <>
-              {food.alt_measures
-                .map((measurement: any, index: number) => (
-                  <option key={index} value={measurement.measure}>
-                    {measurement.measure}
-                  </option>
-                ))}
+              {food.alt_measures.map((measurement: any, index: number) => (
+                <option key={index} value={measurement.measure}>
+                  {measurement.measure}
+                </option>
+              ))}
             </>
           ) : (
             <option value={food.serving_unit}>{food.serving_unit}</option>
