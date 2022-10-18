@@ -329,6 +329,7 @@ export type Query = {
   getCurrentUsersGoals: GoalsResponse;
   getCurrentUsersNutrition: NutritionResponseIterable;
   getCurrentUsersNutritionByDate: NutritionResponse;
+  getCurrentUsersRemainingCaloriesByDate: Scalars['Int'];
   getUsersWorkouts: WorkoutResponseIterable;
 };
 
@@ -339,6 +340,11 @@ export type QueryGetCurrentUsersFoodByDateArgs = {
 
 
 export type QueryGetCurrentUsersNutritionByDateArgs = {
+  date?: InputMaybe<Scalars['DateTime']>;
+};
+
+
+export type QueryGetCurrentUsersRemainingCaloriesByDateArgs = {
   date?: InputMaybe<Scalars['DateTime']>;
 };
 
@@ -543,6 +549,13 @@ export type GetCurrentUsersGoalsQueryVariables = Exact<{ [key: string]: never; }
 
 
 export type GetCurrentUsersGoalsQuery = { __typename?: 'Query', getCurrentUsersGoals: { __typename?: 'GoalsResponse', errors?: Array<{ __typename?: 'GoalsFieldError', field: string, message: string }> | null, data?: { __typename?: 'Goals', id: string, createdAt: any, updatedAt: any, startingWeight?: number | null, currentWeight?: number | null, goalWeight?: number | null, calories?: number | null, protein?: number | null, fat?: number | null, carbohydrate?: number | null } | null } };
+
+export type GetCurrentUsersRemainingCaloriesByDateQueryVariables = Exact<{
+  date?: InputMaybe<Scalars['DateTime']>;
+}>;
+
+
+export type GetCurrentUsersRemainingCaloriesByDateQuery = { __typename?: 'Query', getCurrentUsersRemainingCaloriesByDate: number };
 
 export type GetCurrentUsersNutritionQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1019,6 +1032,30 @@ useGetCurrentUsersGoalsQuery.getKey = (variables?: GetCurrentUsersGoalsQueryVari
 ;
 
 useGetCurrentUsersGoalsQuery.fetcher = (variables?: GetCurrentUsersGoalsQueryVariables, options?: RequestInit['headers']) => customFetcher<GetCurrentUsersGoalsQuery, GetCurrentUsersGoalsQueryVariables>(GetCurrentUsersGoalsDocument, variables, options);
+export const GetCurrentUsersRemainingCaloriesByDateDocument = /*#__PURE__*/ `
+    query GetCurrentUsersRemainingCaloriesByDate($date: DateTime) {
+  getCurrentUsersRemainingCaloriesByDate(date: $date)
+}
+    `;
+export const useGetCurrentUsersRemainingCaloriesByDateQuery = <
+      TData = GetCurrentUsersRemainingCaloriesByDateQuery,
+      TError = unknown
+    >(
+      variables?: GetCurrentUsersRemainingCaloriesByDateQueryVariables,
+      options?: UseQueryOptions<GetCurrentUsersRemainingCaloriesByDateQuery, TError, TData>
+    ) =>
+    useQuery<GetCurrentUsersRemainingCaloriesByDateQuery, TError, TData>(
+      variables === undefined ? ['GetCurrentUsersRemainingCaloriesByDate'] : ['GetCurrentUsersRemainingCaloriesByDate', variables],
+      customFetcher<GetCurrentUsersRemainingCaloriesByDateQuery, GetCurrentUsersRemainingCaloriesByDateQueryVariables>(GetCurrentUsersRemainingCaloriesByDateDocument, variables),
+      options
+    );
+useGetCurrentUsersRemainingCaloriesByDateQuery.document = GetCurrentUsersRemainingCaloriesByDateDocument;
+
+
+useGetCurrentUsersRemainingCaloriesByDateQuery.getKey = (variables?: GetCurrentUsersRemainingCaloriesByDateQueryVariables) => variables === undefined ? ['GetCurrentUsersRemainingCaloriesByDate'] : ['GetCurrentUsersRemainingCaloriesByDate', variables];
+;
+
+useGetCurrentUsersRemainingCaloriesByDateQuery.fetcher = (variables?: GetCurrentUsersRemainingCaloriesByDateQueryVariables, options?: RequestInit['headers']) => customFetcher<GetCurrentUsersRemainingCaloriesByDateQuery, GetCurrentUsersRemainingCaloriesByDateQueryVariables>(GetCurrentUsersRemainingCaloriesByDateDocument, variables, options);
 export const GetCurrentUsersNutritionDocument = /*#__PURE__*/ `
     query GetCurrentUsersNutrition {
   getCurrentUsersNutrition {

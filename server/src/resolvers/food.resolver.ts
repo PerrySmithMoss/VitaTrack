@@ -472,6 +472,144 @@ export class FoodResolver {
     }
   }
 
+  @Query(() => Int)
+  @UseMiddleware(deserializeUser)
+  async getCurrentUsersRemainingCaloriesByDate(
+    @Ctx() ctx: PrismaContext,
+    @Arg("date", () => Date, { nullable: true }) date: Date | null
+  ) {
+    try {
+      const userId = ctx.res.locals.user.id;
+
+      if (!userId) {
+        return {
+          errors: [
+            {
+              field: "Bad Request",
+              message: "You must login to see this resourse.",
+            },
+          ],
+        };
+      }
+
+      let remainingCalories;
+      if (date == null) {
+        // Fetch any food entries for the current date
+        let startOfDay = new Date();
+        startOfDay.setHours(1, 0, 0, 0);
+
+        let endOfDay = new Date();
+        endOfDay.setHours(24, 59, 59, 999);
+
+        const usersFood = await ctx.prisma.food.findMany({
+          where: {
+            AND: [
+              {
+                userId: userId,
+              },
+              {
+                createdAt: {
+                  lte: endOfDay,
+                  gte: startOfDay,
+                },
+              },
+            ],
+          },
+          select: {
+            calories: true,
+          },
+          orderBy: {
+            createdAt: "asc",
+          },
+        });
+
+        const caloriesConsumed = usersFood.reduce((acc, curr) => {
+          return (acc += curr.calories);
+        }, 0);
+
+        const usersCaloricGoals = await ctx.prisma.goals.findUnique({
+          where: {
+            userId: userId,
+          },
+          select: {
+            calories: true
+          }
+        });
+
+        remainingCalories = (usersCaloricGoals?.calories as number) - caloriesConsumed
+      } else {
+        // Fetch food entries for the specified day
+        const startDate = new Date(date); 
+        const startOfDayDate = new Date(
+          startDate.getFullYear(),
+          startDate.getMonth(),
+          startDate.getDate(),
+          0,
+          0,
+          0
+        );
+
+        const endDate = new Date(date);
+        const endOfDayDate = new Date(
+          endDate.getFullYear(),
+          endDate.getMonth(),
+          endDate.getDate(),
+          23,
+          59,
+          59
+        );
+
+        const usersFood = await ctx.prisma.food.findMany({
+          where: {
+            AND: [
+              {
+                userId: userId,
+              },
+              {
+                createdAt: {
+                  lte: endOfDayDate,
+                  gte: startOfDayDate,
+                },
+              },
+            ],
+          },
+          select: {
+            calories: true,
+          },
+          orderBy: {
+            createdAt: "asc",
+          },
+        });
+
+        const caloriesConsumed = usersFood.reduce((acc, curr) => {
+          return (acc += curr.calories);
+        }, 0);
+
+        const usersCaloricGoals = await ctx.prisma.goals.findUnique({
+          where: {
+            userId: userId,
+          },
+          select: {
+            calories: true
+          }
+        });
+
+        remainingCalories = (usersCaloricGoals?.calories as number) - caloriesConsumed
+      }
+
+      return remainingCalories;
+    } catch (err) {
+      return {
+        errors: [
+          {
+            field: "Error while trying to fetch user's food.",
+            message: err,
+          },
+        ],
+      };
+    }
+  }
+
   @Mutation(() => FoodResponseSuccess)
   @UseMiddleware(deserializeUser)
   async deleteFoodFromMealByDate(

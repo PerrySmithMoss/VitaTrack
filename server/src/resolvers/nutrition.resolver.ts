@@ -415,7 +415,7 @@ export class NutritionResolver {
       }
 
       if (nutrition) {
-        const foods = await ctx.prisma.$transaction(
+       await ctx.prisma.$transaction(
           foodsInput.map((food) =>
             ctx.prisma.food.create({
               data: {

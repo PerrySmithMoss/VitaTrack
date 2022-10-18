@@ -1,0 +1,3 @@
+query GetCurrentUsersRemainingCaloriesByDate($date: DateTime) {
+  getCurrentUsersRemainingCaloriesByDate(date: $date)
+}

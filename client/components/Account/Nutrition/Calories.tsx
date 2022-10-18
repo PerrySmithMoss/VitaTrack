@@ -1,14 +1,9 @@
 import React from 'react';
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Label,
-} from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Label } from 'recharts';
 import {
   useGetCurrentUsersGoalsQuery,
   useGetCurrentUsersNutritionByDateQuery,
+  useGetCurrentUsersRemainingCaloriesByDateQuery,
 } from '../../../graphql/generated/graphql';
 
 interface CaloriesProps {}
@@ -56,10 +51,12 @@ const todaysDate = new Date().toISOString();
 export const Calories: React.FC<CaloriesProps> = ({}) => {
   const { data: usersGoals, refetch: refetchUsersGoals } =
     useGetCurrentUsersGoalsQuery();
-  // const { data: todaysNutrition, refetch: refetchTodaysNutrition } =
-  //   useGetCurrentUsersNutritionByDateQuery({ date: new Date().toISOString() });
   const { data: todaysNutrition, refetch: refetchTodaysNutrition } =
     useGetCurrentUsersNutritionByDateQuery({
+      date: todaysDate,
+    });
+  const { data: caloriesRemaining } =
+    useGetCurrentUsersRemainingCaloriesByDateQuery({
       date: todaysDate,
     });
 
@@ -69,16 +66,14 @@ export const Calories: React.FC<CaloriesProps> = ({}) => {
       value:
         todaysNutrition?.getCurrentUsersNutritionByDate.data === null
           ? 0
-          : todaysNutrition?.getCurrentUsersNutritionByDate.data?.calories,
+          : todaysNutrition?.getCurrentUsersNutritionByDate.data?.calories
     },
     {
       name: 'Calories remaining',
       value:
         todaysNutrition?.getCurrentUsersNutritionByDate.data === null
           ? usersGoals?.getCurrentUsersGoals.data?.calories
-          : (usersGoals?.getCurrentUsersGoals.data?.calories as number) -
-            (todaysNutrition?.getCurrentUsersNutritionByDate.data
-              ?.calories as number),
+          : caloriesRemaining?.getCurrentUsersRemainingCaloriesByDate
     },
   ];
 
@@ -136,14 +131,15 @@ export const Calories: React.FC<CaloriesProps> = ({}) => {
                   <CustomLabelv2
                     viewBox={undefined}
                     caloriesRemaining={
-                      todaysNutrition?.getCurrentUsersNutritionByDate.data ===
-                      null
-                        ? (usersGoals?.getCurrentUsersGoals.data
-                            ?.calories as number)
-                        : (usersGoals?.getCurrentUsersGoals.data
-                            ?.calories as number) -
-                          (todaysNutrition?.getCurrentUsersNutritionByDate.data
-                            ?.calories as number)
+                      // todaysNutrition?.getCurrentUsersNutritionByDate.data ===
+                      // null
+                      //   ? (usersGoals?.getCurrentUsersGoals.data
+                      //       ?.calories as number)
+                      //   : (usersGoals?.getCurrentUsersGoals.data
+                      //       ?.calories as number) -
+                      //     (todaysNutrition?.getCurrentUsersNutritionByDate.data
+                      //       ?.calories as number)
+                      caloriesRemaining?.getCurrentUsersRemainingCaloriesByDate as number
                     }
                   />
                 }
