@@ -147,7 +147,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({}) => {
             </svg>
             <span className="font-semibold text-sm">Log in with Google</span>
           </a>
-          <a className="w-full justify-center text-center bg-blue-500 shadow-md hover:bg-blue-700 px-4 py-3 font-semibold text-white inline-flex items-center space-x-2 rounded">
+          <a className="w-full justify-center text-center cursor-pointer bg-blue-500 shadow-md hover:bg-blue-600 px-4 py-3 font-semibold text-white inline-flex items-center space-x-2 rounded">
             <svg
               className="w-5 h-5 fill-current"
               role="img"

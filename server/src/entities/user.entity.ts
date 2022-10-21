@@ -21,6 +21,12 @@ export class User {
   @Field(() => String)
   username: string;
 
+  @Field(() => Boolean)
+  hasGoals: boolean;
+
+  @Field(() => String)
+  gender: string;
+
   @Field(() => Session, { nullable: true })
   session: Session;
 

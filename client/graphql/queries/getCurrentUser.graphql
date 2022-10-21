@@ -4,6 +4,7 @@ query GetCurrentUser {
       id
       email
       username
+      hasGoals
       profile {
         avatar
         bio

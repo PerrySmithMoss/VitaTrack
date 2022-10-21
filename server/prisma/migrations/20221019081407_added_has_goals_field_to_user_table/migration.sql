@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `User` ADD COLUMN `hasGoals` BOOLEAN NOT NULL DEFAULT false;

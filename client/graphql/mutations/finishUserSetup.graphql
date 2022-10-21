@@ -1,0 +1,27 @@
+mutation FinishUserSetup(
+  $goalWeight: Float!
+  $currentWeight: Float!
+  $gender: String!
+  $weightGoal: String!
+) {
+  finishUserSetup(
+    goalWeight: $goalWeight
+    currentWeight: $currentWeight
+    gender: $gender
+    weightGoal: $weightGoal
+  ) {
+    errors {
+      field
+      message
+    }
+    data {
+      id
+      createdAt
+      updatedAt
+      email
+      username
+      hasGoals
+      gender
+    }
+  }
+}

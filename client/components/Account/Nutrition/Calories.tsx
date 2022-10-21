@@ -66,17 +66,21 @@ export const Calories: React.FC<CaloriesProps> = ({}) => {
       value:
         todaysNutrition?.getCurrentUsersNutritionByDate.data === null
           ? 0
-          : todaysNutrition?.getCurrentUsersNutritionByDate.data?.calories
+          : caloriesRemaining?.getCurrentUsersRemainingCaloriesByDate,
     },
     {
       name: 'Calories remaining',
       value:
         todaysNutrition?.getCurrentUsersNutritionByDate.data === null
           ? usersGoals?.getCurrentUsersGoals.data?.calories
-          : caloriesRemaining?.getCurrentUsersRemainingCaloriesByDate
+          :  (todaysNutrition?.getCurrentUsersNutritionByDate.data
+            ?.calories as number) -
+          (caloriesRemaining?.getCurrentUsersRemainingCaloriesByDate as number)
     },
   ];
 
+  console.log('todaysNutrition: ', todaysNutrition);
+  console.log('caloriesRemaining: ', caloriesRemaining);
   return (
     <section className="mt-2">
       <div className="flex items-center justify-between">

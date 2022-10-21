@@ -4,23 +4,22 @@ import Head from 'next/head';
 import { TodaysMacros } from '../../components/Account/Dashboard/TodaysMacros/TodaysMacros';
 import { Navbar } from '../../components/Navbar/Navbar';
 import { SidebarNav } from '../../components/SidebarNav/SidebarNav';
-import {
-  GetCurrentUserQuery,
-  useGetCurrentUserQuery,
-} from '../../graphql/generated/graphql';
+import { useGetCurrentUserQuery } from '../../graphql/generated/graphql';
 import { TodaysWorkout } from '../../components/Account/Dashboard/TodaysWorkout/TodaysWorkout';
 import { TrendCard } from '../../components/Account/Dashboard/TrendCard/TrendCard';
 import { Recipes } from '../../components/Account/Dashboard/Recipes/Recipes';
 import { CaloriesGraph } from '../../components/Account/Dashboard/CaloriesGraph/CaloriesGraph';
 import { MyWorkouts } from '../../components/Account/Workouts/MyWokouts/MyWorkouts';
+import { Wave } from '../../components/Svgs/Home/Wave';
+import { Logo } from '../../components/Svgs/Logo/Logo';
+import { SetupForm } from '../../components/Account/Dashboard/SetupForm/SetupForm';
 
 interface DashboardPageProps {}
 
 const DashboardPage: NextPage<DashboardPageProps> = () => {
-  const { data, refetch: refetchCurrentUser } =
-    useGetCurrentUserQuery<GetCurrentUserQuery>();
+  const { data } = useGetCurrentUserQuery();
 
-  if (data?.getCurrentUser?.data?.id) {
+  if (data?.getCurrentUser?.data?.hasGoals) {
     return (
       <>
         <Head>
@@ -72,7 +71,6 @@ const DashboardPage: NextPage<DashboardPageProps> = () => {
       </>
     );
   }
-
   return (
     <>
       <Head>
@@ -83,16 +81,32 @@ const DashboardPage: NextPage<DashboardPageProps> = () => {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
-      <main className="bg-white relative">
-        <h1 className="text-6xl ">You must log in!</h1>
-      </main>
+      <div className="bg-white relative">
+        <div className="absolute bottom-0 z-0">
+          <Wave />
+        </div>
+        <div className="absolute top-0 w-full border-b">
+          <div className="flex items-center py-3 justify-between">
+            <div className='flex space-x-2 items-center mx-24'>
+              <div>
+                <Logo height={26} width={32} />
+              </div>
+              <h1 className="text-[24px] font-bold text-gray-700">VitaTrack</h1>
+            </div>
+            <div className='mx-24'>
+              <a className='font-bold cursor-pointer text-brand-green hover:text-brand-green-hover'>Log in</a>
+            </div>
+          </div>
+        </div>
+        <SetupForm />
+      </div>
     </>
   );
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { cookie } = context.req.headers;
+  const cookie = context.req.cookies['refreshToken'];
+
   if (!cookie) {
     return {
       redirect: {

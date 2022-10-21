@@ -7,13 +7,11 @@ import { Hero } from '../components/Svgs/Home/Hero';
 import { Wave } from '../components/Svgs/Home/Wave';
 import { Logo } from '../components/Svgs/Logo/Logo';
 import { useGetCurrentUserQuery } from '../graphql/generated/graphql';
-import { getDataFromDehydratedState } from '../utils/getDataFromDehydratedState';
 
 interface HomeProps {
-  dehydratedState: any;
 }
 
-const Home: NextPage<HomeProps> = ({ dehydratedState }) => {
+const Home: NextPage<HomeProps> = ({}) => {
   return (
     <>
       <Head>
@@ -77,7 +75,7 @@ const Home: NextPage<HomeProps> = ({ dehydratedState }) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { cookie } = context.req.headers;
+  const cookie  = context.req.cookies['refreshToken'];
 
   if (cookie) {
     return {

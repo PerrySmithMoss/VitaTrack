@@ -71,24 +71,8 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({}) => {
   return (
     <form onSubmit={onSubmit}>
       <div className="mt-4">
-        <div className="flex justify-between mb-2">
-          <label htmlFor="email" className="block mb-2 text-sm text-gray-600">
-            Username
-          </label>
-        </div>
-        <input
-          type="text"
-          name="username"
-          id="username"
-          placeholder="Jane Doe"
-          value={user.username}
-          onChange={handleUserInputChange}
-          className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
-        />
-      </div>
-      <div className="mt-4">
-        <div className="flex justify-between mb-2">
-          <label htmlFor="email" className="block mb-2 text-sm text-gray-600">
+        <div className="flex justify-between">
+          <label htmlFor="email" className="block mb-1 text-gray-600">
             Email address
           </label>
         </div>
@@ -104,8 +88,8 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({}) => {
         />
       </div>
       <div className="mt-4">
-        <div className="flex justify-between mb-2">
-          <label htmlFor="password" className="text-sm text-gray-600">
+        <div className="flex justify-between">
+          <label htmlFor="password" className="mb-1 text-gray-600">
             Password
           </label>
         </div>
@@ -120,7 +104,23 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({}) => {
           className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
         />
       </div>
-      <div className="mt-5">
+      <div className="mt-4">
+        <div className="flex justify-between">
+          <label htmlFor="username" className="block mb-1 text-gray-600">
+            Username
+          </label>
+        </div>
+        <input
+          type="text"
+          name="username"
+          id="username"
+          placeholder="Jane Doe"
+          value={user.username}
+          onChange={handleUserInputChange}
+          className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
+        />
+      </div>
+      <div className="mt-6">
         <button className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-brand-green hover:bg-brand-green-hover rounded-md focus:outline-none focus:bg-brand-green-hover focus:ring focus:ring-blue-300 focus:ring-opacity-50">
           Sign up
         </button>

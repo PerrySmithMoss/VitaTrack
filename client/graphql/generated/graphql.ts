@@ -194,6 +194,7 @@ export type Mutation = {
   createUser: UserResponse;
   createWorkout: WorkoutResponse;
   deleteFoodFromMealByDate: FoodResponseSuccess;
+  finishUserSetup: UserResponse;
   googleOauthHandler: SessionResponse;
   loginUserWithEmailAndPassword: UserResponse;
   logoutUser: LogoutUserResponse;
@@ -252,6 +253,14 @@ export type MutationDeleteFoodFromMealByDateArgs = {
   date?: InputMaybe<Scalars['DateTime']>;
   foodId: Scalars['Int'];
   mealName: Scalars['String'];
+};
+
+
+export type MutationFinishUserSetupArgs = {
+  currentWeight: Scalars['Float'];
+  gender: Scalars['String'];
+  goalWeight: Scalars['Float'];
+  weightGoal: Scalars['String'];
 };
 
 
@@ -400,6 +409,8 @@ export type User = {
   __typename?: 'User';
   createdAt: Scalars['DateTime'];
   email: Scalars['String'];
+  gender: Scalars['String'];
+  hasGoals: Scalars['Boolean'];
   id: Scalars['String'];
   profile?: Maybe<Profile>;
   session?: Maybe<Session>;
@@ -506,6 +517,16 @@ export type DeleteFoodFromMealByDateMutationVariables = Exact<{
 
 export type DeleteFoodFromMealByDateMutation = { __typename?: 'Mutation', deleteFoodFromMealByDate: { __typename?: 'FoodResponseSuccess', message?: string | null, errors?: Array<{ __typename?: 'FoodFieldError', field: string, message: string }> | null } };
 
+export type FinishUserSetupMutationVariables = Exact<{
+  goalWeight: Scalars['Float'];
+  currentWeight: Scalars['Float'];
+  gender: Scalars['String'];
+  weightGoal: Scalars['String'];
+}>;
+
+
+export type FinishUserSetupMutation = { __typename?: 'Mutation', finishUserSetup: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'UserFieldError', field: string, message: string }> | null, data?: { __typename?: 'User', id: string, createdAt: any, updatedAt: any, email: string, username: string, hasGoals: boolean, gender: string } | null } };
+
 export type GoogleOauthHandlerMutationVariables = Exact<{
   code: Scalars['String'];
 }>;
@@ -536,7 +557,7 @@ export type UpsertUserGoalsMutation = { __typename?: 'Mutation', upsertUserGoals
 export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetCurrentUserQuery = { __typename?: 'Query', getCurrentUser?: { __typename?: 'UserResponse', data?: { __typename?: 'User', id: string, email: string, username: string, profile?: { __typename?: 'Profile', avatar?: string | null, bio?: string | null, id: string } | null, session?: { __typename?: 'Session', userId: string, valid: boolean, userAgent: string, createdAt: any, updatedAt: any } | null } | null } | null };
+export type GetCurrentUserQuery = { __typename?: 'Query', getCurrentUser?: { __typename?: 'UserResponse', data?: { __typename?: 'User', id: string, email: string, username: string, hasGoals: boolean, profile?: { __typename?: 'Profile', avatar?: string | null, bio?: string | null, id: string } | null, session?: { __typename?: 'Session', userId: string, valid: boolean, userAgent: string, createdAt: any, updatedAt: any } | null } | null } | null };
 
 export type GetCurrentUsersFoodByDateQueryVariables = Exact<{
   date?: InputMaybe<Scalars['DateTime']>;
@@ -795,6 +816,40 @@ export const useDeleteFoodFromMealByDateMutation = <
       options
     );
 useDeleteFoodFromMealByDateMutation.fetcher = (variables: DeleteFoodFromMealByDateMutationVariables, options?: RequestInit['headers']) => customFetcher<DeleteFoodFromMealByDateMutation, DeleteFoodFromMealByDateMutationVariables>(DeleteFoodFromMealByDateDocument, variables, options);
+export const FinishUserSetupDocument = /*#__PURE__*/ `
+    mutation FinishUserSetup($goalWeight: Float!, $currentWeight: Float!, $gender: String!, $weightGoal: String!) {
+  finishUserSetup(
+    goalWeight: $goalWeight
+    currentWeight: $currentWeight
+    gender: $gender
+    weightGoal: $weightGoal
+  ) {
+    errors {
+      field
+      message
+    }
+    data {
+      id
+      createdAt
+      updatedAt
+      email
+      username
+      hasGoals
+      gender
+    }
+  }
+}
+    `;
+export const useFinishUserSetupMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<FinishUserSetupMutation, TError, FinishUserSetupMutationVariables, TContext>) =>
+    useMutation<FinishUserSetupMutation, TError, FinishUserSetupMutationVariables, TContext>(
+      ['FinishUserSetup'],
+      (variables?: FinishUserSetupMutationVariables) => customFetcher<FinishUserSetupMutation, FinishUserSetupMutationVariables>(FinishUserSetupDocument, variables)(),
+      options
+    );
+useFinishUserSetupMutation.fetcher = (variables: FinishUserSetupMutationVariables, options?: RequestInit['headers']) => customFetcher<FinishUserSetupMutation, FinishUserSetupMutationVariables>(FinishUserSetupDocument, variables, options);
 export const GoogleOauthHandlerDocument = /*#__PURE__*/ `
     mutation googleOauthHandler($code: String!) {
   googleOauthHandler(code: $code) {
@@ -910,6 +965,7 @@ export const GetCurrentUserDocument = /*#__PURE__*/ `
       id
       email
       username
+      hasGoals
       profile {
         avatar
         bio

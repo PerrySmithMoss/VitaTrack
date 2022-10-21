@@ -12,7 +12,11 @@ import { PrismaContext } from "../types/PrismaContext";
 import { User } from "../entities/user.entity";
 import { requireUser } from "../middleware/requireUser";
 import deserializeUser from "../middleware/deserializeUser";
-import { createUser, findUserByEmail } from "../services/user.service";
+import {
+  createUser,
+  findUserByEmail,
+  findUserById,
+} from "../services/user.service";
 import { createSession, invalidateSession } from "../services/session.service";
 import { signJwt } from "../utils/jwt.utils";
 import { config } from "../../config/config";
@@ -261,6 +265,93 @@ export class UserResolver {
           ],
         };
       }
+      return {
+        errors: [
+          {
+            field: "error",
+            message: err,
+          },
+        ],
+      };
+    }
+  }
+
+  @Mutation(() => UserResponse)
+  @UseMiddleware(deserializeUser)
+  async finishUserSetup(
+    @Ctx() ctx: PrismaContext,
+    @Arg("weightGoal")
+    weightGoal: "Lose weight" | "Maintain weight" | "Gain weight",
+    @Arg("gender") gender: "Male" | "Female",
+    @Arg("currentWeight") currentWeight: number,
+    @Arg("goalWeight") goalWeight: number
+  ) {
+    try {
+      const userId = ctx.res.locals.user.id;
+
+      if (!userId) {
+        return {
+          errors: [
+            {
+              field: "Bad Request",
+              message: "You must login to see this resourse.",
+            },
+          ],
+        };
+      }
+
+      // Set users calories based on their gender
+      // & if they want to lose or gain weight
+      let calories;
+      if (gender === "Male") {
+        if (weightGoal === "Maintain weight") {
+          calories = 2500;
+        } else if (weightGoal === "Gain weight") {
+          calories = 2750;
+        } else if (weightGoal === "Lose weight") {
+          calories = 2000;
+        }
+      } else if (gender === "Female") {
+        if (weightGoal === "Maintain weight") {
+          calories = 2000;
+        } else if (weightGoal === "Gain weight") {
+          calories = 2250;
+        } else if (weightGoal === "Lose weight") {
+          calories = 1500;
+        }
+      }
+
+      await ctx.prisma.goals.create({
+        data: {
+          calories,
+          startingWeight: currentWeight,
+          currentWeight: currentWeight,
+          goalWeight: goalWeight,
+          protein: 35,
+          carbohydrate: 40,
+          fat: 25,
+          user: {
+            connect: {
+              id: userId,
+            },
+          },
+        },
+      });
+
+      const updatedUser = await ctx.prisma.user.update({
+        where: {
+          id: userId
+        },
+        data: {
+          hasGoals: true,
+          gender
+        }
+      })
+
+      return {
+        data: updatedUser,
+      };
+    } catch (err: any) {
       return {
         errors: [
           {
