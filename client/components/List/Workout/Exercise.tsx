@@ -7,7 +7,6 @@ import {
 import { BsBarChartLine } from 'react-icons/bs';
 import { FiMoreVertical } from 'react-icons/fi';
 import { Exercise as IExercise } from '../../../graphql/generated/graphql';
-import { useOnClickOutside } from '../../../hooks/useOnClickOutside';
 import { useGlobalContext } from '../../../state/context/global.context';
 import { Popover } from '../../Popover/Popover';
 
@@ -23,10 +22,6 @@ export const Exercise: React.FC<ExerciseProps> = ({ exIndex, exercise }) => {
     useState(false);
 
   const workoutsContainerRef = useRef<HTMLDivElement>(null);
-
-  // useOnClickOutside(workoutsContainerRef, () =>
-  //   setIsExerciseOptionsPopoverOpen(!isExerciseOptionsPopoverOpen)
-  // );
 
   const handleStrengthSetInputChange = (
     exerciseIndex: number,
@@ -109,7 +104,7 @@ export const Exercise: React.FC<ExerciseProps> = ({ exIndex, exercise }) => {
       <li
         key={exIndex}
         ref={scrollRef}
-        className="flex items-center justify-between bg-gray-100 text-gray-800 mt-6"
+        className="bg-gray-100 text-gray-800 mt-6"
       >
         <div className="flex space-y-3 flex-col">
           {/* Exercises */}
@@ -182,6 +177,7 @@ export const Exercise: React.FC<ExerciseProps> = ({ exIndex, exercise }) => {
                               type="number"
                               step="0.1"
                               name="weight"
+                              defaultValue={strengthSet.weight || ""}
                               onChange={(e) =>
                                 handleStrengthSetInputChange(
                                   exIndex,
@@ -201,6 +197,7 @@ export const Exercise: React.FC<ExerciseProps> = ({ exIndex, exercise }) => {
                               className="w-full bg-transparent text-gray-800 outline-none  text-sm "
                               type="number"
                               name="reps"
+                              defaultValue={strengthSet.reps || ""}
                               onChange={(e) =>
                                 handleStrengthSetInputChange(
                                   exIndex,

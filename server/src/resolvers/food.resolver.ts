@@ -278,7 +278,7 @@ export class FoodResolver {
         };
       }
 
-      const foods = await ctx.prisma.$transaction(
+       await ctx.prisma.$transaction(
         foodInput.map((food) =>
           ctx.prisma.food.create({
             data: {

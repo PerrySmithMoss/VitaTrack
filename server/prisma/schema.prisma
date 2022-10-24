@@ -53,6 +53,7 @@ model Goals {
   startingWeight Float?
   currentWeight  Float?
   goalWeight     Float?
+  dailySteps     Int      @default(10000)
   calories       Int?
   protein        Int?
   fat            Int?

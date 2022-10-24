@@ -1,0 +1,29 @@
+query GetUsersWorkoutByDate {
+  getUsersWorkoutByDate {
+    errors {
+      field
+      message
+    }
+    data {
+      id
+      createdAt
+      updatedAt
+      name
+      startTime
+      endTime
+      bodyweight
+      notes
+      userId
+      exercises {
+        id
+        createdAt
+        updatedAt
+        name
+        category
+        exerciseType
+        unilateral
+        workoutId
+      }
+    }
+  }
+}

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `Goals` ADD COLUMN `dailySteps` INTEGER NOT NULL DEFAULT 10000;

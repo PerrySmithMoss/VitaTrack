@@ -5,7 +5,7 @@ import { Workout } from "./workout.entity";
 
 @ObjectType()
 export class Exercise {
-  @Field(() => ID)
+  @Field(() => Int)
   id: number;
 
   @Field(() => Date)

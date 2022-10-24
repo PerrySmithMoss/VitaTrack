@@ -21,6 +21,9 @@ export class Goals {
   @Field(() => Float, { nullable: true })
   goalWeight: number;
 
+  @Field(() => Int)
+  dailySteps: number;
+
   @Field(() => Int, { nullable: true })
   calories: number;
 

@@ -10,6 +10,7 @@ query GetCurrentUsersGoals {
       updatedAt
       startingWeight
       currentWeight
+      dailySteps
       goalWeight
       calories
       protein

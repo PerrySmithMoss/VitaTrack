@@ -4,12 +4,14 @@ import Head from 'next/head';
 import { TodaysMacros } from '../../components/Account/Dashboard/TodaysMacros/TodaysMacros';
 import { Navbar } from '../../components/Navbar/Navbar';
 import { SidebarNav } from '../../components/SidebarNav/SidebarNav';
-import { useGetCurrentUserQuery } from '../../graphql/generated/graphql';
+import {
+  useGetCurrentUserQuery,
+  useGetCurrentUsersGoalsQuery,
+} from '../../graphql/generated/graphql';
 import { TodaysWorkout } from '../../components/Account/Dashboard/TodaysWorkout/TodaysWorkout';
 import { TrendCard } from '../../components/Account/Dashboard/TrendCard/TrendCard';
 import { Recipes } from '../../components/Account/Dashboard/Recipes/Recipes';
 import { CaloriesGraph } from '../../components/Account/Dashboard/CaloriesGraph/CaloriesGraph';
-import { MyWorkouts } from '../../components/Account/Workouts/MyWokouts/MyWorkouts';
 import { Wave } from '../../components/Svgs/Home/Wave';
 import { Logo } from '../../components/Svgs/Logo/Logo';
 import { SetupForm } from '../../components/Account/Dashboard/SetupForm/SetupForm';
@@ -17,9 +19,10 @@ import { SetupForm } from '../../components/Account/Dashboard/SetupForm/SetupFor
 interface DashboardPageProps {}
 
 const DashboardPage: NextPage<DashboardPageProps> = () => {
-  const { data } = useGetCurrentUserQuery();
+  const { data: user } = useGetCurrentUserQuery();
+  const { data: usersGoals } = useGetCurrentUsersGoalsQuery();
 
-  if (data?.getCurrentUser?.data?.hasGoals) {
+  if (user?.getCurrentUser?.data?.hasGoals) {
     return (
       <>
         <Head>
@@ -30,40 +33,39 @@ const DashboardPage: NextPage<DashboardPageProps> = () => {
           />
           <link rel="icon" href="/favicon.ico" />
         </Head>
-        <div className="relative min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased bg-white">
+        <div className="relative min-h-screen h-full flex flex-col flex-auto flex-shrink-0 antialiased bg-white">
           <div className="flex h-screen w-full">
             <SidebarNav />
             <main className="w-full">
               <Navbar />
               <div className="p-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="flex items-center flex-wrap  gap-6">
                   <TodaysMacros />
                   <TodaysWorkout />
-                  <section className="mt-2">
+                  <section className="mt-2 flex-grow">
                     <h2 className="text-2xl font-bold text-[#2b3042]">
                       Trends
                     </h2>
                     <TrendCard
                       title="Bodyweight"
-                      value={171.2}
-                      measurement="lbs"
-                      plusMinusFigure={6.2}
+                      value={
+                        usersGoals?.getCurrentUsersGoals.data
+                          ?.currentWeight as number
+                      }
                     />
                     <TrendCard
                       title="Steps"
-                      value={11800}
-                      measurement="calories"
-                      plusMinusFigure={2200}
+                      value={
+                        usersGoals?.getCurrentUsersGoals.data
+                          ?.dailySteps as number
+                      }
                     />
                   </section>
                 </div>
-                <div className="grid grid-cols-12 gap-10 mt-10">
+                {/* <div className="grid grid-cols-12 gap-10 mt-10">
                   <Recipes />
                   <CaloriesGraph />
-                </div>
-                <section className="mt-10">
-                  <MyWorkouts />
-                </section>
+                </div> */}
               </div>
             </main>
           </div>
@@ -87,14 +89,16 @@ const DashboardPage: NextPage<DashboardPageProps> = () => {
         </div>
         <div className="absolute top-0 w-full border-b">
           <div className="flex items-center py-3 justify-between">
-            <div className='flex space-x-2 items-center mx-24'>
+            <div className="flex space-x-2 items-center mx-24">
               <div>
                 <Logo height={26} width={32} />
               </div>
               <h1 className="text-[24px] font-bold text-gray-700">VitaTrack</h1>
             </div>
-            <div className='mx-24'>
-              <a className='font-bold cursor-pointer text-brand-green hover:text-brand-green-hover'>Log in</a>
+            <div className="mx-24">
+              <a className="font-bold cursor-pointer text-brand-green hover:text-brand-green-hover">
+                Log in
+              </a>
             </div>
           </div>
         </div>

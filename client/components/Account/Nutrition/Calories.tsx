@@ -78,9 +78,7 @@ export const Calories: React.FC<CaloriesProps> = ({}) => {
           (caloriesRemaining?.getCurrentUsersRemainingCaloriesByDate as number)
     },
   ];
-
-  console.log('todaysNutrition: ', todaysNutrition);
-  console.log('caloriesRemaining: ', caloriesRemaining);
+  
   return (
     <section className="mt-2">
       <div className="flex items-center justify-between">

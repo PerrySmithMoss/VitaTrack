@@ -32,6 +32,16 @@ interface WorkoutPageProps {}
 
 const WorkoutPage: NextPage<WorkoutPageProps> = () => {
   const { data: user } = useGetCurrentUserQuery<GetCurrentUserQuery>();
+  const {
+    selectedMuscleGroup,
+    setSelectedMuscleGroup,
+    workoutExercises,
+    setWorkoutExercises,
+    setIsAddExerciseOpen,
+    setIsAddWorkoutModalOpen,
+    isAddExerciseOpen,
+    isAddWorkoutModalOpen,
+  } = useGlobalContext();
 
   const { refetch: refetchUsersWorkouts } =
     useGetUsersWorkoutsQuery<GetUsersWorkoutsQuery>();
@@ -41,6 +51,7 @@ const WorkoutPage: NextPage<WorkoutPageProps> = () => {
       refetchUsersWorkouts();
       setIsAddExerciseOpen(false);
       setIsAddWorkoutModalOpen(false);
+      setWorkoutExercises([]);
 
       toast.success('Workout added 💪', {
         position: 'top-right',
@@ -54,11 +65,6 @@ const WorkoutPage: NextPage<WorkoutPageProps> = () => {
     },
   });
 
-  const { selectedMuscleGroup, setSelectedMuscleGroup, workoutExercises } =
-    useGlobalContext();
-
-  const [isAddExerciseOpen, setIsAddExerciseOpen] = useState(false);
-  const [isAddWorkoutModalOpen, setIsAddWorkoutModalOpen] = useState(false);
 
   const [workout, setWorkout] = useState({
     name: '',
@@ -90,6 +96,11 @@ const WorkoutPage: NextPage<WorkoutPageProps> = () => {
 
   function handleAddExercise() {
     setIsAddExerciseOpen(!isAddExerciseOpen);
+  }
+
+  const handleCreateNewWorkout = () => {
+    setWorkoutExercises([])
+    setIsAddWorkoutModalOpen(true)
   }
 
   if (user?.getCurrentUser?.data?.id) {
@@ -258,7 +269,16 @@ const WorkoutPage: NextPage<WorkoutPageProps> = () => {
                         <button
                           id="submit"
                           onClick={handleCompleteWorkout}
-                          className="rounded px-5 py-1.5 bg-brand-green hover:bg-brand-green-hover text-white focus:shadow-outline focus:outline-none"
+                          disabled={
+                            workout.name.length === 0 ||
+                            workoutExercises.length === 0
+                          }
+                          className={`${
+                            workout.name.length === 0 ||
+                            workoutExercises.length === 0
+                              ? 'opacity-50 cursor-not-allowed'
+                              : ''
+                          } rounded px-5 py-1.5 bg-brand-green hover:bg-brand-green-hover text-white focus:shadow-outline focus:outline-none`}
                         >
                           Complete
                         </button>
@@ -365,7 +385,7 @@ const WorkoutPage: NextPage<WorkoutPageProps> = () => {
                 </div>
               </Drawer>
               <button
-                onClick={() => setIsAddWorkoutModalOpen(true)}
+                onClick={handleCreateNewWorkout}
                 title="Add Workout"
                 className="fixed z-90 bottom-10 right-8 bg-brand-green w-16 h-16  rounded-full drop-shadow-lg flex justify-center items-center text-white text-4xl hover:bg-brand-green-hover "
               >
@@ -397,7 +417,8 @@ const WorkoutPage: NextPage<WorkoutPageProps> = () => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { cookie } = context.req.headers;
+  const cookie = context.req.cookies['refreshToken'];
+
   if (!cookie) {
     return {
       redirect: {

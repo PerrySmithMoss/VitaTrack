@@ -7,6 +7,10 @@ type GlobalProps = {
   setSelectedMuscleGroup: React.Dispatch<React.SetStateAction<string>>;
   workoutExercises: [];
   setWorkoutExercises: React.Dispatch<React.SetStateAction<any>>;
+  isAddExerciseOpen: boolean;
+  setIsAddExerciseOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  isAddWorkoutModalOpen: boolean;
+  setIsAddWorkoutModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const GlobalContext = createContext<GlobalProps>({
@@ -16,6 +20,10 @@ const GlobalContext = createContext<GlobalProps>({
   setSelectedMuscleGroup: () => {},
   workoutExercises: [],
   setWorkoutExercises: () => {},
+  isAddExerciseOpen: false,
+  setIsAddExerciseOpen: () => {},
+  isAddWorkoutModalOpen: false,
+  setIsAddWorkoutModalOpen: () => {},
 });
 
 export const GlobalContextProvider = ({
@@ -24,6 +32,8 @@ export const GlobalContextProvider = ({
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedMuscleGroup, setSelectedMuscleGroup] = useState('');
   const [workoutExercises, setWorkoutExercises] = useState<any>([]);
+  const [isAddExerciseOpen, setIsAddExerciseOpen] = useState(false);
+  const [isAddWorkoutModalOpen, setIsAddWorkoutModalOpen] = useState(false);
 
   return (
     <GlobalContext.Provider
@@ -34,6 +44,10 @@ export const GlobalContextProvider = ({
         setSelectedMuscleGroup,
         workoutExercises,
         setWorkoutExercises,
+        isAddExerciseOpen,
+        setIsAddExerciseOpen,
+        isAddWorkoutModalOpen,
+        setIsAddWorkoutModalOpen,
       }}
     >
       {children}

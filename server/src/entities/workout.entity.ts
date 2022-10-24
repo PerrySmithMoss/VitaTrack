@@ -4,7 +4,7 @@ import { User } from "./user.entity";
 
 @ObjectType()
 export class Workout {
-  @Field(() => ID)
+  @Field(() => Int)
   id: number;
 
   @Field(() => Date)

@@ -30,18 +30,10 @@ const caloriesData = [
     name: 'Thr',
     calories: 2780,
   },
-    {
-      name: 'Fri',
-      calories: 1890,
-    },
-  //   {
-  //     name: 'Sat',
-  //     calories: 2390,
-  //   },
-  //   {
-  //     name: 'Sun',
-  //     calories: 3490,
-  //   },
+  {
+    name: 'Fri',
+    calories: 1890,
+  },
 ];
 
 const CustomizedAxisTick: FunctionComponent<any> = (props: any) => {
@@ -71,11 +63,11 @@ export const CaloriesGraph: React.FC<CaloriesGraphProps> = ({}) => {
         <div>
           <h3 className="text-2xl font-bold text-[#2b3042]">Calories</h3>
         </div>
-        <div>
+        {/* <div>
           <button className="px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded">
             View all
           </button>
-        </div>
+        </div> */}
       </div>
       <div
         className="shadow mt-5 rounded-lg cursor-pointer pt-4 pr-4 flex-1 justify-center items-center bg-[#fafafa]"

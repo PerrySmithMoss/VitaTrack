@@ -1,0 +1,67 @@
+mutation EditWorkout(
+  $endTime: String!
+  $startTime: String!
+  $name: String!
+  $workoutId: Float!
+  $bodyweight: Float
+  $notes: String
+  $exercises: [CurrExercises!]
+) {
+  editWorkout(
+    endTime: $endTime
+    startTime: $startTime
+    name: $name
+    workoutId: $workoutId
+    bodyweight: $bodyweight
+    notes: $notes
+    exercises: $exercises
+  ) {
+    errors {
+      field
+      message
+    }
+    data {
+      id
+      createdAt
+      updatedAt
+      name
+      startTime
+      endTime
+      bodyweight
+      notes
+      userId
+      exercises {
+        id
+        createdAt
+        updatedAt
+        name
+        category
+        exerciseType
+        unilateral
+        workoutId
+        strengthSets {
+          id
+          createdAt
+          updatedAt
+          setNumber
+          weight
+          reps
+          notes
+          exerciseId
+        }
+        cardioSets {
+          id
+          createdAt
+          updatedAt
+          setNumber
+          minutes
+          seconds
+          distance
+          caloriesBurned
+          notes
+          exerciseId
+        }
+      }
+    }
+  }
+}
