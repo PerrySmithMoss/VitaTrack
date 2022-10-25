@@ -3,9 +3,8 @@ import React, { useState } from 'react';
 import ReactDatePicker from 'react-datepicker';
 import { GiWeightLiftingUp } from 'react-icons/gi';
 import {
-  Exercise,
   GetUsersWorkoutsQuery,
-  useCreateWorkoutMutation,
+  useDeleteWorkoutMutation,
   useEditWorkoutMutation,
   useGetUsersWorkoutsQuery,
   Workout,
@@ -15,8 +14,11 @@ import { WorkoutList } from '../../../List/Workout/WorkoutList';
 import { Modal } from '../../../Modals/Modal';
 import styles from './MyWorkouts.module.css';
 
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { FiMoreVertical } from 'react-icons/fi';
+import { Popover } from '../../../Popover/Popover';
+import { AiOutlineDelete } from 'react-icons/ai';
 
 interface WorkoutCardv2Props {
   workout: Workout;
@@ -24,6 +26,8 @@ interface WorkoutCardv2Props {
 
 export const WorkoutCardv2: React.FC<WorkoutCardv2Props> = ({ workout }) => {
   const [isEditWorkoutModalOpen, setIsEditWorkoutModalOpen] = useState(false);
+  const [isWorkoutOptionsPopoverOpen, setIsWorkoutOptionsPopoverOpen] =
+    useState(false);
 
   const {
     workoutExercises,
@@ -43,7 +47,24 @@ export const WorkoutCardv2: React.FC<WorkoutCardv2Props> = ({ workout }) => {
   const { refetch: refetchUsersWorkouts } =
     useGetUsersWorkoutsQuery<GetUsersWorkoutsQuery>();
 
-  const { mutate } = useEditWorkoutMutation({
+  const { mutate: deleteWorkout } = useDeleteWorkoutMutation({
+    onSuccess: () => {
+      refetchUsersWorkouts();
+      setIsWorkoutOptionsPopoverOpen(false);
+
+      toast.success('Workout deleted ✅', {
+        position: 'top-right',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    },
+  });
+
+  const { mutate: saveWorkout } = useEditWorkoutMutation({
     onSuccess: () => {
       refetchUsersWorkouts();
       setIsAddExerciseOpen(false);
@@ -72,35 +93,44 @@ export const WorkoutCardv2: React.FC<WorkoutCardv2Props> = ({ workout }) => {
   }
 
   async function handleSaveWorkout() {
-    const exercises: any = [...workoutExercises];
-    
-    const formattedExercises = exercises.map(({createdAt, updatedAt, workoutId, ...rest}: any) => {
-      if (rest.exerciseType === 'Strength') {
-        return {
-          ...rest,
-          strengthSets: rest.strengthSets.map(
-            ({ createdAt, updatedAt, exerciseId, ...rest }: any) => rest
-          ),
-        };
-      } else if (rest.exerciseType === 'Cardio') {
-        return {
-          ...rest,
-          cardioSets: rest.cardioSets.map(
-            ({ createdAt, updatedAt, exerciseId , ...rest }: any) => rest
-          ),
-        };
-      }
-    });
+    let exercises: any = [...workoutExercises];
 
-    mutate({
+    exercises = exercises.map(
+      ({ createdAt, updatedAt, workoutId, ...rest }: any) => {
+        if (rest.exerciseType === 'Strength') {
+          return {
+            ...rest,
+            strengthSets: rest.strengthSets.map(
+              ({ createdAt, updatedAt, exerciseId, ...rest }: any) => rest
+            ),
+          };
+        } else if (rest.exerciseType === 'Cardio') {
+          return {
+            ...rest,
+            cardioSets: rest.cardioSets.map(
+              ({ createdAt, updatedAt, exerciseId, ...rest }: any) => rest
+            ),
+          };
+        }
+      }
+    );
+
+    console.log('workoutExercises: ', workoutExercises);
+    console.log('formattedExercises: ', exercises);
+
+    // setWorkoutExercises(exercises);
+
+    saveWorkout({
       workoutId: workout.id,
       name: currWorkout.name,
       startTime: moment(currWorkout.startDate).format(),
       endTime: moment(currWorkout.endDate).format(),
       bodyweight: currWorkout.bodyWeight,
       notes: currWorkout.notes,
-      exercises: formattedExercises,
+      exercises: exercises,
     });
+
+    console.log('workoutExercises: ', workoutExercises);
   }
 
   function handleAddExercise() {
@@ -112,12 +142,13 @@ export const WorkoutCardv2: React.FC<WorkoutCardv2Props> = ({ workout }) => {
     setIsEditWorkoutModalOpen(true);
   };
 
-  console.log('workoutExercises: ', workoutExercises);
-
+  const handleDeleteWorkout = (workoutId: number) => {
+    deleteWorkout({ workoutId });
+  };
 
   return (
     <>
-      <div className="shadow  h-[320px] w-[275px] p-6 rounded-lg mt-5   bg-[#fafafa] flex items-center flex-col justify-center">
+      <div className="shadow relative  h-[320px] w-[275px] p-6 rounded-lg mt-5   bg-[#fafafa] flex items-center flex-col justify-center">
         <div className="mt-6">
           <GiWeightLiftingUp size={70} color="#2b3042" />
         </div>
@@ -200,6 +231,36 @@ export const WorkoutCardv2: React.FC<WorkoutCardv2Props> = ({ workout }) => {
               </div>
             </div>
           )}
+        </div>
+        <div>
+          <button
+            onClick={() =>
+              setIsWorkoutOptionsPopoverOpen(!isWorkoutOptionsPopoverOpen)
+            }
+            title="Delete Workout"
+            className="absolute top-2 right-3"
+          >
+            <FiMoreVertical
+              size={30}
+              className="cursor-pointer rotate-90 text-brand-green hover:text-brand-green-hover"
+            />
+          </button>
+          {isWorkoutOptionsPopoverOpen ? (
+            <Popover>
+              <ul>
+                <li
+                  onClick={() => handleDeleteWorkout(workout.id)}
+                  className="p-3 flex items-center space-x-2 text-red-500 rounded-md cursor-pointer hover:bg-gray-200"
+                >
+                  <AiOutlineDelete
+                    size={20}
+                    className="cursor-pointer text-red-500 hover:text-red-700"
+                  />
+                  <span>Delete workout</span>
+                </li>
+              </ul>
+            </Popover>
+          ) : null}
         </div>
       </div>
       {isEditWorkoutModalOpen && (

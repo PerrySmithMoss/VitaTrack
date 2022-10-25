@@ -56,10 +56,10 @@ class ExercisesInput {
   @Field(() => Boolean, { defaultValue: false })
   unilateral: boolean;
 
-  @Field(() => [StrengthSetInput], {nullable: true})
+  @Field(() => [StrengthSetInput], { nullable: true })
   strengthSets?: StrengthSetInput[];
 
-  @Field(() => [CardioSetInput], {nullable: true})
+  @Field(() => [CardioSetInput], { nullable: true })
   cardioSets?: CardioSetInput[];
 }
 
@@ -77,10 +77,10 @@ class CurrExercisesInput {
   @Field(() => Boolean, { defaultValue: false })
   unilateral: boolean;
 
-  @Field(() => [CurrStrengthSet], {nullable: true})
+  @Field(() => [CurrStrengthSet], { nullable: true })
   strengthSets?: CurrStrengthSet[];
 
-  @Field(() => [CurrCardioSet], {nullable: true})
+  @Field(() => [CurrCardioSet], { nullable: true })
   cardioSets?: CurrCardioSet[];
 }
 
@@ -443,6 +443,9 @@ export class WorkoutResolver {
         },
       });
 
+      console.log("workout: ", workout);
+      console.log("exercises: ", exercises);
+
       if (workout && exercises.length > 0) {
         await Promise.all(
           exercises.map((exercise) => {
@@ -458,9 +461,7 @@ export class WorkoutResolver {
                   unilateral: exercise.unilateral,
                   strengthSets: {
                     deleteMany: {
-                      id: {
-                        in: exercise.strengthSets?.map(({id}) => id),
-                      },
+                      NOT: exercise.strengthSets?.map(({ id }) => ({ id })),
                     },
                     createMany: {
                       data: exercise.strengthSets as CurrStrengthSet[],
@@ -479,17 +480,17 @@ export class WorkoutResolver {
                   exerciseType: exercise.exerciseType,
                   unilateral: exercise.unilateral,
                   cardioSets: {
-                    deleteMany: {
-                      id: {
-                        in: exercise.cardioSets?.map(({id}) => id),
-                      },
-                    },
+                    // deleteMany: {
+                    //   id: {
+                    //     in: exercise.cardioSets?.map(({id}) => id),
+                    //   },
+                    // },
+                    deleteMany: {},
                     createMany: {
                       data: exercise.cardioSets as CurrCardioSet[],
                     },
                   },
                 },
-  
               });
             }
           })
@@ -523,6 +524,48 @@ export class WorkoutResolver {
       return {
         data: workout,
       };
+    } catch (err) {
+      return {
+        errors: [
+          {
+            field: "Error while trying to create workout.",
+            message: err,
+          },
+        ],
+      };
+    }
+  }
+
+  @Mutation(() => Boolean)
+  @UseMiddleware(deserializeUser)
+  @UseMiddleware(requireUser)
+  async deleteWorkout(
+    @Ctx() ctx: PrismaContext,
+    @Arg("workoutId") workoutId: number
+  ) {
+    try {
+      if (!ctx.res.locals.user) {
+        return {
+          errors: [
+            {
+              field: "Error while trying to create workout.",
+              message: "You must be logged in to create a workout.",
+            },
+          ],
+        };
+      }
+
+      const workout = await ctx.prisma.workout.delete({
+        where: {
+          id: workoutId,
+        },
+      });
+
+      if (workout) {
+        return true;
+      } else {
+        return false;
+      }
     } catch (err) {
       return {
         errors: [

@@ -92,6 +92,8 @@ export const Exercise: React.FC<ExerciseProps> = ({ exIndex, exercise }) => {
       return index !== exIndex;
     });
 
+    console.log("filteredExercises: ", filteredExercises)
+
     setWorkoutExercises(filteredExercises);
   };
 

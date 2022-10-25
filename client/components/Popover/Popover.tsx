@@ -1,5 +1,4 @@
 import React from 'react';
-import { AiOutlineDelete } from 'react-icons/ai';
 import styles from './Popover.module.css';
 
 interface PopoverProps {
@@ -10,7 +9,7 @@ export const Popover: React.FC<PopoverProps> = ({ children }) => {
   return (
     <div>
       <div
-        className={`${styles.popoverContainer} bg-gray-50`}
+        className={`${styles.popoverContainer} m-1 bg-gray-50`}
         tabIndex={-1}
         data-position="bottom"
       >
