@@ -1,7 +1,7 @@
 import React from 'react';
 import { useGlobalContext } from '../../state/context/global.context';
 import { Logo } from '../../components/Svgs/Logo/Logo';
-import { MdTrendingUp, MdOutlineSettings, MdLogout } from 'react-icons/md';
+import { MdLogout } from 'react-icons/md';
 import { TbMeat } from 'react-icons/tb';
 import { HiOutlineHome } from 'react-icons/hi';
 import { CgGym, CgProfile } from 'react-icons/cg';
@@ -120,14 +120,14 @@ const menuLinks = [
     link: '/account/dashboard',
   },
   {
-    icon: CgGym,
-    text: 'Workouts',
-    link: '/account/workouts',
-  },
-  {
     icon: TbMeat,
     text: 'Nutrition',
     link: '/account/nutrition',
+  },
+  {
+    icon: CgGym,
+    text: 'Workouts',
+    link: '/account/workouts',
   },
   // {
   //   icon: MdTrendingUp,

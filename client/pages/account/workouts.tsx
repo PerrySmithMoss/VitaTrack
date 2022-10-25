@@ -86,8 +86,8 @@ const WorkoutPage: NextPage<WorkoutPageProps> = () => {
   async function handleCompleteWorkout() {
     mutate({
       name: workout.name,
-      startTime: moment(workout.startDate).format(),
-      endTime: moment(workout.endDate).format(),
+      startTime: moment(workout.startDate).toISOString(),
+      endTime: moment(workout.endDate).toISOString(),
       bodyweight: workout.bodyWeight,
       notes: workout.notes,
       exercises: workoutExercises,

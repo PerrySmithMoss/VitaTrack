@@ -98,6 +98,11 @@ export const TodaysWorkout: React.FC<TodaysWorkoutProps> = ({}) => {
     router.push("/account/workouts")
   }
 
+  const handleAddWorkoutForToday = () => {
+    setWorkoutExercises([])
+    setIsAddWorkoutModalOpen(true)
+  }
+
   if (todaysWorkout?.getUsersWorkoutByDate.data) {
     return (
       <section className="mt-2">
@@ -156,7 +161,7 @@ export const TodaysWorkout: React.FC<TodaysWorkoutProps> = ({}) => {
         </p>
         <div>
           <button
-            onClick={() => setIsAddWorkoutModalOpen(true)}
+            onClick={handleAddWorkoutForToday}
             className="mt-5 rounded text-white inline-flex my-0 mx-auto bg-brand-green hover:bg-brand-green-hover px-7  py-2.5"
           >
             Add workout

@@ -118,8 +118,8 @@ export const WorkoutCardv2: React.FC<WorkoutCardv2Props> = ({ workout }) => {
     saveWorkout({
       workoutId: workout.id,
       name: currWorkout.name,
-      startTime: moment(currWorkout.startDate).format(),
-      endTime: moment(currWorkout.endDate).format(),
+      startTime: moment(currWorkout.startDate).toISOString(),
+      endTime: moment(currWorkout.endDate).toISOString(),
       bodyweight: currWorkout.bodyWeight,
       notes: currWorkout.notes,
       exercises: exercises,
@@ -189,7 +189,7 @@ export const WorkoutCardv2: React.FC<WorkoutCardv2Props> = ({ workout }) => {
                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
               />
             </svg>
-            <p>{moment(workout.startTime).format('ddd D MMM, HH:MM')}</p>
+            <p>{moment(workout.startTime).format('ddd D MMM')}</p>
           </div>
           {workout.exercises.length > 0 && (
             <div className="overflow-hidden max-h-[115px] relative transition-all duration-1000 ease-in-out">
@@ -213,14 +213,14 @@ export const WorkoutCardv2: React.FC<WorkoutCardv2Props> = ({ workout }) => {
               <div
                 className={`w-full h-[53px] absolute bottom-0 left-0 ${styles.showMore} text-center`}
               >
-                <div>
+                {/* <div>
                   <button
                     onClick={handleEditWorkout}
                     className="rounded inline-flex my-0 mx-auto bg-gray-50 hover:bg-gray-100 px-7 border py-1"
                   >
                     Edit
                   </button>
-                </div>
+                </div> */}
               </div>
             </div>
           )}

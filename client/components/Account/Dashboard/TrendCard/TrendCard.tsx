@@ -16,18 +16,6 @@ export const TrendCard: React.FC<TrendCardProps> = ({ title, value }) => {
   const [isEditTrendOpen, setIsEditTrendModalOpen] = useState(false);
   const [input, setInput] = useState(value);
 
-  const handleNumber = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let input = e.target.value;
-
-    // if (input.match(/^([0-9]{1,})?(\.)?([0-9]{1,})?$/))
-    setInput(parseInt(input));
-  };
-
-  const handleFloat = () => {
-    // The conditional prevents parseFloat(null) = NaN (when the user deletes the input)
-    setInput(input);
-  };
-
   const { refetch: refetchUsersGoals } = useGetCurrentUsersGoalsQuery();
   const { refetch: refetchUsersRemainingCalories } =
     useGetCurrentUsersRemainingCaloriesByDateQuery();
@@ -58,8 +46,6 @@ export const TrendCard: React.FC<TrendCardProps> = ({ title, value }) => {
   useEffect(() => {
     setInput(value);
   }, [value]);
-
-  console.log(title);
 
   return (
     <>
@@ -110,18 +96,8 @@ export const TrendCard: React.FC<TrendCardProps> = ({ title, value }) => {
                         <input
                           type="number"
                           step="0.1"
-                          // type="text"
                           name="bodyweight"
-                          // value={value || 0}
-                          // onKeyPress={(event) => {
-                          //   if (!/[0-9]/.test(event.key)) {
-                          //     event.preventDefault();
-                          //   }
-                          // }}
-                          // onChange={(e) => setInput(parseInt(e.target.value))}
                           value={input}
-                          // onChange={handleNumber}
-                          // onBlur={handleFloat}
                           onChange={(e) => setInput(parseFloat(e.target.value))}
                           className="bg-gray-50 text-gray-800 text-center border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500  block w-3/4 p-2.5"
                         />
