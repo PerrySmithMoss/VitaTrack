@@ -86,8 +86,8 @@ class CurrExercisesInput {
 
 @InputType()
 class CurrExercises extends CurrExercisesInput {
-  @Field(() => Int)
-  id: number;
+  @Field(() => Int, {nullable: true})
+  id?: number;
 }
 
 @InputType()
@@ -107,8 +107,8 @@ class StrengthSetInput {
 
 @InputType()
 class CurrStrengthSet extends StrengthSetInput {
-  @Field(() => Int)
-  id: number;
+  @Field(() => Int , {nullable: true})
+  id?: number;
 }
 
 @InputType()
@@ -134,8 +134,8 @@ class CardioSetInput {
 
 @InputType()
 class CurrCardioSet extends CardioSetInput {
-  @Field(() => Int)
-  id: number;
+  @Field(() => Int , {nullable: true})
+  id?: number;
 }
 
 @Resolver()
@@ -293,8 +293,8 @@ export class WorkoutResolver {
         return {
           errors: [
             {
-              field: "Error while trying to create workout.",
-              message: "You must be logged in to create a workout.",
+              field: "Bad Request",
+              message: "You must login to see this resourse.",
             },
           ],
         };
@@ -422,8 +422,8 @@ export class WorkoutResolver {
         return {
           errors: [
             {
-              field: "Error while trying to create workout.",
-              message: "You must be logged in to create a workout.",
+              field: "Bad Request",
+              message: "You must login to see this resourse.",
             },
           ],
         };
@@ -443,6 +443,15 @@ export class WorkoutResolver {
         },
       });
 
+      // 1. delete all exercises and strength/cardio sets in workout
+      // 2. create new exercises and strength/cardio sets in workout
+
+      // await ctx.prisma.exercise.deleteMany({
+      //   where: {
+      //     id:
+      //   }
+      // })
+
       console.log("workout: ", workout);
       console.log("exercises: ", exercises);
 
@@ -450,52 +459,185 @@ export class WorkoutResolver {
         await Promise.all(
           exercises.map((exercise) => {
             if (exercise.exerciseType === "Strength") {
-              return ctx.prisma.exercise.update({
-                where: {
-                  id: exercise.id,
-                },
-                data: {
-                  name: exercise.name,
-                  category: exercise.category,
-                  exerciseType: exercise.exerciseType,
-                  unilateral: exercise.unilateral,
-                  strengthSets: {
-                    deleteMany: {
-                      NOT: exercise.strengthSets?.map(({ id }) => ({ id })),
-                    },
-                    createMany: {
-                      data: exercise.strengthSets as CurrStrengthSet[],
+              if (exercise.id) {
+                return ctx.prisma.exercise.update({
+                  where: {
+                    id: exercise.id,
+                  },
+                  data: {
+                    name: exercise.name,
+                    category: exercise.category,
+                    exerciseType: exercise.exerciseType,
+                    unilateral: exercise.unilateral,
+                    strengthSets: {
+                      deleteMany: {},
+                      createMany: {
+                        data: exercise.strengthSets as CurrStrengthSet[],
+                      },
                     },
                   },
-                },
-              });
+                });
+              } else {
+                return ctx.prisma.exercise.create({
+                  data: {
+                    name: exercise.name,
+                    category: exercise.category,
+                    exerciseType: exercise.exerciseType,
+                    unilateral: exercise.unilateral,
+                    workout: {
+                      connect: {
+                        id: workout.id,
+                      },
+                    },
+                    strengthSets: {
+                      createMany: {
+                        data: exercise.strengthSets as StrengthSetInput[],
+                      },
+                    },
+                  },
+                });
+              }
+              // return ctx.prisma.exercise.upsert({
+              //   where: {
+              //     id: exercise.id,
+              //   },
+              //   create: {
+              //     name: exercise.name,
+              //     category: exercise.category,
+              //     exerciseType: exercise.exerciseType,
+              //     unilateral: exercise.unilateral,
+              //     workoutId: workout.id,
+              //     strengthSets: {
+              //       createMany: {
+              //         data: exercise.strengthSets as StrengthSetInput[],
+              //       },
+              //     },
+              //   },
+              //   update: {
+              //     name: exercise.name,
+              //     category: exercise.category,
+              //     exerciseType: exercise.exerciseType,
+              //     unilateral: exercise.unilateral,
+              //     strengthSets: {
+              //       updateMany: {
+              //         data: exercise.strengthSets as CurrStrengthSet[],
+              //       },
+              //     },
+              //   },
+              // });
             } else if (exercise.exerciseType === "Cardio") {
-              return ctx.prisma.exercise.update({
-                where: {
-                  id: exercise.id,
-                },
-                data: {
-                  name: exercise.name,
-                  category: exercise.category,
-                  exerciseType: exercise.exerciseType,
-                  unilateral: exercise.unilateral,
-                  cardioSets: {
-                    // deleteMany: {
-                    //   id: {
-                    //     in: exercise.cardioSets?.map(({id}) => id),
-                    //   },
-                    // },
-                    deleteMany: {},
-                    createMany: {
-                      data: exercise.cardioSets as CurrCardioSet[],
+              if (exercise.id) {
+                return ctx.prisma.exercise.update({
+                  where: {
+                    id: exercise.id,
+                  },
+                  data: {
+                    name: exercise.name,
+                    category: exercise.category,
+                    exerciseType: exercise.exerciseType,
+                    unilateral: exercise.unilateral,
+                    cardioSets: {
+                      deleteMany: {},
+                      createMany: {
+                        data: exercise.cardioSets as CurrCardioSet[],
+                      },
                     },
                   },
-                },
-              });
+                });
+              } else {
+                return ctx.prisma.exercise.create({
+                  data: {
+                    name: exercise.name,
+                    category: exercise.category,
+                    exerciseType: exercise.exerciseType,
+                    unilateral: exercise.unilateral,
+                    workout: {
+                      connect: {
+                        id: workout.id,
+                      },
+                    },
+                    cardioSets: {
+                      createMany: {
+                        data: exercise.cardioSets as CardioSetInput[],
+                      },
+                    },
+                  },
+                });
+              }
+              // return ctx.prisma.exercise.update({
+              //   where: {
+              //     id: exercise.id,
+              //   },
+              //   data: {
+              //     name: exercise.name,
+              //     category: exercise.category,
+              //     exerciseType: exercise.exerciseType,
+              //     unilateral: exercise.unilateral,
+              //     // cardioSets: {
+              //     //   // deleteMany: {
+              //     //   //   id: {
+              //     //   //     in: exercise.cardioSets?.map(({id}) => id),
+              //     //   //   },
+              //     //   // },
+              //     //   deleteMany: {},
+              //     //   createMany: {
+              //     //     data: exercise.cardioSets as CurrCardioSet[],
+              //     //   },
+              //     // },
+              //   },
+              // });
             }
           })
         );
       }
+      // if (workout && exercises.length > 0) {
+      //   await Promise.all(
+      //     exercises.map((exercise) => {
+      //       if (exercise.exerciseType === "Strength") {
+      //         return ctx.prisma.exercise.update({
+      //           where: {
+      //             id: exercise.id,
+      //           },
+      //           data: {
+      //             name: exercise.name,
+      //             category: exercise.category,
+      //             exerciseType: exercise.exerciseType,
+      //             unilateral: exercise.unilateral,
+      //             // strengthSets: {
+      //             //   deleteMany: {},
+      //             //   createMany: {
+      //             //     data: exercise.strengthSets as CurrStrengthSet[],
+      //             //   },
+      //             // },
+      //           },
+      //         });
+      //       } else if (exercise.exerciseType === "Cardio") {
+      //         return ctx.prisma.exercise.update({
+      //           where: {
+      //             id: exercise.id,
+      //           },
+      //           data: {
+      //             name: exercise.name,
+      //             category: exercise.category,
+      //             exerciseType: exercise.exerciseType,
+      //             unilateral: exercise.unilateral,
+      //             // cardioSets: {
+      //             //   // deleteMany: {
+      //             //   //   id: {
+      //             //   //     in: exercise.cardioSets?.map(({id}) => id),
+      //             //   //   },
+      //             //   // },
+      //             //   deleteMany: {},
+      //             //   createMany: {
+      //             //     data: exercise.cardioSets as CurrCardioSet[],
+      //             //   },
+      //             // },
+      //           },
+      //         });
+      //       }
+      //     })
+      //   );
+      // }
 
       // Re-fetch the workout after the exercises and sets have been added
       workout = await ctx.prisma.workout.findUniqueOrThrow({
@@ -548,8 +690,8 @@ export class WorkoutResolver {
         return {
           errors: [
             {
-              field: "Error while trying to create workout.",
-              message: "You must be logged in to create a workout.",
+              field: "Bad Request",
+              message: "You must login to see this resourse.",
             },
           ],
         };
@@ -570,7 +712,49 @@ export class WorkoutResolver {
       return {
         errors: [
           {
-            field: "Error while trying to create workout.",
+            field: "Error while trying to delete workout.",
+            message: err,
+          },
+        ],
+      };
+    }
+  }
+
+  @Mutation(() => Boolean)
+  @UseMiddleware(deserializeUser)
+  @UseMiddleware(requireUser)
+  async deleteExercise(
+    @Ctx() ctx: PrismaContext,
+    @Arg("exerciseId") exerciseId: number
+  ) {
+    try {
+      if (!ctx.res.locals.user) {
+        return {
+          errors: [
+            {
+              field: "Bad Request",
+              message: "You must login to see this resourse.",
+            },
+          ],
+        };
+      }
+
+      const exercise = await ctx.prisma.exercise.delete({
+        where: {
+          id: exerciseId,
+        },
+      });
+
+      if (exercise) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (err) {
+      return {
+        errors: [
+          {
+            field: "Error while trying to delete exercise.",
             message: err,
           },
         ],

@@ -6,7 +6,12 @@ import {
 } from 'react-icons/ai';
 import { BsBarChartLine } from 'react-icons/bs';
 import { FiMoreVertical } from 'react-icons/fi';
-import { Exercise as IExercise } from '../../../graphql/generated/graphql';
+import {
+  Exercise as IExercise,
+  GetUsersWorkoutsQuery,
+  useDeleteExerciseMutation,
+  useGetUsersWorkoutsQuery,
+} from '../../../graphql/generated/graphql';
 import { useGlobalContext } from '../../../state/context/global.context';
 import { Popover } from '../../Popover/Popover';
 
@@ -20,6 +25,15 @@ export const Exercise: React.FC<ExerciseProps> = ({ exIndex, exercise }) => {
   const { workoutExercises, setWorkoutExercises } = useGlobalContext();
   const [isExerciseOptionsPopoverOpen, setIsExerciseOptionsPopoverOpen] =
     useState(false);
+
+  const { refetch: refetchUsersWorkouts } =
+    useGetUsersWorkoutsQuery<GetUsersWorkoutsQuery>();
+
+  const { mutate: deleteExercise } = useDeleteExerciseMutation({
+    onSuccess: () => {
+      refetchUsersWorkouts();
+    },
+  });
 
   const workoutsContainerRef = useRef<HTMLDivElement>(null);
 
@@ -85,16 +99,16 @@ export const Exercise: React.FC<ExerciseProps> = ({ exIndex, exercise }) => {
     setWorkoutExercises(exercises);
   };
 
-  const handleDeleteExercise = (exIndex: number) => {
+  const handleDeleteExercise = (exerciseId: number, exIndex: number) => {
     const exercises: IExercise[] = [...workoutExercises];
 
     const filteredExercises = exercises.filter((_exercise, index) => {
       return index !== exIndex;
     });
 
-    console.log("filteredExercises: ", filteredExercises)
-
     setWorkoutExercises(filteredExercises);
+
+    deleteExercise({ exerciseId });
   };
 
   useEffect(() => {
@@ -134,7 +148,7 @@ export const Exercise: React.FC<ExerciseProps> = ({ exIndex, exercise }) => {
                       <Popover>
                         <ul>
                           <li
-                            onClick={() => handleDeleteExercise(exIndex)}
+                            onClick={() => handleDeleteExercise(exercise.id, exIndex)}
                             className="p-3 flex items-center space-x-1 text-red-500 rounded-md cursor-pointer hover:bg-gray-200"
                           >
                             <AiOutlineDelete
@@ -179,7 +193,7 @@ export const Exercise: React.FC<ExerciseProps> = ({ exIndex, exercise }) => {
                               type="number"
                               step="0.1"
                               name="weight"
-                              defaultValue={strengthSet.weight || ""}
+                              defaultValue={strengthSet.weight || ''}
                               onChange={(e) =>
                                 handleStrengthSetInputChange(
                                   exIndex,
@@ -199,7 +213,7 @@ export const Exercise: React.FC<ExerciseProps> = ({ exIndex, exercise }) => {
                               className="w-full bg-transparent text-gray-800 outline-none  text-sm "
                               type="number"
                               name="reps"
-                              defaultValue={strengthSet.reps || ""}
+                              defaultValue={strengthSet.reps || ''}
                               onChange={(e) =>
                                 handleStrengthSetInputChange(
                                   exIndex,

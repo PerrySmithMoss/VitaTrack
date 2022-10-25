@@ -249,13 +249,17 @@ export const WorkoutCardv2: React.FC<WorkoutCardv2Props> = ({ workout }) => {
             <Popover>
               <ul>
                 <li
-                  onClick={() => handleDeleteWorkout(workout.id)}
-                  className="p-3 flex items-center space-x-2 text-red-500 rounded-md cursor-pointer hover:bg-gray-200"
+                  onClick={handleEditWorkout}
+                  className="p-3 flex items-center space-x-2 text-gray-800 cursor-pointer hover:bg-gray-200"
                 >
-                  <AiOutlineDelete
-                    size={20}
-                    className="cursor-pointer text-red-500 hover:text-red-700"
-                  />
+                  <FiMoreVertical size={20} className="cursor-pointer" />
+                  <span>Edit workout</span>
+                </li>
+                <li
+                  onClick={() => handleDeleteWorkout(workout.id)}
+                  className="p-3 flex items-center text-gray-800 space-x-2 cursor-pointer hover:bg-gray-200"
+                >
+                  <AiOutlineDelete size={20} className="cursor-pointer " />
                   <span>Delete workout</span>
                 </li>
               </ul>

@@ -42,7 +42,7 @@ export type CardioSetInput = {
 export type CurrCardioSet = {
   caloriesBurned?: InputMaybe<Scalars['String']>;
   distance?: InputMaybe<Scalars['String']>;
-  id: Scalars['Int'];
+  id?: InputMaybe<Scalars['Int']>;
   minutes?: InputMaybe<Scalars['String']>;
   notes?: InputMaybe<Scalars['String']>;
   seconds?: InputMaybe<Scalars['String']>;
@@ -53,14 +53,14 @@ export type CurrExercises = {
   cardioSets?: InputMaybe<Array<CurrCardioSet>>;
   category: Scalars['String'];
   exerciseType: Scalars['String'];
-  id: Scalars['Int'];
+  id?: InputMaybe<Scalars['Int']>;
   name: Scalars['String'];
   strengthSets?: InputMaybe<Array<CurrStrengthSet>>;
   unilateral?: InputMaybe<Scalars['Boolean']>;
 };
 
 export type CurrStrengthSet = {
-  id: Scalars['Int'];
+  id?: InputMaybe<Scalars['Int']>;
   notes?: InputMaybe<Scalars['String']>;
   reps?: InputMaybe<Scalars['String']>;
   setNumber?: InputMaybe<Scalars['Int']>;
@@ -222,6 +222,7 @@ export type Mutation = {
   addNutritionWithFoods: NutritionResponse;
   createUser: UserResponse;
   createWorkout: WorkoutResponse;
+  deleteExercise: Scalars['Boolean'];
   deleteFoodFromMealByDate: FoodResponseSuccess;
   deleteWorkout: Scalars['Boolean'];
   editWorkout: WorkoutResponse;
@@ -277,6 +278,11 @@ export type MutationCreateWorkoutArgs = {
   name: Scalars['String'];
   notes?: InputMaybe<Scalars['String']>;
   startTime: Scalars['String'];
+};
+
+
+export type MutationDeleteExerciseArgs = {
+  exerciseId: Scalars['Float'];
 };
 
 
@@ -560,6 +566,13 @@ export type CreateWorkoutMutationVariables = Exact<{
 
 
 export type CreateWorkoutMutation = { __typename?: 'Mutation', createWorkout: { __typename?: 'WorkoutResponse', errors?: { __typename?: 'WorkoutFieldError', field: string, message: string } | null, data?: { __typename?: 'Workout', id: number, createdAt: any, updatedAt: any, name: string, startTime: string, endTime: string, bodyweight?: number | null, notes?: string | null, userId: string, exercises: Array<{ __typename?: 'Exercise', id: number, createdAt: any, updatedAt: any, name: string, category: string, exerciseType: string, unilateral?: boolean | null, workoutId: number, strengthSets: Array<{ __typename?: 'StrengthSet', id: number, createdAt: any, updatedAt: any, setNumber?: number | null, weight?: string | null, reps?: string | null, notes?: string | null, exerciseId: string }>, cardioSets: Array<{ __typename?: 'CardioSet', id: number, createdAt: any, updatedAt: any, setNumber?: number | null, minutes?: string | null, seconds?: string | null, distance?: string | null, caloriesBurned?: string | null, notes?: string | null, exerciseId: string }> }> } | null } };
+
+export type DeleteExerciseMutationVariables = Exact<{
+  exerciseId: Scalars['Float'];
+}>;
+
+
+export type DeleteExerciseMutation = { __typename?: 'Mutation', deleteExercise: boolean };
 
 export type DeleteFoodFromMealByDateMutationVariables = Exact<{
   mealName: Scalars['String'];
@@ -873,6 +886,21 @@ export const useCreateWorkoutMutation = <
       options
     );
 useCreateWorkoutMutation.fetcher = (variables: CreateWorkoutMutationVariables, options?: RequestInit['headers']) => customFetcher<CreateWorkoutMutation, CreateWorkoutMutationVariables>(CreateWorkoutDocument, variables, options);
+export const DeleteExerciseDocument = /*#__PURE__*/ `
+    mutation DeleteExercise($exerciseId: Float!) {
+  deleteExercise(exerciseId: $exerciseId)
+}
+    `;
+export const useDeleteExerciseMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteExerciseMutation, TError, DeleteExerciseMutationVariables, TContext>) =>
+    useMutation<DeleteExerciseMutation, TError, DeleteExerciseMutationVariables, TContext>(
+      ['DeleteExercise'],
+      (variables?: DeleteExerciseMutationVariables) => customFetcher<DeleteExerciseMutation, DeleteExerciseMutationVariables>(DeleteExerciseDocument, variables)(),
+      options
+    );
+useDeleteExerciseMutation.fetcher = (variables: DeleteExerciseMutationVariables, options?: RequestInit['headers']) => customFetcher<DeleteExerciseMutation, DeleteExerciseMutationVariables>(DeleteExerciseDocument, variables, options);
 export const DeleteFoodFromMealByDateDocument = /*#__PURE__*/ `
     mutation DeleteFoodFromMealByDate($mealName: String!, $foodId: Int!, $date: DateTime) {
   deleteFoodFromMealByDate(mealName: $mealName, foodId: $foodId, date: $date) {
