@@ -45,6 +45,9 @@ class GoalsInput {
   goalWeight: number;
 
   @Field(() => Int, { nullable: true })
+  dailySteps: number;
+
+  @Field(() => Int, { nullable: true })
   calories: number;
 
   @Field(() => Int, { nullable: true })
@@ -130,6 +133,7 @@ export class GoalsResolver {
           startingWeight: goalsInput.startingWeight,
           currentWeight: goalsInput.currentWeight,
           goalWeight: goalsInput.goalWeight,
+          dailySteps: goalsInput.dailySteps,
           calories: goalsInput.calories,
           protein: goalsInput.protein,
           fat: goalsInput.fat,
@@ -139,6 +143,7 @@ export class GoalsResolver {
           startingWeight: goalsInput.startingWeight,
           currentWeight: goalsInput.currentWeight,
           goalWeight: goalsInput.goalWeight,
+          dailySteps: goalsInput.dailySteps,
           calories: goalsInput.calories,
           protein: goalsInput.protein,
           fat: goalsInput.fat,

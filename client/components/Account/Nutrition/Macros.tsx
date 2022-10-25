@@ -11,6 +11,7 @@ import {
 import {
   useGetCurrentUsersGoalsQuery,
   useGetCurrentUsersNutritionByDateQuery,
+  useGetCurrentUsersRemainingCaloriesByDateQuery,
   useUpsertUserGoalsMutation,
 } from '../../../graphql/generated/graphql';
 import {
@@ -104,7 +105,14 @@ const todaysDate = new Date().toISOString();
 
 export const Macros: React.FC<MacrosProps> = ({}) => {
   const { data: usersGoals, refetch: refetchUsersGoals } = useGetCurrentUsersGoalsQuery();
-  const { mutate } = useUpsertUserGoalsMutation({ onSuccess: () => refetchUsersGoals() });
+  const { refetch: refetchUsersRemainingCalories } =
+  useGetCurrentUsersRemainingCaloriesByDateQuery({
+    date: todaysDate,
+  });
+  const { mutate } = useUpsertUserGoalsMutation({ onSuccess: () => {
+    refetchUsersGoals()
+    refetchUsersRemainingCalories()
+  } });
 
   const [isEditMacrosOpen, setIsEditMacrosModalOpen] = useState(false);
   const [caloriesInput, setCaloriesInput] = useState(

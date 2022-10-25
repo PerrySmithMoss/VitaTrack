@@ -115,11 +115,6 @@ export const WorkoutCardv2: React.FC<WorkoutCardv2Props> = ({ workout }) => {
       }
     );
 
-    console.log('workoutExercises: ', workoutExercises);
-    console.log('formattedExercises: ', exercises);
-
-    // setWorkoutExercises(exercises);
-
     saveWorkout({
       workoutId: workout.id,
       name: currWorkout.name,
@@ -129,8 +124,6 @@ export const WorkoutCardv2: React.FC<WorkoutCardv2Props> = ({ workout }) => {
       notes: currWorkout.notes,
       exercises: exercises,
     });
-
-    console.log('workoutExercises: ', workoutExercises);
   }
 
   function handleAddExercise() {

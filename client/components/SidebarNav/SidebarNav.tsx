@@ -139,9 +139,9 @@ const menuLinks = [
     text: 'Profile',
     link: '/account/profile',
   },
-  {
-    icon: MdOutlineSettings,
-    text: 'Settings',
-    link: '/account/settings',
-  },
+  // {
+  //   icon: MdOutlineSettings,
+  //   text: 'Settings',
+  //   link: '/account/settings',
+  // },
 ];

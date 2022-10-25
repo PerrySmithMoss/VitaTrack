@@ -195,6 +195,7 @@ export type GoalsInput = {
   calories?: InputMaybe<Scalars['Int']>;
   carbohydrate?: InputMaybe<Scalars['Int']>;
   currentWeight?: InputMaybe<Scalars['Float']>;
+  dailySteps?: InputMaybe<Scalars['Int']>;
   fat?: InputMaybe<Scalars['Int']>;
   goalWeight?: InputMaybe<Scalars['Float']>;
   protein?: InputMaybe<Scalars['Int']>;
