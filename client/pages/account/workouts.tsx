@@ -130,7 +130,7 @@ const WorkoutPage: NextPage<WorkoutPageProps> = () => {
             <SidebarNav />
             <main className="w-full">
               <Navbar />
-              <div className="p-8">
+              <div className="p-4 xs:p-8">
                 <section>
                   <MyWorkouts />
                 </section>

@@ -1,5 +1,5 @@
 import moment from 'moment';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import ReactDatePicker from 'react-datepicker';
 import { GiWeightLiftingUp } from 'react-icons/gi';
 import {
@@ -19,6 +19,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { FiMoreVertical } from 'react-icons/fi';
 import { Popover } from '../../../Popover/Popover';
 import { AiOutlineDelete } from 'react-icons/ai';
+import { useOnClickOutside } from '../../../../hooks/useOnClickOutside';
 
 interface WorkoutCardv2Props {
   workout: Workout;
@@ -43,6 +44,8 @@ export const WorkoutCardv2: React.FC<WorkoutCardv2Props> = ({ workout }) => {
     bodyWeight: workout.bodyweight,
     notes: workout.notes,
   });
+
+  const workoutOptionsRef = useRef<HTMLButtonElement>(null);
 
   const { refetch: refetchUsersWorkouts } =
     useGetUsersWorkoutsQuery<GetUsersWorkoutsQuery>();
@@ -131,6 +134,7 @@ export const WorkoutCardv2: React.FC<WorkoutCardv2Props> = ({ workout }) => {
   }
 
   const handleEditWorkout = () => {
+    setIsWorkoutOptionsPopoverOpen(false);
     setWorkoutExercises(workout.exercises);
     setIsEditWorkoutModalOpen(true);
   };
@@ -141,7 +145,7 @@ export const WorkoutCardv2: React.FC<WorkoutCardv2Props> = ({ workout }) => {
 
   return (
     <>
-      <div className="shadow relative  h-[320px] w-[275px] p-6 rounded-lg mt-5   bg-[#fafafa] flex items-center flex-col justify-center">
+      <div className="shadow relative h-auto w-full xs:h-[320px] xs:w-[275px] p-6 rounded-lg mt-5   bg-[#fafafa] flex items-center flex-col justify-center">
         <div className="mt-6">
           <GiWeightLiftingUp size={70} color="#2b3042" />
         </div>
@@ -191,7 +195,30 @@ export const WorkoutCardv2: React.FC<WorkoutCardv2Props> = ({ workout }) => {
             </svg>
             <p>{moment(workout.startTime).format('ddd D MMM')}</p>
           </div>
-          {workout.exercises.length > 0 && (
+          {workout.exercises.length > 2 ? (
+            <div className="hidden xxs:block overflow-hidden max-h-[115px] relative transition-all duration-1000 ease-in-out">
+              <ul className="mt-2">
+                {workout.exercises.slice(0, 2).map((exercise) => {
+                  const current =
+                    exerciseToColor[exercise.category.toLowerCase()];
+                  return (
+                    <li
+                      key={exercise.id}
+                      className="truncate flex items-center space-x-3"
+                    >
+                      <div
+                        className={`${current.color} h-[10px] w-[10px] mr-2`}
+                      ></div>
+                      {exercise.name}
+                    </li>
+                  );
+                })}
+              </ul>
+              <div
+                className={`w-full h-[16px] absolute bottom-0 left-0 ${styles.showMore} text-center`}
+              ></div>
+            </div>
+          ) : (
             <div className="overflow-hidden max-h-[115px] relative transition-all duration-1000 ease-in-out">
               <ul className="mt-2">
                 {workout.exercises.map((exercise) => {
@@ -210,27 +237,16 @@ export const WorkoutCardv2: React.FC<WorkoutCardv2Props> = ({ workout }) => {
                   );
                 })}
               </ul>
-              <div
-                className={`w-full h-[53px] absolute bottom-0 left-0 ${styles.showMore} text-center`}
-              >
-                {/* <div>
-                  <button
-                    onClick={handleEditWorkout}
-                    className="rounded inline-flex my-0 mx-auto bg-gray-50 hover:bg-gray-100 px-7 border py-1"
-                  >
-                    Edit
-                  </button>
-                </div> */}
-              </div>
             </div>
           )}
         </div>
         <div>
           <button
+            ref={workoutOptionsRef}
             onClick={() =>
               setIsWorkoutOptionsPopoverOpen(!isWorkoutOptionsPopoverOpen)
             }
-            title="Delete Workout"
+            title="Workout options"
             className="absolute top-2 right-3"
           >
             <FiMoreVertical
@@ -354,7 +370,8 @@ export const WorkoutCardv2: React.FC<WorkoutCardv2Props> = ({ workout }) => {
                           //   }
                           // }}
                           onChange={handleUserInputChange}
-                          className="block text-right text-gray-800 bg-transparent outline-none"
+                          className="block cursor-pointer text-right text-gray-800 bg-transparent w-full outline-none"
+
                         />
                       </div>
                       <div className="flex items-center space-x-2">

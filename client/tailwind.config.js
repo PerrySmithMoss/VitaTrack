@@ -11,11 +11,14 @@ module.exports = {
         "brand-green-hover": "#10A882",
       },
       screens: {
+        'xxs': '350px',
+        // => @media (min-width: 350px) { ... }
+
         'xs': '500px',
         // => @media (min-width: 500px) { ... }
 
         'smx': '585px',
-        // => @media (min-width: 500px) { ... }
+        // => @media (min-width: 585px) { ... }
 
         'sm': '700px',
         // => @media (min-width: 700px) { ... }
