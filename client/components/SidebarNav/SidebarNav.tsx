@@ -25,7 +25,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({}) => {
 
   return (
     <aside
-      className={`bg-white border-gray-200 border-r flex flex-col h-full p-5 pt-5 ${
+      className={`hidden xs:flex bg-white border-gray-200 border-r  flex-col h-full p-5 pt-5 ${
         isSidebarOpen ? 'w-60' : 'w-20'
       } duration-300 relative`}
     >

@@ -58,7 +58,7 @@ export const TrendCard: React.FC<TrendCardProps> = ({ title, value }) => {
               <div>
                 <h4 className="text-[#7e7e89] font-semibold">{title}</h4>
               </div>
-              <div>
+              <div className='hidden xxs:inline-block'>
                 <MdTrendingUp />
               </div>
             </div>

@@ -41,7 +41,7 @@ const Bullet = ({
 const CustomizedLegend = (props: any) => {
   const { payload } = props;
   return (
-    <ul className={styles.legendList}>
+    <ul className={`${styles.legendList}`}>
       {payload.map((entry: any, index: number) => (
         <li key={`item-${index}`}>
           <div className={styles.bulletLabel}>
@@ -161,47 +161,46 @@ export const TodaysMacros: React.FC<TodaysMacrosProps> = ({}) => {
         Today's Macros
       </h2>
       <div
-        className="shadow min-w-[350px] rounded-lg cursor-pointer flex justify-center items-center bg-[#fafafa] hover:bg-gray-100 mt-5 pr-6"
-        style={{ height: 270, width: '100%', display: 'block' }}
+        className={`${styles.todaysMacrosGraphWrapper} shadow relative rounded-lg cursor-pointer flex justify-center items-center bg-[#fafafa] hover:bg-gray-100 mt-5 pr-3 xs:pr-6`}
       >
-        <ResponsiveContainer width="100%" height={270}>
-          <PieChart layout="vertical">
-            <Pie
-              data={data01}
-              dataKey="value"
-              cx={120}
-              cy={128}
-              innerRadius={80}
-              outerRadius={100}
-            >
-              {data01.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
-                />
-              ))}
-              <Label
-                content={
-                  <CustomLabel
-                    labelText={`${
-                      data?.getCurrentUsersGoals.data?.calories as number
-                    }`}
-                    value={'Remaining'}
-                    viewBox={undefined}
+          <ResponsiveContainer >
+            <PieChart layout="vertical">
+              <Pie
+                data={data01}
+                dataKey="value"
+                cx={120}
+                cy={128}
+                innerRadius={80}
+                outerRadius={100}
+              >
+                {data01.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
                   />
-                }
-                position="center"
+                ))}
+                <Label
+                  content={
+                    <CustomLabel
+                      labelText={`${
+                        data?.getCurrentUsersGoals.data?.calories as number
+                      }`}
+                      value={'Remaining'}
+                      viewBox={undefined}
+                    />
+                  }
+                  position="center"
+                />
+              </Pie>
+              <Legend
+                layout="vertical"
+                verticalAlign="middle"
+                align="right"
+                content={<CustomizedLegend />}
               />
-            </Pie>
-            <Legend
-              layout="vertical"
-              verticalAlign="middle"
-              align="right"
-              content={<CustomizedLegend />}
-            />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
     </section>
   );
 };
