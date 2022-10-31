@@ -86,7 +86,7 @@ export const MyProfile: React.FC<MyProfileProps> = ({}) => {
         <div className="flex rounded-lg mt-8">
           <div className="relative rounded-full">
             <Image
-              src="/assets/images/default-avatar.png"
+              src={data?.getCurrentUser?.data?.profile?.avatar as string}
               alt="Avatar"
               width={100}
               height={100}
