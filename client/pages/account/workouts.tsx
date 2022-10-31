@@ -316,7 +316,9 @@ const WorkoutPage: NextPage<WorkoutPageProps> = () => {
                           </p>
                         </div>
                       ) : (
-                        <button className="hover:text-gray-200" type="button">
+                        <button
+                        onClick={() => setIsAddExerciseOpen(false)}
+                        className="hover:text-gray-200" type="button">
                           Cancel
                         </button>
                       )}
@@ -327,7 +329,7 @@ const WorkoutPage: NextPage<WorkoutPageProps> = () => {
                           {selectedMuscleGroup}
                         </h4>
                       ) : (
-                        <h4 className="text-xl font-bold">Select Exercise</h4>
+                        <h4 className="text-lg xs:text-xl font-bold">Select Exercise</h4>
                       )}
                     </div>
                     <div className="flex items-center space-x-2">
@@ -338,13 +340,13 @@ const WorkoutPage: NextPage<WorkoutPageProps> = () => {
                       >
                         <AiOutlinePlus size={26} color="white" />
                       </button>
-                      <button
+                      {/* <button
                         type="button"
                         className="relative cursor-pointer flex text-center items-center justify-center h-8 w-8 rounded-full bg-brand-green hover:bg-brand-green-hover"
                         data-modal-toggle="default-modal"
                       >
                         <FiMoreHorizontal size={26} color="white" />
-                      </button>
+                      </button> */}
                     </div>
                   </header>
                   <div>

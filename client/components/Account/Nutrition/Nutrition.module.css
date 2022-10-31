@@ -35,7 +35,6 @@
 
 /* Food diary */
 .foodDiaryTable {
-  margin-top: 20px;
   width: 100%;
 }
 
@@ -108,7 +107,7 @@
   font-size: 14px !important;
   max-width: 350px !important;
   white-space: normal !important;
-  background: #f6f6f6 !important;
+  background: #fff !important;
   padding: 4px 10px !important;
 }
 
@@ -134,7 +133,7 @@
   cursor: pointer;
   text-decoration: none;
   padding-right: 9px;
-  border-right: solid 1px #0f73ab;
+  /* border-right: solid 1px #0f73ab; */
   margin-right: 7px;
   font-size: 13px;
   color: #0072bf;
@@ -165,7 +164,6 @@
   position: relative;
   zoom: 1;
   font-size: 13px;
-  z-index: 1;
 }
 
 .bottom .foodName {
@@ -337,6 +335,13 @@
   }
 }
 
+@media (max-width: 650px) {
+  .mealHeading {
+    font-size: 1.1rem !important;
+    padding: 15px 0 5px 0 !important;
+  }
+}
+
 .foodChoicesList {
   overflow: hidden;
   max-height: 610px;
@@ -354,9 +359,9 @@
   font-size: 14px;
   text-align: left;
   background-color: #fff;
-  border: 1px solid rgba(0,0,0,.15);
+  border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 4px;
-  box-shadow: 0 6px 12px rgba(0,0,0,.175);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
   background-clip: padding-box;
   padding: 0;
   margin-top: -1px;

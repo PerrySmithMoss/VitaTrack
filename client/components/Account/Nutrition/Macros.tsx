@@ -254,10 +254,9 @@ export const Macros: React.FC<MacrosProps> = ({}) => {
         </div>
       </div>
       <div
-        className="shadow min-w-[350px] rounded-lg cursor-pointer flex justify-center items-center bg-[#fafafa] hover:bg-gray-100 mt-3 pr-6"
-        style={{ height: 270, width: '100%', display: 'block' }}
+        className="shadow w-[350px] h-[270px] rounded-lg cursor-pointer flex justify-center items-center bg-[#fafafa] hover:bg-gray-100 mt-3 pr-6"
       >
-        <ResponsiveContainer width="100%" height={270}>
+        <ResponsiveContainer>
           <PieChart layout="vertical">
             <Pie
               data={data01}

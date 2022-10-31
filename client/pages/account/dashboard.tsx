@@ -39,7 +39,7 @@ const DashboardPage: NextPage<DashboardPageProps> = () => {
             <main className="w-full">
               <Navbar />
               <div className="pl-4 pt-3 pb-4 xs:p-8">
-                <div className="flex items-center flex-wrap   gap-6">
+                <div className="flex items-center flex-wrap gap-6">
                   <TodaysMacros />
                   <TodaysWorkout />
                   <section className="mt-2 flex-grow">

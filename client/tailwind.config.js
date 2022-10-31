@@ -20,6 +20,9 @@ module.exports = {
         'smx': '585px',
         // => @media (min-width: 585px) { ... }
 
+        'smm': '640px',
+        // => @media (min-width: 585px) { ... }
+
         'sm': '700px',
         // => @media (min-width: 700px) { ... }
   

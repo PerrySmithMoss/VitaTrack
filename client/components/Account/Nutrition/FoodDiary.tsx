@@ -1,16 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
+
 import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { BiCalendar } from 'react-icons/bi';
+
+import { FaChevronLeft, FaChevronRight, FaPlus } from 'react-icons/fa';
 import {
-  FaChevronLeft,
-  FaChevronRight,
-  FaPlus,
-  FaChevronDown,
-  FaChevronUp,
-} from 'react-icons/fa';
-import { AiFillMinusCircle, AiOutlinePlus } from 'react-icons/ai';
+  AiFillMinusCircle,
+  AiFillPlusCircle,
+  AiOutlinePlus,
+} from 'react-icons/ai';
 import styles from './Nutrition.module.css';
 import {
   Food,
@@ -359,15 +358,15 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
   }, [searchInput]);
 
   return (
-    <div className="mt-10">
-      <div className=" border-t-2">
-        <div className="flex items-center py-5">
+    <div className="mt-0">
+      <div>
+        <div className="block md:flex items-center pb-5">
           <div>
             <h2 className="text-2xl text-[#2b3042] font-bold">
               Food Diary for:
             </h2>
           </div>
-          <div className="flex items-center gap-1 ml-3">
+          <div className="flex items-center gap-1 ml-0 md:ml-3 mt-2 md:mt-0">
             <div className="flex items-center">
               <button
                 type="button"
@@ -400,18 +399,558 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
               </button>
             </div>
           </div>
-          <div className="flex items-center ml-1">
-            <button
-              type="button"
-              onClick={() => setIsShowingCalendar(!isShowingCalendar)}
-              aria-label="Choose Date"
-              className="p-1 m-0 outline-none rounded-r"
-            >
-              <BiCalendar size={40} color="#5E5F5F" />
-            </button>
+        </div>
+        <div className="block smm:hidden">
+          <div className="bg-[#eee] pb-3 px-2 xxs:px-5 pt-3">
+            <h3 className="text-lg text-[#2b3042] font-bold">
+              Calories Remaining
+            </h3>
+            <div className="flex items-center w-full mt-2 xs:mt-5">
+              <div className="flex items-center justify-between w-full px-2">
+                {/* Goals */}
+                <div className="flex flex-col items-center justify-center">
+                  <div>
+                    <span>
+                      {usersGoals?.getCurrentUsersGoals.data?.calories}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-sm">Goal</span>
+                  </div>
+                </div>
+                <div className="flex flex-col items-center justify-center">
+                  <span className="text-2xl">-</span>
+                </div>
+                {/* Food */}
+                <div className="flex flex-col items-center justify-center">
+                  <div>
+                    <span>
+                      {' '}
+                      {usersFood?.getCurrentUsersFoodByDate.data &&
+                        convertFloatToOneDecimalPlacev2(
+                          sumBy(
+                            usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                            'calories',
+                            'All'
+                          )
+                        )}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-sm">Food</span>
+                  </div>
+                </div>
+                <div className="flex flex-col items-center justify-center">
+                  <span className="text-2xl">=</span>
+                </div>
+                {/* Food */}
+                <div className="flex flex-col items-center justify-center">
+                  <div>
+                    <span
+                      className={`${
+                        usersFood?.getCurrentUsersFoodByDate.data &&
+                        isNumberPositive(
+                          convertFloatToOneDecimalPlacev2(
+                            (usersGoals?.getCurrentUsersGoals.data
+                              ?.calories as number) -
+                              sumBy(
+                                usersFood?.getCurrentUsersFoodByDate
+                                  .data as Food[],
+                                'calories',
+                                'All'
+                              )
+                          )
+                        )
+                          ? styles.possitive
+                          : styles.negative
+                      }`}
+                    >
+                      {usersFood?.getCurrentUsersFoodByDate.data &&
+                        convertFloatToOneDecimalPlacev2(
+                          (usersGoals?.getCurrentUsersGoals.data
+                            ?.calories as number) -
+                            sumBy(
+                              usersFood?.getCurrentUsersFoodByDate
+                                .data as Food[],
+                              'calories',
+                              'All'
+                            )
+                        )}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-sm">Remaining</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            {/* <div className="flex items-center w-full mt-5"> */}
+            <div className={styles.basketMacroBreakdown}>
+              <div className={`${styles.basketMacroBreakdownCol}`}>
+                {/* {memoizedSumOfSelectedFoodsMacros.total_protein.toLocaleString()} */}
+                {usersFood?.getCurrentUsersFoodByDate.data &&
+                  convertFloatToOneDecimalPlacev2(
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'protein',
+                      'All'
+                    )
+                  )}{' '}
+                g<span>Protein</span>
+              </div>
+              <div className={`${styles.basketMacroBreakdownCol}`}>
+                {usersFood?.getCurrentUsersFoodByDate.data &&
+                  convertFloatToOneDecimalPlacev2(
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'carbohydrate',
+                      'All'
+                    )
+                  )}
+                g<span>Carbs</span>
+              </div>
+              <div className={`${styles.basketMacroBreakdownCol}`}>
+                {usersFood?.getCurrentUsersFoodByDate.data &&
+                  convertFloatToOneDecimalPlacev2(
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'fat',
+                      'All'
+                    )
+                  )}
+                g<span>Fat</span>
+              </div>
+              <div className={`${styles.basketMacroBreakdownCol}`}>
+                {usersFood?.getCurrentUsersFoodByDate.data &&
+                  convertFloatToOneDecimalPlacev2(
+                    sumBy(
+                      usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                      'sodium',
+                      'All'
+                    )
+                  )}
+                mg
+                <span>Sodium</span>
+              </div>
+            </div>
+            {/* </div> */}
+          </div>
+          <div className=" bg-[#f6f6f6]">
+            <div className="flex items-center justify-between px-2 pt-3 pb-1 border-b">
+              <div className={`text-[#00548f] font-bold uppercase`}>
+                Breakfast{' '}
+                <AiFillPlusCircle
+                  size={23}
+                  onClick={() => handleShowAddFoodDrawer('Breakfast')}
+                  className="cursor-pointer inline-block mb-1 ml-1 text-brand-green hover:text-brand-green-hover"
+                />
+              </div>
+              <div className="text-sm inline-block">
+                {' '}
+                <span className="font-bold">
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'calories',
+                        'Breakfast'
+                      ),
+                      false
+                    )}{' '}
+                </span>
+                calories
+              </div>
+            </div>
+            <div className='bg-[#fff] py-1'>
+              {usersFood?.getCurrentUsersFoodByDate.data?.map((foodEntry) => {
+                if (foodEntry.mealName === 'Breakfast') {
+                  return (
+                    <div
+                      key={foodEntry.id}
+                      className="flex items-center justify-between pt-1"
+                    >
+                      <div className={`${styles.foodName}`}>
+                        <div>
+                          {foodEntry.name},{' '}
+                          {`${foodEntry.numOfServings} ${foodEntry.servingSize}`}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center">
+                        <div className="text-sm text-brand-green">
+                          {convertFloatToOneDecimalPlace(
+                            foodEntry.calories,
+                            true
+                          )}
+                        </div>
+
+                        <div>
+                          <div className="inline">
+                            <AiFillMinusCircle
+                              size={21}
+                              onClick={() =>
+                                handleDeleteFood(
+                                  parseInt(foodEntry.id),
+                                  foodEntry.mealName
+                                )
+                              }
+                              className="cursor-pointer inline mb-1 ml-2 mr-1  text-[red] hover:text-red-700"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+              })}
+            </div>
+            <div className="flex items-center justify-between px-2 pt-3 pb-1 border-t border-b">
+              <div className={`text-[#00548f] font-bold uppercase`}>
+                Lunch
+                <AiFillPlusCircle
+                  size={23}
+                  onClick={() => handleShowAddFoodDrawer('Lunch')}
+                  className="cursor-pointer inline-block mb-1 ml-1 text-brand-green hover:text-brand-green-hover"
+                />
+              </div>
+              <div className="text-sm inline-block">
+                <span className="font-bold">
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'calories',
+                        'Lunch'
+                      ),
+                      false
+                    )}
+                </span>{' '}
+                calories
+              </div>
+            </div>
+            <div className='bg-[#fff] py-1'>
+              {usersFood?.getCurrentUsersFoodByDate.data?.map((foodEntry) => {
+                if (foodEntry.mealName === 'Lunch') {
+                  return (
+                    <div
+                      key={foodEntry.id}
+                      className="flex items-center justify-between pt-1"
+                    >
+                      <div className={styles.foodName}>
+                        <div>
+                          {foodEntry.name},{' '}
+                          {`${foodEntry.numOfServings} ${foodEntry.servingSize}`}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center">
+                        <div className="text-sm text-brand-green">
+                          {convertFloatToOneDecimalPlace(
+                            foodEntry.calories,
+                            true
+                          )}
+                        </div>
+
+                        <div>
+                          <div className="inline">
+                            <AiFillMinusCircle
+                              size={21}
+                              onClick={() =>
+                                handleDeleteFood(
+                                  parseInt(foodEntry.id),
+                                  foodEntry.mealName
+                                )
+                              }
+                              className="cursor-pointer inline mb-1 ml-2 mr-1  text-[red] hover:text-red-700"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+              })}
+            </div>
+            <div className="flex items-center justify-between px-2 pt-3 pb-1 border-t border-b">
+              <div className={`text-[#00548f] font-bold uppercase`}>
+                Dinner
+                <AiFillPlusCircle
+                  size={23}
+                  onClick={() => handleShowAddFoodDrawer('Dinner')}
+                  className="cursor-pointer inline-block mb-1 ml-1 text-brand-green hover:text-brand-green-hover"
+                />
+              </div>
+              <div className="text-sm inline-block">
+                {' '}
+                <span className="font-bold">
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'calories',
+                        'Dinner'
+                      ),
+                      false
+                    )}
+                </span>{' '}
+                calories
+              </div>
+            </div>
+            <div className='bg-[#fff] py-1'>
+              {usersFood?.getCurrentUsersFoodByDate.data?.map((foodEntry) => {
+                if (foodEntry.mealName === 'Dinner') {
+                  return (
+                    <div
+                      key={foodEntry.id}
+                      className="flex items-center justify-between pt-1"
+                    >
+                      <div className={styles.foodName}>
+                        <div>
+                          {foodEntry.name},{' '}
+                          {`${foodEntry.numOfServings} ${foodEntry.servingSize}`}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center">
+                        <div className="text-sm text-brand-green">
+                          {convertFloatToOneDecimalPlace(
+                            foodEntry.calories,
+                            true
+                          )}
+                        </div>
+
+                        <div>
+                          <div>
+                            <div className="inline">
+                              <AiFillMinusCircle
+                                size={21}
+                                onClick={() =>
+                                  handleDeleteFood(
+                                    parseInt(foodEntry.id),
+                                    foodEntry.mealName
+                                  )
+                                }
+                                className="cursor-pointer inline mb-1 ml-2 mr-1  text-[red] hover:text-red-700"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+              })}
+            </div>
+            <div className="flex items-center justify-between px-2 pt-3 pb-1 border-t border-b">
+              <div className={`text-[#00548f] font-bold uppercase`}>
+                Snacks
+                <AiFillPlusCircle
+                  size={23}
+                  onClick={() => handleShowAddFoodDrawer('Snacks')}
+                  className="cursor-pointer inline-block mb-1 ml-1 text-brand-green hover:text-brand-green-hover"
+                />
+              </div>
+              <div className="text-sm inline-block">
+                {' '}
+                <span className="font-bold">
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'calories',
+                        'Snacks'
+                      ),
+                      false
+                    )}
+                </span>{' '}
+                calories
+              </div>
+            </div>
+            <div className='bg-[#fff] py-1'>
+              {usersFood?.getCurrentUsersFoodByDate.data?.map((foodEntry) => {
+                if (foodEntry.mealName === 'Snacks') {
+                  return (
+                    <div
+                      key={foodEntry.id}
+                      className="flex items-center justify-between pt-1"
+                    >
+                      <div className={styles.foodName}>
+                        <div>
+                          {foodEntry.name},{' '}
+                          {`${foodEntry.numOfServings} ${foodEntry.servingSize}`}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center">
+                        <div className="text-sm text-brand-green">
+                          {convertFloatToOneDecimalPlace(
+                            foodEntry.calories,
+                            true
+                          )}
+                        </div>
+
+                        <div>
+                          <div className="inline">
+                            <AiFillMinusCircle
+                              size={21}
+                              onClick={() =>
+                                handleDeleteFood(
+                                  parseInt(foodEntry.id),
+                                  foodEntry.mealName
+                                )
+                              }
+                              className="cursor-pointer inline mb-1 ml-2 mr-1  text-[red] hover:text-red-700"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+              })}
+            </div>
+            <div className="flex items-center justify-between px-2 pt-3 pb-1 border-t border-b">
+              <div className={`text-[#00548f] font-bold uppercase`}>
+                Meal 5
+                <AiFillPlusCircle
+                  size={23}
+                  onClick={() => handleShowAddFoodDrawer('Meal 5')}
+                  className="cursor-pointer inline-block mb-1 ml-1 text-brand-green hover:text-brand-green-hover"
+                />
+              </div>
+              <div className="text-sm inline-block">
+                {' '}
+                <span className="font-bold">
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'calories',
+                        'Meal 5'
+                      ),
+                      false
+                    )}
+                </span>{' '}
+                calories
+              </div>
+            </div>
+            <div className='bg-[#fff] py-1'>
+              {usersFood?.getCurrentUsersFoodByDate.data?.map((foodEntry) => {
+                if (foodEntry.mealName === 'Meal 5') {
+                  return (
+                    <div
+                      key={foodEntry.id}
+                      className="flex items-center justify-between pt-1"
+                    >
+                      <div className={styles.foodName}>
+                        <div>
+                          {foodEntry.name},{' '}
+                          {`${foodEntry.numOfServings} ${foodEntry.servingSize}`}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center">
+                        <div className="text-sm text-brand-green">
+                          {convertFloatToOneDecimalPlace(
+                            foodEntry.calories,
+                            true
+                          )}
+                        </div>
+
+                        <div>
+                          <div className="inline">
+                            <AiFillMinusCircle
+                              size={21}
+                              onClick={() =>
+                                handleDeleteFood(
+                                  parseInt(foodEntry.id),
+                                  foodEntry.mealName
+                                )
+                              }
+                              className="cursor-pointer inline mb-1 ml-2 mr-1  text-[red] hover:text-red-700"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+              })}
+            </div>
+            <div className="flex items-center justify-between px-2 pt-3 pb-1 border-t border-b">
+              <div className={`text-[#00548f] font-bold uppercase`}>
+                Meal 6
+                <AiFillPlusCircle
+                  size={23}
+                  onClick={() => handleShowAddFoodDrawer('Meal 6')}
+                  className="cursor-pointer inline-block mb-1 ml-1 text-brand-green hover:text-brand-green-hover"
+                />
+              </div>
+              <div className="text-sm inline-block">
+                {' '}
+                <span className="font-bold">
+                  {usersFood?.getCurrentUsersFoodByDate.data &&
+                    convertFloatToOneDecimalPlace(
+                      sumBy(
+                        usersFood?.getCurrentUsersFoodByDate.data as Food[],
+                        'calories',
+                        'Meal 6'
+                      ),
+                      false
+                    )}
+                </span>{' '}
+                calories
+              </div>
+            </div>
+            <div className='bg-[#fff] py-1'>
+              {usersFood?.getCurrentUsersFoodByDate.data?.map((foodEntry) => {
+                if (foodEntry.mealName === 'Meal 6') {
+                  return (
+                    <div
+                      key={foodEntry.id}
+                      className="flex items-center justify-between pt-1"
+                    >
+                      <div className={styles.foodName}>
+                        <div>
+                          {foodEntry.name},{' '}
+                          {`${foodEntry.numOfServings} ${foodEntry.servingSize}`}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center">
+                        <div className="text-sm text-brand-green">
+                          {convertFloatToOneDecimalPlace(
+                            foodEntry.calories,
+                            true
+                          )}
+                        </div>
+
+                        <div>
+                          <div className="inline">
+                            <AiFillMinusCircle
+                              size={21}
+                              onClick={() =>
+                                handleDeleteFood(
+                                  parseInt(foodEntry.id),
+                                  foodEntry.mealName
+                                )
+                              }
+                              className="cursor-pointer inline mb-1 ml-2 mr-1  text-[red] hover:text-red-700"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+              })}
+            </div>
           </div>
         </div>
-        <div className="overflow-visible clear-both container">
+
+        <div className="hidden smm:block overflow-visible clear-both container">
           <table className={styles.foodDiaryTable}>
             <tbody>
               <tr>
@@ -530,9 +1069,9 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                   >
                     Add Food
                   </button>
-                  <div className={styles.quickTools}>
+                  {/* <div className={styles.quickTools}>
                     <a className="toggle_diary_options">Quick Tools</a>
-                  </div>
+                  </div> */}
                 </td>
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
@@ -608,7 +1147,7 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                 </td>
               </tr>
 
-              <tr className="meal_header">
+              <tr>
                 <td className={`${styles.mealHeading}`}>Lunch</td>
               </tr>
               {usersFood?.getCurrentUsersFoodByDate.data?.map((foodEntry) => {
@@ -689,9 +1228,9 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                   >
                     Add Food
                   </button>
-                  <div className={styles.quickTools}>
+                  {/* <div className={styles.quickTools}>
                     <a className="toggle_diary_options">Quick Tools</a>
-                  </div>
+                  </div> */}
                 </td>
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
@@ -767,7 +1306,7 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
 
                 <td></td>
               </tr>
-              <tr className="meal_header">
+              <tr>
                 <td className={`${styles.mealHeading}`}>Dinner</td>
               </tr>
               {usersFood?.getCurrentUsersFoodByDate.data?.map((foodEntry) => {
@@ -848,9 +1387,9 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                   >
                     Add Food
                   </button>
-                  <div className={styles.quickTools}>
+                  {/* <div className={styles.quickTools}>
                     <a className="toggle_diary_options">Quick Tools</a>
-                  </div>
+                  </div> */}
                 </td>
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
@@ -927,7 +1466,7 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                 <td></td>
               </tr>
 
-              <tr className="meal_header">
+              <tr>
                 <td className={`${styles.mealHeading}`}>Snacks</td>
               </tr>
 
@@ -1009,9 +1548,9 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                   >
                     Add Food
                   </button>
-                  <div className={styles.quickTools}>
+                  {/* <div className={styles.quickTools}>
                     <a className="toggle_diary_options">Quick Tools</a>
-                  </div>
+                  </div> */}
                 </td>
 
                 <td>
@@ -1089,7 +1628,7 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                 <td></td>
               </tr>
 
-              <tr className="meal_header">
+              <tr>
                 <td className={`${styles.mealHeading}`}>Meal&nbsp;5</td>
               </tr>
               {usersFood?.getCurrentUsersFoodByDate.data?.map((foodEntry) => {
@@ -1170,9 +1709,9 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                   >
                     Add Food
                   </button>
-                  <div className={styles.quickTools}>
+                  {/* <div className={styles.quickTools}>
                     <a className="toggle_diary_options">Quick Tools</a>
-                  </div>
+                  </div> */}
                 </td>
 
                 <td>
@@ -1250,7 +1789,7 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                 <td></td>
               </tr>
 
-              <tr className="meal_header">
+              <tr>
                 <td className={`${styles.mealHeading}`}>Meal&nbsp;6</td>
               </tr>
               {usersFood?.getCurrentUsersFoodByDate.data?.map((foodEntry) => {
@@ -1331,9 +1870,9 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                   >
                     Add Food
                   </button>
-                  <div className={styles.quickTools}>
+                  {/* <div className={styles.quickTools}>
                     <a className="toggle_diary_options">Quick Tools</a>
-                  </div>
+                  </div> */}
                 </td>
                 <td>
                   {usersFood?.getCurrentUsersFoodByDate.data &&
@@ -1994,8 +2533,7 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                 </ul>
               )}
 
-     {selectedFoods.length > 0 && (
-             
+              {selectedFoods.length > 0 && (
                 <div>
                   <div className="bg-gray-200 flex justify-between items-center py-2 px-4">
                     <div>
@@ -2047,51 +2585,51 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
                       />
                     </div>
                   </div> */}
-      <div>
                   <div>
-                    {selectedFoods.length === 0 ? (
+                    <div>
+                      {selectedFoods.length === 0 ? (
+                        <button
+                          disabled={true}
+                          className="w-full cursor-not-allowed opacity-50 mt-8 py-2 bg-brand-green text-white text-bold rounded hover:bg-brand-green-hover"
+                        >
+                          Log {selectedFoods.length} foods
+                        </button>
+                      ) : selectedFoods.length === 1 ? (
+                        <button
+                          onClick={handleLogFoods}
+                          className="w-full mt-8 py-2 bg-brand-green text-white text-bold rounded hover:bg-brand-green-hover"
+                        >
+                          Log {selectedFoods.length} food
+                        </button>
+                      ) : (
+                        <button
+                          onClick={handleLogFoods}
+                          className="w-full mt-8 py-2 bg-brand-green text-white text-bold rounded hover:bg-brand-green-hover"
+                        >
+                          Log {selectedFoods.length} foods
+                        </button>
+                      )}
+                    </div>
+                    <div className="flex justify-center mt-4 group">
                       <button
-                        disabled={true}
-                        className="w-full cursor-not-allowed opacity-50 mt-8 py-2 bg-brand-green text-white text-bold rounded hover:bg-brand-green-hover"
+                        onClick={() => setSelectedFoods([])}
+                        className="flex items-center gap-1"
                       >
-                        Log {selectedFoods.length} foods
+                        <div>
+                          <FaPlus
+                            style={{ transform: 'rotate(45deg)' }}
+                            size={18}
+                            className="text-[#0073e6] group-hover:text-blue-700"
+                          />
+                        </div>
+                        <div className="mt-1 text-[#0073e6] group-hover:text-blue-700">
+                          Clear basket
+                        </div>
                       </button>
-                    ) : selectedFoods.length === 1 ? (
-                      <button
-                        onClick={handleLogFoods}
-                        className="w-full mt-8 py-2 bg-brand-green text-white text-bold rounded hover:bg-brand-green-hover"
-                      >
-                        Log {selectedFoods.length} food
-                      </button>
-                    ) : (
-                      <button
-                        onClick={handleLogFoods}
-                        className="w-full mt-8 py-2 bg-brand-green text-white text-bold rounded hover:bg-brand-green-hover"
-                      >
-                        Log {selectedFoods.length} foods
-                      </button>
-                    )}
-                  </div>
-                  <div className="flex justify-center mt-4 group">
-                    <button
-                      onClick={() => setSelectedFoods([])}
-                      className="flex items-center gap-1"
-                    >
-                      <div>
-                        <FaPlus
-                          style={{ transform: 'rotate(45deg)' }}
-                          size={18}
-                          className="text-[#0073e6] group-hover:text-blue-700"
-                        />
-                      </div>
-                      <div className="mt-1 text-[#0073e6] group-hover:text-blue-700">
-                        Clear basket
-                      </div>
-                    </button>
-                  </div>
+                    </div>
                   </div>
                 </div>
-                  )}            
+              )}
             </div>
           </div>
         </Drawer>
