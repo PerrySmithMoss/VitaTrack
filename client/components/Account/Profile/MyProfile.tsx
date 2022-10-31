@@ -90,9 +90,10 @@ export const MyProfile: React.FC<MyProfileProps> = ({}) => {
               alt="Avatar"
               width={100}
               height={100}
-              className={`${styles.avatar} h-full w-full rounded-full cursor-pointer relative`}
+              // className={`${styles.avatar} h-full w-full rounded-full cursor-pointer relative`}
+              className={`h-full w-full rounded-full relative`}
             />
-            <div
+            {/* <div
               style={{ transform: 'translate(50%, 0%)' }}
               className=" cursor-pointer top-2 right-1.5 absolute rounded-full"
             >
@@ -100,7 +101,8 @@ export const MyProfile: React.FC<MyProfileProps> = ({}) => {
                 //   onClick={() => setIsUpdateUserAvatarModalOpen(true)}
                 aria-label="Update Profile Avatar"
                 role="button"
-                className="h-10 w-10 bg-gray-300 hover:bg-gray-400 flex justify-center rounded-full text-center items-center"
+                // className="h-10 w-10 bg-gray-300 hover:bg-gray-400 flex justify-center rounded-full text-center items-center"
+                className="h-10 w-10 bg-gray-300 flex justify-center rounded-full text-center items-center"
               >
                 <svg
                   version="1.1"
@@ -144,12 +146,12 @@ export const MyProfile: React.FC<MyProfileProps> = ({}) => {
                   <g></g>
                 </svg>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="mt-5 mb-5 ">
+        <div className="mt-3 mb-5 ">
           <label
             htmlFor="name"
             className="text-gray-800 font-medium leading-tight tracking-normal"
