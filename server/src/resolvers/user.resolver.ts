@@ -340,13 +340,88 @@ export class UserResolver {
 
       const updatedUser = await ctx.prisma.user.update({
         where: {
-          id: userId
+          id: userId,
         },
         data: {
           hasGoals: true,
-          gender
+          gender,
+        },
+      });
+
+      return {
+        data: updatedUser,
+      };
+    } catch (err: any) {
+      return {
+        errors: [
+          {
+            field: "error",
+            message: err,
+          },
+        ],
+      };
+    }
+  }
+
+  @Mutation(() => UserResponse)
+  @UseMiddleware(deserializeUser)
+  async updateUser(
+    @Ctx() ctx: PrismaContext,
+    @Arg("username") username: string,
+    @Arg("gender") gender: "Male" | "Female",
+    @Arg("email") email: string,
+    @Arg("password") password: string
+  ) {
+    try {
+      const userId = ctx.res.locals.user.id;
+
+      if (!userId) {
+        return {
+          errors: [
+            {
+              field: "Bad Request",
+              message: "You must login to see this resourse.",
+            },
+          ],
+        };
+      }
+
+      let updatedUser;
+      if (password === "") {
+        updatedUser = await ctx.prisma.user.update({
+          where: {
+            id: userId,
+          },
+          data: {
+            username,
+            gender,
+            email,
+          },
+        });
+      } else {
+        if (password.length <= 7 && password.length > 0) {
+          return {
+            errors: [
+              {
+                field: "Password",
+                message: "Password must be 8 or more characters",
+              },
+            ],
+          };
+        } else if (password.length >= 8) {
+          updatedUser = await ctx.prisma.user.update({
+            where: {
+              id: userId,
+            },
+            data: {
+              username,
+              gender,
+              email,
+              password,
+            },
+          });
         }
-      })
+      }
 
       return {
         data: updatedUser,

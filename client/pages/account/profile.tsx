@@ -1,20 +1,18 @@
 import { dehydrate, QueryClient } from '@tanstack/react-query';
 import type { GetServerSideProps, NextPage } from 'next';
 import Head from 'next/head';
-import { Calories } from '../../components/Account/Nutrition/Calories';
-import { FoodDiary } from '../../components/Account/Nutrition/FoodDiary';
-import { Macros } from '../../components/Account/Nutrition/Macros';
+import { MyProfile } from '../../components/Account/Profile/MyProfile';
 import { Navbar } from '../../components/Navbar/Navbar';
 import { SidebarNav } from '../../components/SidebarNav/SidebarNav';
 import { useGetCurrentUserQuery } from '../../graphql/generated/graphql';
 
-interface NutritionPageProps {}
+interface ProfilePageProps {}
 
-const NutritionPage: NextPage<NutritionPageProps> = () => {
+const ProfilePage: NextPage<ProfilePageProps> = () => {
   return (
     <>
       <Head>
-        <title>Nutrition | VitaTrack</title>
+        <title>Profile | VitaTrack</title>
         <meta
           name="description"
           content="VitaTrack is a one stop shop to track all of your nutrition and gym performance."
@@ -27,11 +25,7 @@ const NutritionPage: NextPage<NutritionPageProps> = () => {
           <main className="w-full">
             <Navbar />
             <div className="p-4 md:p-8">
-              {/* <div className="flex items-center flex-wrap gap-6">
-                <Calories />
-                <Macros />
-              </div> */}
-              <FoodDiary />
+                <MyProfile />
             </div>
           </main>
         </div>
@@ -69,4 +63,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   };
 };
 
-export default NutritionPage;
+export default ProfilePage;

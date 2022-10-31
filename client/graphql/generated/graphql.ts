@@ -231,6 +231,7 @@ export type Mutation = {
   googleOauthHandler: SessionResponse;
   loginUserWithEmailAndPassword: UserResponse;
   logoutUser: LogoutUserResponse;
+  updateUser: UserResponse;
   upsertUserGoals: GoalsResponse;
 };
 
@@ -326,6 +327,14 @@ export type MutationGoogleOauthHandlerArgs = {
 export type MutationLoginUserWithEmailAndPasswordArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
+};
+
+
+export type MutationUpdateUserArgs = {
+  email: Scalars['String'];
+  gender: Scalars['String'];
+  password: Scalars['String'];
+  username: Scalars['String'];
 };
 
 
@@ -634,6 +643,16 @@ export type LogoutUserMutationVariables = Exact<{ [key: string]: never; }>;
 
 export type LogoutUserMutation = { __typename?: 'Mutation', logoutUser: { __typename?: 'LogoutUserResponse', message: string, success: boolean } };
 
+export type UpdateUserMutationVariables = Exact<{
+  password: Scalars['String'];
+  email: Scalars['String'];
+  gender: Scalars['String'];
+  username: Scalars['String'];
+}>;
+
+
+export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'UserFieldError', field: string, message: string }> | null, data?: { __typename?: 'User', id: string, createdAt: any, updatedAt: any, email: string, username: string, hasGoals: boolean, gender: string } | null } };
+
 export type UpsertUserGoalsMutationVariables = Exact<{
   goalsInput: GoalsInput;
 }>;
@@ -644,7 +663,7 @@ export type UpsertUserGoalsMutation = { __typename?: 'Mutation', upsertUserGoals
 export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetCurrentUserQuery = { __typename?: 'Query', getCurrentUser?: { __typename?: 'UserResponse', data?: { __typename?: 'User', id: string, email: string, username: string, hasGoals: boolean, profile?: { __typename?: 'Profile', avatar?: string | null, bio?: string | null, id: string } | null, session?: { __typename?: 'Session', userId: string, valid: boolean, userAgent: string, createdAt: any, updatedAt: any } | null } | null } | null };
+export type GetCurrentUserQuery = { __typename?: 'Query', getCurrentUser?: { __typename?: 'UserResponse', data?: { __typename?: 'User', id: string, email: string, username: string, hasGoals: boolean, gender: string, profile?: { __typename?: 'Profile', avatar?: string | null, bio?: string | null, id: string } | null, session?: { __typename?: 'Session', userId: string, valid: boolean, userAgent: string, createdAt: any, updatedAt: any } | null } | null } | null };
 
 export type GetCurrentUsersFoodByDateQueryVariables = Exact<{
   date?: InputMaybe<Scalars['DateTime']>;
@@ -1118,6 +1137,40 @@ export const useLogoutUserMutation = <
       options
     );
 useLogoutUserMutation.fetcher = (variables?: LogoutUserMutationVariables, options?: RequestInit['headers']) => customFetcher<LogoutUserMutation, LogoutUserMutationVariables>(LogoutUserDocument, variables, options);
+export const UpdateUserDocument = /*#__PURE__*/ `
+    mutation UpdateUser($password: String!, $email: String!, $gender: String!, $username: String!) {
+  updateUser(
+    password: $password
+    email: $email
+    gender: $gender
+    username: $username
+  ) {
+    errors {
+      field
+      message
+    }
+    data {
+      id
+      createdAt
+      updatedAt
+      email
+      username
+      hasGoals
+      gender
+    }
+  }
+}
+    `;
+export const useUpdateUserMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateUserMutation, TError, UpdateUserMutationVariables, TContext>) =>
+    useMutation<UpdateUserMutation, TError, UpdateUserMutationVariables, TContext>(
+      ['UpdateUser'],
+      (variables?: UpdateUserMutationVariables) => customFetcher<UpdateUserMutation, UpdateUserMutationVariables>(UpdateUserDocument, variables)(),
+      options
+    );
+useUpdateUserMutation.fetcher = (variables: UpdateUserMutationVariables, options?: RequestInit['headers']) => customFetcher<UpdateUserMutation, UpdateUserMutationVariables>(UpdateUserDocument, variables, options);
 export const UpsertUserGoalsDocument = /*#__PURE__*/ `
     mutation UpsertUserGoals($goalsInput: GoalsInput!) {
   upsertUserGoals(goalsInput: $goalsInput) {
@@ -1159,6 +1212,7 @@ export const GetCurrentUserDocument = /*#__PURE__*/ `
       email
       username
       hasGoals
+      gender
       profile {
         avatar
         bio
