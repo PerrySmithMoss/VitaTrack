@@ -63,7 +63,7 @@
   background: none !important;
   border: none !important;
   color: #00548f !important;
-  font-size: 1.25rem !important;
+  font-size: 1.1rem !important;
   line-height: 1.75rem !important;
   border-collapse: collapse !important;
   border-spacing: 0 !important;
@@ -339,6 +339,12 @@
   .mealHeading {
     font-size: 1.1rem !important;
     padding: 15px 0 5px 0 !important;
+  }
+}
+
+@media (min-width: 800px) {
+  .mealHeading {
+    font-size: 1.25rem !important;
   }
 }
 

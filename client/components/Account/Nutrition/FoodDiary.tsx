@@ -362,7 +362,7 @@ export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
       <div>
         <div className="block md:flex items-center pb-5">
           <div>
-            <h2 className="text-2xl text-[#2b3042] font-bold">
+            <h2 className="text-xl lg:text-2xl text-[#2b3042] font-bold">
               Food Diary for:
             </h2>
           </div>
