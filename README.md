@@ -3,7 +3,9 @@
 <p>VitaTrack is a Web App which allows users to track all of their nutrition and workouts.</p>
 
 ![tech_stack](https://user-images.githubusercontent.com/59027997/199284920-2c4bc2f1-2310-4102-9670-bbdffbb1ef51.png)
+</div>
 
+<div>
 <h2>Features</h2>
 <ul>
   <li>Login / Registration / Logout</li>
@@ -12,7 +14,7 @@
   <li>Track nutrition</li>
   <li>CRUD functionality on workouts/nutrition</li>
 </ul>
-
+</div>
 <div>
 <h2>Technologies</h2>
 <ul>
