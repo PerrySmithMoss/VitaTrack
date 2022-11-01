@@ -20,7 +20,7 @@ import {
 import { createSession, invalidateSession } from "../services/session.service";
 import { signJwt } from "../utils/jwt.utils";
 import { config } from "../../config/config";
-import argon2 from "argon2";
+import argon2, { hash } from "argon2";
 import {
   accessTokenCookieOptions,
   refreshTokenCookieOptions,
@@ -409,6 +409,8 @@ export class UserResolver {
             ],
           };
         } else if (password.length >= 8) {
+          const hashedPassword = await hash(password);
+
           updatedUser = await ctx.prisma.user.update({
             where: {
               id: userId,
@@ -417,7 +419,7 @@ export class UserResolver {
               username,
               gender,
               email,
-              password,
+              password: hashedPassword,
             },
           });
         }

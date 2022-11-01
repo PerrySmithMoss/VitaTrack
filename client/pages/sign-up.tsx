@@ -25,7 +25,7 @@ const SignUpPage: NextPage<SignUpPageProps> = () => {
           <Wave />
         </div>
         <div className="absolute top-0">
-          <div className="flex items-center mx-10 mt-4">
+        <div className="flex items-center mx-6 xs:mx-10 mt-4">
             <div className="">
               <Logo height={26} width={32} />
             </div>
@@ -38,8 +38,8 @@ const SignUpPage: NextPage<SignUpPageProps> = () => {
               <Hero />
             </div>
           </div>
-          <div className="flex items-center w-full max-w-md pr-10 mx-auto lg:w-5/12 z-10">
-            <div className="flex-1 mr-6">
+          <div className="flex items-center w-full max-w-md lg:pr-10 mx-auto lg:w-5/12 z-10">
+            <div className="flex-1 lg:mr-6 px-6">
               <div className="text-center">
                 <h2 className="text-5xl font-bold text-center text-gray-700">
                   Sign up
