@@ -6,7 +6,7 @@ export const Wave: React.FC<WaveProps> = ({}) => {
   return (
     <div className="custom-shape-divider-bottom-1660136869 z-0">
       <svg
-        height={200}
+        height={100}
         width="100%"
         fill="#2DD197"
         data-name="Layer 1"

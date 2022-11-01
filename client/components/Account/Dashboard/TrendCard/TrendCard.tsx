@@ -103,14 +103,14 @@ export const TrendCard: React.FC<TrendCardProps> = ({ title, value }) => {
                         />
                       ) : title === 'Steps' ? (
                         <input
-                          type="text"
+                        type="number"
                           name="steps"
                           value={input}
-                          onKeyPress={(event) => {
-                            if (!/[0-9]/.test(event.key)) {
-                              event.preventDefault();
-                            }
-                          }}
+                          // onKeyPress={(event) => {
+                          //   if (!/[0-9]/.test(event.key)) {
+                          //     event.preventDefault();
+                          //   }
+                          // }}
                           onChange={(e) => setInput(parseInt(e.target.value))}
                           className="bg-gray-50 text-gray-800 text-center border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500  block w-3/4 p-2.5"
                         />
