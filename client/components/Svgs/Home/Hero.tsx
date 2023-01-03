@@ -6,7 +6,7 @@ export const Hero: React.FC<HeroProps> = ({}) => {
   return (
     <svg
       className="z-10"
-      width="559"
+      width="450"
       height="275"
       viewBox="0 0 559 292"
       fill="none"

@@ -24,15 +24,15 @@ const Home: NextPage<HomeProps> = ({}) => {
       </Head>
 
       <main className="bg-white relative">
-        <div className="absolute bottom-0 z-0">
+        <div className="absolute bottom-0 z-0 w-full">
           <Wave />
         </div>
-        <div className="absolute top-0">
-          <div className="flex items-center mx-6 xs:mx-10 mt-4">
+        <div className="flex items-center top-0">
+          <div className="flex items-center mx-6 xs:mx-6 mt-4">
             <div className="">
               <Logo height={26} width={32} />
             </div>
-            <h1 className="text-3xl font-bold text-gray-700">VitaTrack</h1>
+            <h1 className="text-xl xs:text-2xl font-bold text-gray-700 text-right">VitaTrack</h1>
           </div>
         </div>
         <div className="flex justify-center h-screen z-10">
@@ -44,7 +44,7 @@ const Home: NextPage<HomeProps> = ({}) => {
           <div className="flex items-center w-full max-w-md lg:pr-10 mx-auto lg:w-5/12 z-10">
             <div className="flex-1 lg:mr-6 px-6">
               <div className="text-center">
-                <h2 className="text-5xl font-bold text-center text-gray-700">
+                <h2 className="text-3xl xs:text-5xl font-bold text-center text-gray-700">
                   Log in
                 </h2>
                 <p className="mt-4 text-gray-500">
