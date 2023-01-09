@@ -5,7 +5,7 @@ dotenv.config();
 export const config = {
   isProduction: process.env.NODE_ENV! === "production",
 
-  serverPort: process.env.SERVER_PORT,
+  serverPort: process.env.PORT,
   serverDomain: process.env.SERVER_DOMAIN,
   clientURL: process.env.CLIENT_URL,
   serverURL: process.env.SERVER_URL,
@@ -21,5 +21,5 @@ export const config = {
 
   googleClientID: process.env.GOOGLE_CLIENT_ID,
   googleClientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  googleOauthRedirectUrl: process.env.GOOGLE_OAUTH_REDIRECT_URL
+  googleOauthRedirectUrl: process.env.GOOGLE_OAUTH_REDIRECT_URL,
 };
