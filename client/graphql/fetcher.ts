@@ -4,11 +4,11 @@ export function customFetcher<TData, TVariables>(
   headers?: RequestInit['headers'] | undefined
 ) {
   return async (): Promise<TData> => {
-    const res = await fetch('http://localhost:5000/graphql/', {
+    const res = await fetch(`${process.env.SERVER_ENDPOINT}/graphql/`, {
       method: 'POST',
       ...{
         headers: {
-            ...headers,
+          ...headers,
           'Apollo-Require-Preflight': 'true',
           'Content-Type': 'application/json',
         },

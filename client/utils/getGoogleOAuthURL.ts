@@ -3,7 +3,7 @@ export function getGoogleOAuthURL() {
 
   const options = {
     // redirect_uri: process.env.NEXT_PUBLIC_GOOGLE_OAUTH_REDIRECT_URL as string,
-    redirect_uri: "http://localhost:3000",
+    redirect_uri: process.env.NEXT_PUBLIC_SERVER_ENDPOINT as string,
     client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID as string,
     access_type: 'offline',
     response_type: 'code',
