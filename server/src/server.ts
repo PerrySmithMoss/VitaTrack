@@ -27,7 +27,7 @@ async function main() {
   app.use(express.static("public"));
   app.use(
     cors({
-      origin: process.env.CORS_ORIGIN as string,
+      origin: config.clientURL as string,
       credentials: true,
     })
   );

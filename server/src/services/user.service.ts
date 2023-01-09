@@ -133,7 +133,7 @@ export async function getGoogleOAuthTokensV2(
     client_id: config.googleClientID,
     client_secret: config.googleClientSecret,
     // redirect_uri: config.googleOauthRedirectUrl,
-    redirect_uri: "http://localhost:3000",
+    redirect_uri: config.clientURL,
     grant_type: "authorization_code",
   };
 

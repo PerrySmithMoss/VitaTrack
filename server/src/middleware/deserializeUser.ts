@@ -2,6 +2,7 @@ import { MiddlewareFn } from "type-graphql";
 import { PrismaContext } from "../types/PrismaContext";
 import { verifyJwt } from "../utils/jwt.utils";
 import { reIssueAccessToken } from "../services/session.service";
+import { config } from "../../config/config";
 
 const deserializeUser: MiddlewareFn<PrismaContext> = async (
   { context },
@@ -22,7 +23,7 @@ const deserializeUser: MiddlewareFn<PrismaContext> = async (
         context.res.cookie("accessToken", newAccessToken, {
           maxAge: 900000, // 15 mins
           httpOnly: true,
-          domain: "localhost",
+          domain: config.serverDomain,
           path: "/",
           sameSite: "lax",
           secure: false,
@@ -56,7 +57,7 @@ const deserializeUser: MiddlewareFn<PrismaContext> = async (
       context.res.cookie("accessToken", newAccessToken, {
         maxAge: 900000, // 15 mins
         httpOnly: true,
-        domain: "localhost",
+        domain: config.serverDomain,
         path: "/",
         sameSite: "strict",
         secure: false,

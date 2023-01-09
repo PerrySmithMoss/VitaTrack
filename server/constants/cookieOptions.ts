@@ -1,9 +1,10 @@
 import { CookieOptions } from "express";
+import { config } from "../config/config";
 
 export const accessTokenCookieOptions: CookieOptions = {
   maxAge: 900000, // 15 mins
   httpOnly: true,
-  domain: "localhost",
+  domain: config.serverDomain,
   path: "/",
   sameSite: "lax",
   secure: false,
