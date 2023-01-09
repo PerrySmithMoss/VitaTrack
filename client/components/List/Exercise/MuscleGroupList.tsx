@@ -4,7 +4,7 @@ import { useGlobalContext } from '../../../state/context/global.context';
 
 interface MuscleGroupListProps {}
 
-export const MuscleGroupList: React.FC<MuscleGroupListProps> = ({}) => {
+export const MuscleGroupList: React.FC<MuscleGroupListProps> = () => {
   const { setSelectedMuscleGroup } = useGlobalContext();
 
   const handleSelectMuscleGroup = (muscleGroup: string) => {

@@ -2,7 +2,7 @@ import React from 'react';
 
 interface HeroProps {}
 
-export const Hero: React.FC<HeroProps> = ({}) => {
+export const Hero: React.FC<HeroProps> = () => {
   return (
     <svg
       className="z-10"

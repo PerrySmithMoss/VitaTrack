@@ -2,7 +2,7 @@ import React from 'react';
 
 interface WaveProps {}
 
-export const Wave: React.FC<WaveProps> = ({}) => {
+export const Wave: React.FC<WaveProps> = () => {
   return (
     <div className="z-0">
       <svg

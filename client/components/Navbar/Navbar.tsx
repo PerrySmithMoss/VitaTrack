@@ -11,7 +11,7 @@ import { useRouter } from 'next/router';
 
 interface NavbarProps {}
 
-export const Navbar: React.FC<NavbarProps> = ({}) => {
+export const Navbar: React.FC<NavbarProps> = () => {
   const { isSidebarOpen, setIsSidebarOpen } = useGlobalContext();
   const { data, refetch: refetchCurrentUser } =
     useGetCurrentUserQuery<GetCurrentUserQuery>();

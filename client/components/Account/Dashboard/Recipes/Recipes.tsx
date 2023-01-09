@@ -2,7 +2,7 @@ import React from 'react';
 
 interface RecipesProps {}
 
-export const Recipes: React.FC<RecipesProps> = ({}) => {
+export const Recipes: React.FC<RecipesProps> = () => {
   return (
     <section className="col-span-12 lg:col-span-7">
       <div className="flex justify-between items-center">
@@ -42,7 +42,7 @@ export const Recipes: React.FC<RecipesProps> = ({}) => {
                 scope="row"
                 className="py-4 w-1/2 pl-3 font-bold pr-6 whitespace-nowrap"
               >
-                Steak n' Eggs
+                Steak n&apos; Eggs
               </th>
               <td className="py-4 my-2 pr-6  text-center">47(g)</td>
               <td className="py-4 pr-6  text-center">16.8(g)</td>
@@ -57,7 +57,7 @@ export const Recipes: React.FC<RecipesProps> = ({}) => {
                 scope="row"
                 className="py-4 w-1/2 pl-3 font-bold pr-6 whitespace-nowrap"
               >
-                Steak n' Eggs
+                Steak n&apos; Eggs
               </th>
               <td className="py-4 my-2 pr-6  text-center">47(g)</td>
               <td className="py-4 pr-6  text-center">16.8(g)</td>
@@ -72,7 +72,7 @@ export const Recipes: React.FC<RecipesProps> = ({}) => {
                 scope="row"
                 className="py-4 w-1/2 pl-3 font-bold pr-6 whitespace-nowrap"
               >
-                Steak n' Eggs
+                Steak n&apos; Eggs
               </th>
               <td className="py-4 my-2 pr-6  text-center">47(g)</td>
               <td className="py-4 pr-6  text-center">16.8(g)</td>
@@ -87,7 +87,7 @@ export const Recipes: React.FC<RecipesProps> = ({}) => {
                 scope="row"
                 className="py-4 w-1/2 pl-3 font-bold pr-6 whitespace-nowrap"
               >
-                Steak n' Eggs
+                Steak n&apos; Eggs
               </th>
               <td className="py-4 my-2 pr-6  text-center">47(g)</td>
               <td className="py-4 pr-6  text-center">16.8(g)</td>
@@ -102,7 +102,7 @@ export const Recipes: React.FC<RecipesProps> = ({}) => {
                 scope="row"
                 className="py-4 w-1/2 pl-3 font-bold pr-6 whitespace-nowrap"
               >
-                Steak n' Eggs
+                Steak n&apos; Eggs
               </th>
               <td className="py-4 my-2 pr-6  text-center">47(g)</td>
               <td className="py-4 pr-6  text-center">16.8(g)</td>

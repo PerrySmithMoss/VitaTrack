@@ -11,7 +11,7 @@ import styles from './SignUp.module.css';
 
 interface SignUpFormProps {}
 
-export const SignUpForm: React.FC<SignUpFormProps> = ({}) => {
+export const SignUpForm: React.FC<SignUpFormProps> = () => {
   const {
     push,
     query: { code },

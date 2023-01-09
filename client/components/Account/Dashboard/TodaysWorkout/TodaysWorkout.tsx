@@ -27,7 +27,7 @@ import Link from 'next/link';
 
 interface TodaysWorkoutProps {}
 
-export const TodaysWorkout: React.FC<TodaysWorkoutProps> = ({}) => {
+export const TodaysWorkout: React.FC<TodaysWorkoutProps> = () => {
   const [isAddExerciseOpen, setIsAddExerciseOpen] = useState(false);
   const [workout, setWorkout] = useState({
     name: '',
@@ -106,7 +106,7 @@ export const TodaysWorkout: React.FC<TodaysWorkoutProps> = ({}) => {
   if (todaysWorkout?.getUsersWorkoutByDate.data) {
     return (
       <section className="mt-2">
-        <h2 className="text-2xl font-bold text-[#2b3042]">Today's Workout</h2>
+        <h2 className="text-2xl font-bold text-[#2b3042]">Today&apos;s Workout</h2>
         <div className="shadow h-[270px] min-w-[300px] rounded-lg mt-5 w-full  bg-[#fafafa] flex items-center flex-col justify-center">
           <div className="mt-6">
             <GiWeightLiftingUp size={70} color="#2b3042" />
@@ -154,7 +154,7 @@ export const TodaysWorkout: React.FC<TodaysWorkoutProps> = ({}) => {
   }
   return (
     <section className="mt-2 pr-4">
-      <h2 className="text-2xl font-bold text-[#2b3042]">Today's Workout</h2>
+      <h2 className="text-2xl font-bold text-[#2b3042]">Today&apos;s Workout</h2>
       <div className="shadow h-[200px] xs:h-[270px] w-full xxs:w-[300px] rounded-lg mt-5  bg-[#fafafa] flex items-center flex-col justify-center">
         <p className="px-6 xxs:px-14 text-center font-medium text-lg leading-6">
           You have not yet added a workout for today. 

@@ -23,7 +23,7 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
-export const MySchedule: React.FC<MyScheduleProps> = ({}) => {
+export const MySchedule: React.FC<MyScheduleProps> = () => {
   // TODO: Possibly add custom styling https://github.com/jquense/react-big-calendar#custom-styling
   // TODO: Possibly add drag & drop capabilities
   // https://github.com/christopher-caldwell/react-big-calendar-demo/blob/master/src/App.tsx

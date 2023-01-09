@@ -56,7 +56,7 @@ const CustomizedAxisTick: FunctionComponent<any> = (props: any) => {
   );
 };
 
-export const CaloriesGraph: React.FC<CaloriesGraphProps> = ({}) => {
+export const CaloriesGraph: React.FC<CaloriesGraphProps> = () => {
   return (
     <section className="col-span-12 lg:col-span-5 flex flex-col ">
       <div className="flex justify-between items-center">

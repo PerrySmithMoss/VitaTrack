@@ -5,7 +5,7 @@ import { Exercise } from './Exercise';
 
 interface WorkoutListProps {}
 
-export const WorkoutList: React.FC<WorkoutListProps> = ({}) => {
+export const WorkoutList: React.FC<WorkoutListProps> = () => {
   const { workoutExercises } = useGlobalContext();
 
   return (

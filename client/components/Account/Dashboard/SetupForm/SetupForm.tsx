@@ -7,7 +7,7 @@ import styles from './SetupForm.module.css';
 
 interface SetupFormProps {}
 
-export const SetupForm: React.FC<SetupFormProps> = ({}) => {
+export const SetupForm: React.FC<SetupFormProps> = () => {
   const [formStep, setFormStep] = useState(1);
   const [formAnswers, setFormAnswers] = useState({
     weightGoal: '',
@@ -94,7 +94,7 @@ export const SetupForm: React.FC<SetupFormProps> = ({}) => {
                     What is your current weight?
                   </h1>
                   <p className="text-sm mt-1 text-gray-500">
-                    It's ok to estimate. You can update this later.
+                    It&apos;s ok to estimate. You can update this later.
                   </p>
                   <input
                     type="number"
@@ -115,7 +115,7 @@ export const SetupForm: React.FC<SetupFormProps> = ({}) => {
                     What is your goal weight?
                   </h1>
                   <p className="text-sm mt-1 text-gray-500">
-                    Don't worry. This doesn't affect your daily calorie goal and
+                    Don&apos;t worry. This doesn&apos;t affect your daily calorie goal and
                     you can always change it later.
                   </p>
                   <input

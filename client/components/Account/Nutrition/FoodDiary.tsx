@@ -46,7 +46,7 @@ type mealNames =
   | 'Meal 6'
   | undefined;
 
-export const FoodDiary: React.FC<FoodDiaryProps> = ({}) => {
+export const FoodDiary: React.FC<FoodDiaryProps> = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(todaysDate);
   const [isShowingCalendar, setIsShowingCalendar] = useState(false);
   const [isAddFoodDrawerOpen, setIsAddFoodDrawerOpen] = useState(false);

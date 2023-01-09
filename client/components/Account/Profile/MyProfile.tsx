@@ -41,7 +41,7 @@ const createUserSchema = object({
 
 type CreateUserInput = TypeOf<typeof createUserSchema>;
 
-export const MyProfile: React.FC<MyProfileProps> = ({}) => {
+export const MyProfile: React.FC<MyProfileProps> = () => {
   const { data, refetch: refetchUser } = useGetCurrentUserQuery();
   const { mutate: updateUser } = useUpdateUserMutation({
     onSuccess: () => {

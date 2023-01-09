@@ -48,7 +48,7 @@ const CustomLabelv2 = ({
 
 const todaysDate = new Date().toISOString();
 
-export const Calories: React.FC<CaloriesProps> = ({}) => {
+export const Calories: React.FC<CaloriesProps> = () => {
   const { data: usersGoals, refetch: refetchUsersGoals } =
     useGetCurrentUsersGoalsQuery();
   const { data: todaysNutrition, refetch: refetchTodaysNutrition } =

@@ -8,7 +8,7 @@ import { WorkoutCardv2 } from './WorkoutCardv2';
 
 interface MyWorkoutsProps {}
 
-export const MyWorkouts: React.FC<MyWorkoutsProps> = ({}) => {
+export const MyWorkouts: React.FC<MyWorkoutsProps> = () => {
   const { data } = useGetUsersWorkoutsQuery<GetUsersWorkoutsQuery>();
   return (
     <div>

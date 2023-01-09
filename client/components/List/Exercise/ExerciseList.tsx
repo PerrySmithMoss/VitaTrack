@@ -5,7 +5,7 @@ import { useGlobalContext } from '../../../state/context/global.context';
 
 interface ExerciseListProps {}
 
-export const ExerciseList: React.FC<ExerciseListProps> = ({}) => {
+export const ExerciseList: React.FC<ExerciseListProps> = () => {
   const { selectedMuscleGroup, setWorkoutExercises, workoutExercises } =
     useGlobalContext();
   const [exercises, setExercises] = useState<any>();

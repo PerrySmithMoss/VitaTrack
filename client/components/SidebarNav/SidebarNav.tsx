@@ -11,7 +11,7 @@ import { useLogoutUserMutation } from '../../graphql/generated/graphql';
 
 interface SidebarNavProps {}
 
-export const SidebarNav: React.FC<SidebarNavProps> = ({}) => {
+export const SidebarNav: React.FC<SidebarNavProps> = () => {
   const { isSidebarOpen, setIsSidebarOpen } = useGlobalContext();
   const router = useRouter();
 

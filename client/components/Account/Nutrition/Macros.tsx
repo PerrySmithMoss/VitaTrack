@@ -103,7 +103,7 @@ const CustomLabel = ({
 
 const todaysDate = new Date().toISOString();
 
-export const Macros: React.FC<MacrosProps> = ({}) => {
+export const Macros: React.FC<MacrosProps> = () => {
   const { data: usersGoals, refetch: refetchUsersGoals } = useGetCurrentUsersGoalsQuery();
   const { refetch: refetchUsersRemainingCalories } =
   useGetCurrentUsersRemainingCaloriesByDateQuery({

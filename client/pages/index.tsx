@@ -11,7 +11,7 @@ import { useGetCurrentUserQuery } from '../graphql/generated/graphql';
 interface HomeProps {
 }
 
-const Home: NextPage<HomeProps> = ({}) => {
+const Home: NextPage<HomeProps> = () => {
   return (
     <>
       <Head>

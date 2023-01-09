@@ -95,7 +95,7 @@ const CustomLabel = ({
   );
 };
 
-export const TodaysMacros: React.FC<TodaysMacrosProps> = ({}) => {
+export const TodaysMacros: React.FC<TodaysMacrosProps> = () => {
   const { data } = useGetCurrentUsersGoalsQuery();
 
   const data01 = [
@@ -158,7 +158,7 @@ export const TodaysMacros: React.FC<TodaysMacrosProps> = ({}) => {
   return (
     <section className="mt-2  cursor-pointer">
       <h2 className="text-2xl text-[#2b3042] font-bold cursor-pointer">
-        Today's Macros
+        Today&apos;s Macros
       </h2>
       <div
         className={`${styles.todaysMacrosGraphWrapper} todaysMacrosGraphWrapper shadow relative rounded-lg cursor-pointer flex justify-center items-center bg-[#fafafa] hover:bg-gray-100 mt-5 pr-3 xs:pr-6`}

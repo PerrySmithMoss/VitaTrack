@@ -11,7 +11,7 @@ import styles from './Login.module.css';
 
 interface LoginFormProps {}
 
-export const LoginForm: React.FC<LoginFormProps> = ({}) => {
+export const LoginForm: React.FC<LoginFormProps> = () => {
   const {
     push,
     query: { code },
