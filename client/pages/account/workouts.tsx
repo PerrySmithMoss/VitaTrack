@@ -11,7 +11,7 @@ import {
   useGetUsersWorkoutsQuery,
 } from '../../graphql/generated/graphql';
 import { MyWorkouts } from '../../components/Account/Workouts/MyWokouts/MyWorkouts';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Modal } from '../../components/Modals/Modal';
 import { Drawer } from '../../components/Drawer/Drawer';
 import { AiOutlinePlus } from 'react-icons/ai';
@@ -27,11 +27,17 @@ import moment from 'moment';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import router, { useRouter } from 'next/router';
+import { SyncLoader } from 'react-spinners';
 
 interface WorkoutPageProps {}
 
 const WorkoutPage: NextPage<WorkoutPageProps> = () => {
-  const { data: user } = useGetCurrentUserQuery<GetCurrentUserQuery>();
+  const {
+    data,
+    isLoading,
+    refetch: refetchUsersWorkouts,
+  } = useGetCurrentUserQuery<GetCurrentUserQuery>();
   const {
     selectedMuscleGroup,
     setSelectedMuscleGroup,
@@ -42,9 +48,9 @@ const WorkoutPage: NextPage<WorkoutPageProps> = () => {
     isAddExerciseOpen,
     isAddWorkoutModalOpen,
   } = useGlobalContext();
+  const [mounted, setMounted] = useState(false);
 
-  const { refetch: refetchUsersWorkouts } =
-    useGetUsersWorkoutsQuery<GetUsersWorkoutsQuery>();
+  const router = useRouter();
 
   const { mutate } = useCreateWorkoutMutation({
     onSuccess: () => {
@@ -64,7 +70,6 @@ const WorkoutPage: NextPage<WorkoutPageProps> = () => {
       });
     },
   });
-
 
   const [workout, setWorkout] = useState({
     name: '',
@@ -99,11 +104,21 @@ const WorkoutPage: NextPage<WorkoutPageProps> = () => {
   }
 
   const handleCreateNewWorkout = () => {
-    setWorkoutExercises([])
-    setIsAddWorkoutModalOpen(true)
-  }
+    setWorkoutExercises([]);
+    setIsAddWorkoutModalOpen(true);
+  };
 
-  if (user?.getCurrentUser?.data?.id) {
+  useEffect(() => {
+    setMounted(true);
+  });
+
+  if (isLoading || !mounted) {
+    return null;
+  }
+  if (!data?.getCurrentUser?.data) {
+    router.push('/');
+  }
+  if (data?.getCurrentUser?.data?.id) {
     return (
       <>
         <Head>
@@ -317,8 +332,10 @@ const WorkoutPage: NextPage<WorkoutPageProps> = () => {
                         </div>
                       ) : (
                         <button
-                        onClick={() => setIsAddExerciseOpen(false)}
-                        className="hover:text-gray-200" type="button">
+                          onClick={() => setIsAddExerciseOpen(false)}
+                          className="hover:text-gray-200"
+                          type="button"
+                        >
                           Cancel
                         </button>
                       )}
@@ -329,7 +346,9 @@ const WorkoutPage: NextPage<WorkoutPageProps> = () => {
                           {selectedMuscleGroup}
                         </h4>
                       ) : (
-                        <h4 className="text-lg xs:text-xl font-bold">Select Exercise</h4>
+                        <h4 className="text-lg xs:text-xl font-bold">
+                          Select Exercise
+                        </h4>
                       )}
                     </div>
                     <div className="flex items-center space-x-2">
@@ -399,36 +418,25 @@ const WorkoutPage: NextPage<WorkoutPageProps> = () => {
       </>
     );
   }
-
   return (
-    <>
-      <Head>
-        <title>Workouts | VitaTrack</title>
-        <meta
-          name="description"
-          content="VitaTrack is a one stop shop to track all of your nutrition and gym performance."
-        />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main className="bg-white relative">
-        <h1 className="text-6xl ">You must log in!</h1>
-      </main>
-    </>
+    <div className="flex justify-center items-center h-screen">
+      <SyncLoader color={'#00CC99'} size={25} />
+    </div>
   );
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const cookie = context.req.cookies['refreshToken'];
+  // const cookie = context.req.cookies['refreshToken'];
 
-  if (!cookie) {
-    return {
-      redirect: {
-        destination: '/',
-        permanent: false,
-      },
-    };
-  }
+  // Not working in production due to the front-end and back-end being on different domians
+  // if (!cookie) {
+  //   return {
+  //     redirect: {
+  //       destination: '/',
+  //       permanent: false,
+  //     },
+  //   };
+  // }
 
   const queryClient = new QueryClient();
 

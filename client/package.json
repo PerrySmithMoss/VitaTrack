@@ -26,6 +26,7 @@
     "react-dom": "18.2.0",
     "react-hook-form": "^7.38.0",
     "react-icons": "^4.4.0",
+    "react-spinners": "^0.13.7",
     "react-toastify": "^9.0.8",
     "recharts": "2.1.12",
     "zod": "^3.19.1"

@@ -2,16 +2,34 @@ import { dehydrate, QueryClient } from '@tanstack/react-query';
 import type { GetServerSideProps, NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import { LoginForm } from '../components/Login/LoginForm';
 import { Hero } from '../components/Svgs/Home/Hero';
 import { Wave } from '../components/Svgs/Home/Wave';
 import { Logo } from '../components/Svgs/Logo/Logo';
-import { useGetCurrentUserQuery } from '../graphql/generated/graphql';
+import {
+  GetCurrentUserQuery,
+  useGetCurrentUserQuery,
+} from '../graphql/generated/graphql';
 
-interface HomeProps {
-}
+interface HomeProps {}
 
 const Home: NextPage<HomeProps> = () => {
+  const [mounted, setMounted] = useState(false);
+  const router = useRouter();
+  const { data, isLoading } = useGetCurrentUserQuery<GetCurrentUserQuery>();
+
+  useEffect(() => {
+    setMounted(true);
+  });
+
+  if (isLoading || !mounted) {
+    return null;
+  }
+  if (data?.getCurrentUser?.data && !isLoading) {
+    router.push('/account/dashboard');
+  }
   return (
     <>
       <Head>
@@ -32,7 +50,9 @@ const Home: NextPage<HomeProps> = () => {
             <div className="">
               <Logo height={26} width={32} />
             </div>
-            <h1 className="text-xl xs:text-2xl font-bold text-gray-700 text-right">VitaTrack</h1>
+            <h1 className="text-xl xs:text-2xl font-bold text-gray-700 text-right">
+              VitaTrack
+            </h1>
           </div>
         </div>
         <div className="flex justify-center h-screen z-10">
@@ -75,16 +95,17 @@ const Home: NextPage<HomeProps> = () => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const cookie  = context.req.cookies['refreshToken'];
+  // const cookie = context.req.cookies['refreshToken'];
 
-  if (cookie) {
-    return {
-      redirect: {
-        destination: '/account/dashboard',
-        permanent: false,
-      },
-    };
-  }
+  // Not working in production due to the front-end and back-end being on different domians
+  // if (!cookie) {
+  //   return {
+  //     redirect: {
+  //       destination: '/',
+  //       permanent: false,
+  //     },
+  //   };
+  // }
 
   const queryClient = new QueryClient();
 

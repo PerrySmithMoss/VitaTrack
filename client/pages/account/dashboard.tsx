@@ -5,6 +5,7 @@ import { TodaysMacros } from '../../components/Account/Dashboard/TodaysMacros/To
 import { Navbar } from '../../components/Navbar/Navbar';
 import { SidebarNav } from '../../components/SidebarNav/SidebarNav';
 import {
+  GetCurrentUserQuery,
   useGetCurrentUserQuery,
   useGetCurrentUsersGoalsQuery,
 } from '../../graphql/generated/graphql';
@@ -15,14 +16,30 @@ import { CaloriesGraph } from '../../components/Account/Dashboard/CaloriesGraph/
 import { Wave } from '../../components/Svgs/Home/Wave';
 import { Logo } from '../../components/Svgs/Logo/Logo';
 import { SetupForm } from '../../components/Account/Dashboard/SetupForm/SetupForm';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import { SyncLoader } from 'react-spinners';
 
 interface DashboardPageProps {}
 
 const DashboardPage: NextPage<DashboardPageProps> = () => {
-  const { data: user } = useGetCurrentUserQuery();
+  const [mounted, setMounted] = useState(false);
+  const router = useRouter();
   const { data: usersGoals } = useGetCurrentUsersGoalsQuery();
+  const { data: user, isLoading } =
+    useGetCurrentUserQuery<GetCurrentUserQuery>();
 
-  if (user?.getCurrentUser?.data?.hasGoals) {
+  useEffect(() => {
+    setMounted(true);
+  });
+
+  if (isLoading || !mounted) {
+    return null;
+  }
+  if (!user?.getCurrentUser?.data) {
+     router.push('/');
+  }
+  if (!isLoading && user?.getCurrentUser?.data?.hasGoals) {
     return (
       <>
         <Head>
@@ -72,53 +89,63 @@ const DashboardPage: NextPage<DashboardPageProps> = () => {
         </div>
       </>
     );
-  }
-  return (
-    <>
-      <Head>
-        <title>Dashboard | VitaTrack</title>
-        <meta
-          name="description"
-          content="VitaTrack is a one stop shop to track all of your nutrition and gym performance."
-        />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <div className="bg-white relative">
-        <div className="absolute bottom-0 z-0">
-          <Wave />
-        </div>
-        <div className="absolute top-0 w-full border-b">
-          <div className="flex items-center py-3 justify-between">
-            <div className="flex space-x-2 items-center mx-24">
-              <div>
-                <Logo height={26} width={32} />
+  } else if (!isLoading && user?.getCurrentUser?.data?.hasGoals === false) {
+    return (
+      <>
+        <Head>
+          <title>Dashboard | VitaTrack</title>
+          <meta
+            name="description"
+            content="VitaTrack is a one stop shop to track all of your nutrition and gym performance."
+          />
+          <link rel="icon" href="/favicon.ico" />
+        </Head>
+        <div className="bg-white relative">
+          <div className="absolute bottom-0 z-0">
+            <Wave />
+          </div>
+          <div className="absolute top-0 w-full border-b">
+            <div className="flex items-center py-3 justify-between">
+              <div className="flex space-x-2 items-center mx-24">
+                <div>
+                  <Logo height={26} width={32} />
+                </div>
+                <h1 className="text-[24px] font-bold text-gray-700">
+                  VitaTrack
+                </h1>
               </div>
-              <h1 className="text-[24px] font-bold text-gray-700">VitaTrack</h1>
-            </div>
-            <div className="mx-24">
-              <a className="font-bold cursor-pointer text-brand-green hover:text-brand-green-hover">
-                Log in
-              </a>
+              <div className="mx-24">
+                <a className="font-bold cursor-pointer text-brand-green hover:text-brand-green-hover">
+                  Log in
+                </a>
+              </div>
             </div>
           </div>
+          <SetupForm />
         </div>
-        <SetupForm />
-      </div>
-    </>
+      </>
+    );
+  } else {
+  return (
+    <div className="flex justify-center items-center h-screen">
+      <SyncLoader color={'#00CC99'} size={25} />
+    </div>
   );
+};
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const cookie = context.req.cookies['refreshToken'];
+  // const cookie = context.req.cookies['refreshToken'];
 
-  if (!cookie) {
-    return {
-      redirect: {
-        destination: '/',
-        permanent: false,
-      },
-    };
-  }
+  // Not working in production due to the front-end and back-end being on different domians
+  // if (!cookie) {
+  //   return {
+  //     redirect: {
+  //       destination: '/',
+  //       permanent: false,
+  //     },
+  //   };
+  // }
 
   const queryClient = new QueryClient();
 

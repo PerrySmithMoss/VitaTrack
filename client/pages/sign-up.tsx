@@ -71,22 +71,4 @@ const SignUpPage: NextPage<SignUpPageProps> = () => {
   );
 };
 
-// export const getServerSideProps: GetServerSideProps = async (context) => {
-//   const queryClient = new QueryClient();
-
-//   await queryClient.prefetchQuery(
-//     useGetCurrentUserQuery.getKey(),
-//     useGetCurrentUserQuery.fetcher(
-//       undefined,
-//       context.req.headers as Record<string, string>
-//     )
-//   );
-
-//   return {
-//     props: {
-//       dehydratedState: dehydrate(queryClient),
-//     },
-//   };
-// };
-
 export default SignUpPage;

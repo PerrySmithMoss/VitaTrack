@@ -8,18 +8,28 @@ import {
   useGetCurrentUserQuery,
 } from '../../graphql/generated/graphql';
 import { MySchedule } from '../../components/Account/Dashboard/MySchedule/MySchedule';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { SyncLoader } from 'react-spinners';
 
 interface CalendarPageProps {}
 
 const CalendarPage: NextPage<CalendarPageProps> = () => {
-  const { data, refetch: refetchCurrentUser } =
-    useGetCurrentUserQuery<GetCurrentUserQuery>();
+  const { data, isLoading } = useGetCurrentUserQuery<GetCurrentUserQuery>();
 
-  // TODO: Possibly add custom styling https://github.com/jquense/react-big-calendar#custom-styling
-  // TODO: Possibly add drag & drop capabilities
-  // https://github.com/christopher-caldwell/react-big-calendar-demo/blob/master/src/App.tsx
-  //  http://jquense.github.io/react-big-calendar/examples/index.html?path=/docs/about-big-calendar--page
-  
+  const [mounted, setMounted] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    setMounted(true);
+  });
+
+  if (isLoading || !mounted) {
+    return null;
+  }
+  if (!data?.getCurrentUser?.data) {
+    router.push('/');
+  }
   if (data?.getCurrentUser?.data?.id) {
     return (
       <>
@@ -47,35 +57,25 @@ const CalendarPage: NextPage<CalendarPageProps> = () => {
       </>
     );
   }
-
   return (
-    <>
-      <Head>
-        <title>Dashboard | VitaTrack</title>
-        <meta
-          name="description"
-          content="VitaTrack is a one stop shop to track all of your nutrition and gym performance."
-        />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main className="bg-white relative">
-        <h1 className="text-6xl ">You must log in!</h1>
-      </main>
-    </>
+    <div className="flex justify-center items-center h-screen">
+      <SyncLoader color={'#00CC99'} size={25} />
+    </div>
   );
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { cookie } = context.req.headers;
-  if (!cookie) {
-    return {
-      redirect: {
-        destination: '/',
-        permanent: false,
-      },
-    };
-  }
+  // const cookie = context.req.cookies['refreshToken'];
+
+  // Not working in production due to the front-end and back-end being on different domians
+  // if (!cookie) {
+  //   return {
+  //     redirect: {
+  //       destination: '/',
+  //       permanent: false,
+  //     },
+  //   };
+  // }
 
   const queryClient = new QueryClient();
 
