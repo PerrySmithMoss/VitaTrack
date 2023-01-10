@@ -5,8 +5,8 @@
   "license": "UNLICENSED",
   "scripts": {
     "dev": "next dev",
-    "build": "graphql-codegen --config codegen.yml && next build",
-    "start": "graphql-codegen --config codegen.yml && next start",
+    "build": "next build",
+    "start": "next start",
     "test": "jest",
     "lint": "next lint",
     "prettier": "prettier --write .",

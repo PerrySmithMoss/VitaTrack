@@ -47,6 +47,7 @@ async function main() {
       // globalMiddlewares: [deserializeUser],
     }),
     context: ({ req, res }) => ({ prisma, req, res }),
+    introspection: true, // make true if first time setting up GraphQL server
     csrfPrevention: true,
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
