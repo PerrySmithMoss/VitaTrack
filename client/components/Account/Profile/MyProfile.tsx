@@ -85,7 +85,7 @@ export const MyProfile: React.FC<MyProfileProps> = () => {
       <div className="flex items-center space-x-10">
         <div className="flex rounded-lg mt-8">
           <div className="relative rounded-full">
-            <Image
+            <img
               src={data?.getCurrentUser?.data?.profile?.avatar as string}
               alt="Avatar"
               width={100}
