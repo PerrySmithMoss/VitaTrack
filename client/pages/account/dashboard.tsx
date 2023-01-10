@@ -37,7 +37,7 @@ const DashboardPage: NextPage<DashboardPageProps> = () => {
     return null;
   }
   if (!user?.getCurrentUser?.data) {
-     router.push('/');
+    router.push('/');
   }
   if (!isLoading && user?.getCurrentUser?.data?.hasGoals) {
     return (
@@ -125,13 +125,12 @@ const DashboardPage: NextPage<DashboardPageProps> = () => {
         </div>
       </>
     );
-  } else {
+  }
   return (
     <div className="flex justify-center items-center h-screen">
       <SyncLoader color={'#00CC99'} size={25} />
     </div>
   );
-};
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
