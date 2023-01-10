@@ -452,9 +452,11 @@ export class UserResolver {
       if (config.serverEnv === "prod") {
         ctx.res.clearCookie(config.accessTokenCookieName as string, {
           domain: `.${config.serverDomain}`,
+          path: "/",
         });
         ctx.res.clearCookie(config.refreshTokenCookieName as string, {
           domain: `.${config.serverDomain}`,
+          path: "/",
         });
       } else {
         ctx.res.clearCookie("accessToken");
