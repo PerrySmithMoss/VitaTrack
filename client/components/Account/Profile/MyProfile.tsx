@@ -88,10 +88,8 @@ export const MyProfile: React.FC<MyProfileProps> = () => {
             <img
               src={data?.getCurrentUser?.data?.profile?.avatar as string}
               alt="Avatar"
-              width={100}
-              height={100}
               // className={`${styles.avatar} h-full w-full rounded-full cursor-pointer relative`}
-              className={`h-full w-full rounded-full relative`}
+              className={`h-[100px] w-[100px] rounded-full relative`}
             />
             {/* <div
               style={{ transform: 'translate(50%, 0%)' }}
