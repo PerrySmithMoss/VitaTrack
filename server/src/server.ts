@@ -28,6 +28,7 @@ async function main() {
   app.use(
     cors({
       origin: config.clientURL as string,
+      optionsSuccessStatus: 200, 
       credentials: true,
     })
   );
@@ -60,7 +61,7 @@ async function main() {
 
   apolloServer.applyMiddleware({
     app,
-    cors: { credentials: true, origin: config.clientURL as string },
+    cors: false
   });
 
   httpServer.listen(config.serverPort, () =>
