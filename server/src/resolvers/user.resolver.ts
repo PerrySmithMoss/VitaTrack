@@ -85,7 +85,7 @@ export class UserResolver {
       return {
         errors: [
           {
-            field: "Error while trying to log user out.",
+            field: "Logged in user",
             message: err,
           },
         ],
@@ -449,9 +449,9 @@ export class UserResolver {
 
       await invalidateSession(sessionId);
 
-      ctx.res.clearCookie(config.accessTokenCookieName as string);
+      ctx.res.clearCookie("accessToken");
 
-      ctx.res.clearCookie(config.refreshTokenCookieName as string);
+      ctx.res.clearCookie("refreshToken");
 
       ctx.res.removeHeader("x-access-token");
 
