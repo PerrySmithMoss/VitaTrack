@@ -449,9 +449,17 @@ export class UserResolver {
 
       await invalidateSession(sessionId);
 
-      ctx.res.clearCookie("accessToken");
-
-      ctx.res.clearCookie("refreshToken");
+      if (config.serverEnv === "prod") {
+        ctx.res.clearCookie(config.accessTokenCookieName as string, {
+          domain: config.serverDomain,
+        });
+        ctx.res.clearCookie(config.refreshTokenCookieName as string, {
+          domain: config.serverDomain,
+        });
+      } else {
+        ctx.res.clearCookie("accessToken");
+        ctx.res.clearCookie("refreshToken");
+      }
 
       ctx.res.removeHeader("x-access-token");
 
