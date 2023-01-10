@@ -26,9 +26,8 @@ const httpServer = createServer(app);
 async function main() {
   app.use(express.static("public"));
   app.use(
-    "/graphql",
     cors({
-      origin: [config.clientURL as string, config.serverURL as string],
+      origin: config.clientURL as string,
       credentials: true,
     })
   );
