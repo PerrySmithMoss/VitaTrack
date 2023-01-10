@@ -23,15 +23,15 @@ import { FoodResolver } from "./resolvers/food.resolver";
 const app: Application = express();
 const httpServer = createServer(app);
 
+const corsOptions = {
+  origin: config.clientURL as string,
+  optionsSuccessStatus: 200,
+  credentials: true,
+};
+
 async function main() {
   app.use(express.static("public"));
-  app.use(
-    cors({
-      origin: config.clientURL as string,
-      optionsSuccessStatus: 200, 
-      credentials: true,
-    })
-  );
+  app.use(cors(corsOptions));
   app.use(cookieParser());
 
   const apolloServer = new ApolloServer({
@@ -61,7 +61,7 @@ async function main() {
 
   apolloServer.applyMiddleware({
     app,
-    cors: false
+    cors: corsOptions,
   });
 
   httpServer.listen(config.serverPort, () =>
