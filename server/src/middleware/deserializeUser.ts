@@ -25,8 +25,8 @@ const deserializeUser: MiddlewareFn<PrismaContext> = async (
           httpOnly: true,
           domain: config.serverDomain,
           path: "/",
-          sameSite: "lax",
-          secure: false,
+          sameSite: config.serverEnv === "prod" ? "none" : "lax",
+          secure: config.serverEnv === "prod" ? true : false,
         });
       }
 
@@ -59,8 +59,8 @@ const deserializeUser: MiddlewareFn<PrismaContext> = async (
         httpOnly: true,
         domain: config.serverDomain,
         path: "/",
-        sameSite: "strict",
-        secure: false,
+        sameSite: config.serverEnv === "prod" ? "none" : "lax",
+        secure: config.serverEnv === "prod" ? true : false,
       });
     }
 

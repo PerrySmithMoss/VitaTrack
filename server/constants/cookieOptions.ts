@@ -6,11 +6,11 @@ export const accessTokenCookieOptions: CookieOptions = {
   httpOnly: true,
   domain: config.serverDomain,
   path: "/",
-  sameSite: "lax",
-  secure: false,
+  sameSite: config.serverEnv === "prod" ? "none" : "lax",
+  secure: config.serverEnv === "prod" ? true : false,
 };
 
 export const refreshTokenCookieOptions: CookieOptions = {
   ...accessTokenCookieOptions,
-  maxAge: 3.154e10, // 1 year
+  maxAge: 6.048e8, // 7 days
 };
