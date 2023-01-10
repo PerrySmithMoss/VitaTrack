@@ -4,6 +4,7 @@ export function customFetcher<TData, TVariables>(
   headers?: RequestInit['headers'] | undefined
 ) {
   return async (): Promise<TData> => {
+    console.log(`SERVER_ENDPOINT: ${process.env.NEXT_PUBLIC_SERVER_ENDPOINT}`)
     const res = await fetch(`${process.env.SERVER_ENDPOINT}/graphql/`, {
       method: 'POST',
       ...{
