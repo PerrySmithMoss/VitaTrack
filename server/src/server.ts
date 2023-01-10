@@ -26,8 +26,9 @@ const httpServer = createServer(app);
 async function main() {
   app.use(express.static("public"));
   app.use(
+    "/graphql",
     cors({
-      origin: config.clientURL as string,
+      origin: [config.clientURL as string, config.serverURL as string],
       credentials: true,
     })
   );
@@ -47,7 +48,7 @@ async function main() {
       // globalMiddlewares: [deserializeUser],
     }),
     context: ({ req, res }) => ({ prisma, req, res }),
-    introspection: true, // make true if first time setting up GraphQL server
+    // introspection: true, // make true if first time setting up GraphQL server
     csrfPrevention: true,
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
@@ -58,7 +59,10 @@ async function main() {
 
   await apolloServer.start();
 
-  apolloServer.applyMiddleware({ app, cors: false });
+  apolloServer.applyMiddleware({
+    app,
+    cors: { credentials: true, origin: config.clientURL as string },
+  });
 
   httpServer.listen(config.serverPort, () =>
     console.log(

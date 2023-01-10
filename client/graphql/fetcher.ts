@@ -11,6 +11,7 @@ export function customFetcher<TData, TVariables>(
           ...headers,
           'Apollo-Require-Preflight': 'true',
           'Content-Type': 'application/json',
+          'Accept'      : `application/json`
         },
         credentials: 'include',
       },
