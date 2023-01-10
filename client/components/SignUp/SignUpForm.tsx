@@ -72,7 +72,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = () => {
     <form onSubmit={onSubmit}>
       <div className="mt-4">
         <div className="flex justify-between">
-          <label htmlFor="email" className="block mb-1 text-gray-600">
+          <label htmlFor="email" className="text-gray-600">
             Email address
           </label>
         </div>
@@ -89,7 +89,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = () => {
       </div>
       <div className="mt-4">
         <div className="flex justify-between">
-          <label htmlFor="password" className="mb-1 text-gray-600">
+          <label htmlFor="password" className="text-gray-600">
             Password
           </label>
         </div>
@@ -106,7 +106,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = () => {
       </div>
       <div className="mt-4">
         <div className="flex justify-between">
-          <label htmlFor="username" className="block mb-1 text-gray-600">
+          <label htmlFor="username" className="text-gray-600">
             Username
           </label>
         </div>

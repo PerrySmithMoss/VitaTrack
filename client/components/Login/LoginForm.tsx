@@ -72,7 +72,7 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
     <form onSubmit={onSubmit}>
       <div className="mt-4">
         <div className="flex justify-between mb-2">
-          <label htmlFor="email" className="block mb-2 text-sm text-gray-600">
+          <label htmlFor="email" className="text-sm text-gray-600">
             Email address
           </label>
         </div>
