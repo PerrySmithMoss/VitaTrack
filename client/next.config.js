@@ -4,8 +4,7 @@ const nextConfig = {
   swcMinify: true,
   images: {
     domains: [
-      'localhost',
-      'chinwag.up.railway.app',
+      'vitatrack.onrender.com',
       'nix-tag-images.s3.amazonaws.com',
       'nutritionix-api.s3.amazonaws.com',
       'd2eawub7utcl6.cloudfront.net',
