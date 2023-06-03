@@ -1,4 +1,4 @@
--- CreateTable
+--  CreateTable
 CREATE TABLE "Profile" (
     "id" SERIAL NOT NULL,
     "bio" TEXT,
