@@ -2,150 +2,57 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["interactiveTransactions"]
+  provider = "prisma-client-js"
+}
+
+model Post {
+  id             Int         @id @default(autoincrement())
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  albumName      String      @db.VarChar(255)
+  artistName     String      @db.VarChar(255)
+  albumImage     String      @default("") @db.VarChar(255)
+  rating         Decimal     @db.Decimal(10, 1)
+  title          String
+  previewSongUrl String?     @db.VarChar(255)
+  genre          String     @db.VarChar(255)
+  published      Boolean     @default(false)
+  author         User        @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId       Int
+  songGenres     SongGenre[]
+}
+
+model SongGenre {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  genre     String   @db.VarChar(255)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    Int
 }
 
 model Profile {
-  id       Int     @id @default(autoincrement())
-  bio      String?
-  avatar   String? @default("https://vita-track.onrender.com/images/default-avatar.jpg")
-  avatarId String?
-  userId   String  @unique
-  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     Int     @id @default(autoincrement())
+  bio    String?
+  avatar String? @default("https://im-listening.up.railway.app/images/default-avatar.jpg")
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int     @unique
 }
 
 model User {
-  id        String      @id @default(cuid())
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  email     String      @unique
-  password  String?
-  username  String
-  gender    String      @default("Female")
-  hasGoals  Boolean     @default(false)
-  profile   Profile?
-  goals     Goals?
-  nutrition Nutrition[]
-  foods     Food[]
-  session   Session?
-  workouts  Workout[]
-}
-
-model Session {
-  valid     Boolean  @default(true)
-  userAgent String
+  id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  userId    String   @unique
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Goals {
-  id             Int      @id @default(autoincrement())
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  startingWeight Float?
-  currentWeight  Float?
-  goalWeight     Float?
-  dailySteps     Int      @default(10000)
-  calories       Int?
-  protein        Int?
-  fat            Int?
-  carbohydrate   Int?
-  userId         String   @unique
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Nutrition {
-  id           Int      @id @default(autoincrement())
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  date         DateTime @unique
-  calories     Int?
-  protein      Int?
-  fat          Int?
-  carbohydrate Int?
-  userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  foods        Food[]
-}
-
-model Food {
-  id            Int       @id @default(autoincrement())
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  name          String
-  mealName      String
-  servingSize   String
-  numOfServings Float
-  calories      Int
-  protein       Float
-  fat           Float
-  carbohydrate  Float
-  sugar         Float
-  sodium        Float
-  userId        String
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  nutrition     Nutrition @relation(fields: [nutritionId], references: [id], onDelete: Cascade)
-  nutritionId   Int
-}
-
-model Workout {
-  id         Int        @id @default(autoincrement())
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-  name       String
-  startTime  String
-  endTime    String
-  bodyweight Float?
-  notes      String?
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId     String
-  exercises  Exercise[]
-}
-
-model Exercise {
-  id           Int           @id @default(autoincrement())
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  name         String
-  category     String
-  exerciseType String
-  unilateral   Boolean       @default(false)
-  workout      Workout       @relation(fields: [workoutId], references: [id], onDelete: Cascade)
-  workoutId    Int
-  strengthSets StrengthSet[]
-  cardioSets   CardioSet[]
-}
-
-model StrengthSet {
-  id         Int      @id @default(autoincrement())
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  setNumber  Int      @default(1)
-  weight     String?
-  reps       String?
-  notes      String?
-  exercise   Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
-  exerciseId Int
-}
-
-model CardioSet {
-  id             Int      @id @default(autoincrement())
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  setNumber      Int      @default(1)
-  minutes        String?
-  seconds        String?
-  distance       String?
-  caloriesBurned String?
-  notes          String?
-  exercise       Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
-  exerciseId     Int
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  username  String   @unique
+  posts     Post[]
+  profile   Profile?
 }
