@@ -17,9 +17,11 @@ export const SetupForm: React.FC<SetupFormProps> = () => {
   });
   const { refetch: refetchUser } = useGetCurrentUserQuery();
 
-  const { mutate } = useFinishUserSetupMutation({onSuccess: () => {
-    refetchUser()
-  }});
+  const { mutate } = useFinishUserSetupMutation({
+    onSuccess: () => {
+      refetchUser();
+    },
+  });
 
   const handleCompleteEditingGoals = () => {
     mutate({
@@ -115,8 +117,8 @@ export const SetupForm: React.FC<SetupFormProps> = () => {
                     What is your goal weight?
                   </h1>
                   <p className="text-sm mt-1 text-gray-500">
-                    Don&apos;t worry. This doesn&apos;t affect your daily calorie goal and
-                    you can always change it later.
+                    Don&apos;t worry. This doesn&apos;t affect your daily
+                    calorie goal and you can always change it later.
                   </p>
                   <input
                     type="number"
@@ -242,7 +244,7 @@ export const SetupForm: React.FC<SetupFormProps> = () => {
               <div className="flex items-center justify-center w-full flex-col flex-wrap px-16">
                 <div>
                   <h1 className="text-[26px] font-bold text-center leading-[1.8rem] text-gray-800">
-                    Welcome! Just a few questions so we can customize VitaTrack
+                    Welcome! Just a few questions so we can customise VitaTrack
                     for you.
                   </h1>
                 </div>

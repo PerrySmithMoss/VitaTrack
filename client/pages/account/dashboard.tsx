@@ -8,6 +8,7 @@ import {
   GetCurrentUserQuery,
   useGetCurrentUserQuery,
   useGetCurrentUsersGoalsQuery,
+  useLogoutUserMutation,
 } from '../../graphql/generated/graphql';
 import { TodaysWorkout } from '../../components/Account/Dashboard/TodaysWorkout/TodaysWorkout';
 import { TrendCard } from '../../components/Account/Dashboard/TrendCard/TrendCard';
@@ -25,9 +26,18 @@ interface DashboardPageProps {}
 const DashboardPage: NextPage<DashboardPageProps> = () => {
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
+
   const { data: usersGoals } = useGetCurrentUsersGoalsQuery();
   const { data: user, isLoading } =
     useGetCurrentUserQuery<GetCurrentUserQuery>();
+
+  const { mutate: logoutUser } = useLogoutUserMutation({
+    onSuccess: () => router.push('/'),
+  });
+
+  const handleLogOut = () => {
+    logoutUser({});
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -101,7 +111,7 @@ const DashboardPage: NextPage<DashboardPageProps> = () => {
           <link rel="icon" href="/favicon.ico" />
         </Head>
         <div className="bg-white relative">
-          <div className="absolute bottom-0 z-0">
+          <div className="absolute bottom-0 z-0 w-full">
             <Wave />
           </div>
           <div className="absolute top-0 w-full border-b">
@@ -115,9 +125,12 @@ const DashboardPage: NextPage<DashboardPageProps> = () => {
                 </h1>
               </div>
               <div className="mx-24">
-                <a className="font-bold cursor-pointer text-brand-green hover:text-brand-green-hover">
-                  Log in
-                </a>
+                <button
+                  onClick={handleLogOut}
+                  className="cursor-pointer text-brand-green hover:text-brand-green-hover"
+                >
+                  Log out
+                </button>
               </div>
             </div>
           </div>

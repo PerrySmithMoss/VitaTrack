@@ -21,11 +21,11 @@ const SignUpPage: NextPage<SignUpPageProps> = () => {
       </Head>
 
       <main className="bg-white relative">
-        <div className="absolute bottom-0 z-0">
+        <div className="absolute bottom-0 z-0 w-full">
           <Wave />
         </div>
         <div className="absolute top-0">
-        <div className="flex items-center mx-6 xs:mx-10 mt-4">
+          <div className="flex items-center mx-6 xs:mx-10 mt-4">
             <div className="">
               <Logo height={26} width={32} />
             </div>
@@ -34,7 +34,7 @@ const SignUpPage: NextPage<SignUpPageProps> = () => {
         </div>
         <div className="flex justify-center h-screen z-10">
           <div className="hidden bg-cover lg:block lg:w-7/12">
-          <div className="flex items-center h-full pl-20 z-10">
+            <div className="flex items-center h-full pl-20 z-10">
               <Hero />
             </div>
           </div>
@@ -56,9 +56,9 @@ const SignUpPage: NextPage<SignUpPageProps> = () => {
                     className="cursor-pointer focus:outline-none focus:underline hover:underline"
                     href="/"
                   >
-                    <a className="text-blue-500 cursor-pointer focus:outline-none focus:underline hover:underline">
+                    <span className="text-blue-500 cursor-pointer focus:outline-none focus:underline hover:underline">
                       Log in
-                    </a>
+                    </span>
                   </Link>
                   .
                 </p>

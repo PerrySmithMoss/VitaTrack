@@ -563,7 +563,7 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
                 calories
               </div>
             </div>
-            <div className='bg-[#fff] py-1'>
+            <div className="bg-[#fff] py-1">
               {usersFood?.getCurrentUsersFoodByDate.data?.map((foodEntry) => {
                 if (foodEntry.mealName === 'Breakfast') {
                   return (
@@ -630,7 +630,7 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
                 calories
               </div>
             </div>
-            <div className='bg-[#fff] py-1'>
+            <div className="bg-[#fff] py-1">
               {usersFood?.getCurrentUsersFoodByDate.data?.map((foodEntry) => {
                 if (foodEntry.mealName === 'Lunch') {
                   return (
@@ -698,7 +698,7 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
                 calories
               </div>
             </div>
-            <div className='bg-[#fff] py-1'>
+            <div className="bg-[#fff] py-1">
               {usersFood?.getCurrentUsersFoodByDate.data?.map((foodEntry) => {
                 if (foodEntry.mealName === 'Dinner') {
                   return (
@@ -768,7 +768,7 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
                 calories
               </div>
             </div>
-            <div className='bg-[#fff] py-1'>
+            <div className="bg-[#fff] py-1">
               {usersFood?.getCurrentUsersFoodByDate.data?.map((foodEntry) => {
                 if (foodEntry.mealName === 'Snacks') {
                   return (
@@ -836,7 +836,7 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
                 calories
               </div>
             </div>
-            <div className='bg-[#fff] py-1'>
+            <div className="bg-[#fff] py-1">
               {usersFood?.getCurrentUsersFoodByDate.data?.map((foodEntry) => {
                 if (foodEntry.mealName === 'Meal 5') {
                   return (
@@ -904,7 +904,7 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
                 calories
               </div>
             </div>
-            <div className='bg-[#fff] py-1'>
+            <div className="bg-[#fff] py-1">
               {usersFood?.getCurrentUsersFoodByDate.data?.map((foodEntry) => {
                 if (foodEntry.mealName === 'Meal 6') {
                   return (
@@ -2466,6 +2466,7 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
                                       src={food['photo']['thumb']}
                                       height={30}
                                       width={30}
+                                      alt={food.food_name}
                                     />
                                   </div>
                                   <div>
@@ -2499,6 +2500,7 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
                                         src={food['photo']['thumb']}
                                         height={30}
                                         width={30}
+                                        alt={food.food_name}
                                       />
                                     </div>
                                     <div>

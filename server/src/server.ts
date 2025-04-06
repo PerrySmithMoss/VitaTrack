@@ -14,7 +14,6 @@ import {
   WorkoutResolver,
 } from "./resolvers/index";
 import cors from "cors";
-import deserializeUser from "./middleware/deserializeUser";
 import cookieParser from "cookie-parser";
 import { GoalsResolver } from "./resolvers/goals.resolver";
 import { NutritionResolver } from "./resolvers/nutrition.resolver";
@@ -48,7 +47,7 @@ async function main() {
       // globalMiddlewares: [deserializeUser],
     }),
     context: ({ req, res }) => ({ prisma, req, res }),
-    introspection: config.serverEnv === "prod" ? false : true, // make true if first time setting up GraphQL server
+    // introspection: true, // make true if first time setting up GraphQL server
     csrfPrevention: true,
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
@@ -65,9 +64,7 @@ async function main() {
   });
 
   httpServer.listen(config.serverPort, () =>
-    console.log(
-      `🚀  Server running on ${config.serverURL}:${config.serverPort}`
-    )
+    console.log(`🚀  Server running at ${config.serverURL}`)
   );
 }
 

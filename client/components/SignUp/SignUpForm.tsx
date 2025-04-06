@@ -18,7 +18,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = () => {
   } = useRouter();
   const [codeParam, setCodeParam] = useState('');
 
-  const { refetch: refetchCurrentUser } =
+  const { data, refetch: refetchCurrentUser } =
     useGetCurrentUserQuery<GetCurrentUserQuery>();
 
   const { mutate: createUserUsingGoogleCredentails } =
@@ -26,6 +26,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = () => {
       onSuccess: () => handleSuccessfulSignUp(),
     });
 
+  console.log('user: ', data);
   function handleSuccessfulSignUp() {
     refetchCurrentUser();
 

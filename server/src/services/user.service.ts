@@ -19,7 +19,9 @@ export async function createUser(userInput: UserInput) {
       email: userInput.email,
       password: hashedPassword,
       profile: {
-        create: {},
+        create: {
+          avatar: process.env.DEFAULT_USER_AVATAR,
+        },
       },
     },
     include: {

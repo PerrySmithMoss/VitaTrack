@@ -76,7 +76,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = () => {
                   >
                     {link.link !== null ? (
                       <Link href={link.link}>
-                        <a className="flex items-center space-x-2.5">
+                        <div className="flex items-center space-x-2.5">
                           <span className="text-2xl block float-left">
                             <link.icon />
                           </span>
@@ -91,7 +91,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = () => {
                           >
                             {link.text}
                           </span>
-                        </a>
+                        </div>
                       </Link>
                     ) : (
                       <>
@@ -175,7 +175,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = () => {
             >
               {link.link !== null ? (
                 <Link href={link.link}>
-                  <a className="flex items-center space-x-2.5">
+                  <div className="flex items-center space-x-2.5">
                     <span className="text-2xl block float-left">
                       <link.icon />
                     </span>
@@ -188,7 +188,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = () => {
                     >
                       {link.text}
                     </span>
-                  </a>
+                  </div>
                 </Link>
               ) : (
                 <>

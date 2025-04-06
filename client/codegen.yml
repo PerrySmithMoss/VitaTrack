@@ -1,4 +1,4 @@
-schema: 'https://vita-track.onrender.com/graphql'
+schema: 'https://vitatrack.up.railway.app/graphql'
 documents: 'graphql/**/*/*.graphql'
 overwrite: true
 generates:

@@ -12,11 +12,7 @@ import { PrismaContext } from "../types/PrismaContext";
 import { User } from "../entities/user.entity";
 import { requireUser } from "../middleware/requireUser";
 import deserializeUser from "../middleware/deserializeUser";
-import {
-  createUser,
-  findUserByEmail,
-  findUserById,
-} from "../services/user.service";
+import { createUser, findUserByEmail } from "../services/user.service";
 import { createSession, invalidateSession } from "../services/session.service";
 import { signJwt } from "../utils/jwt.utils";
 import { config } from "../../config/config";

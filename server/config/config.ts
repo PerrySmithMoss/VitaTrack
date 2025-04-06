@@ -11,7 +11,7 @@ export const config = {
   clientURL: process.env.CLIENT_URL,
   serverURL: process.env.SERVER_URL,
 
-  databaseURL: process.env.DATABASE_URL!,
+  databaseURL: process.env.DATABASE_URL,
 
   publicKey: process.env.PUBLIC_KEY,
   privateKey: process.env.PRIVATE_KEY,

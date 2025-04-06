@@ -79,9 +79,9 @@ const Home: NextPage<HomeProps> = () => {
                     className="cursor-pointer focus:outline-none focus:underline hover:underline"
                     href="/sign-up"
                   >
-                    <a className="text-blue-500 cursor-pointer focus:outline-none focus:underline hover:underline">
+                    <span className="text-blue-500 cursor-pointer focus:outline-none focus:underline hover:underline">
                       Sign up
-                    </a>
+                    </span>
                   </Link>
                   .
                 </p>
