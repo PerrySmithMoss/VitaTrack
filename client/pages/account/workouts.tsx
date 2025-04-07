@@ -5,10 +5,8 @@ import { Navbar } from '../../components/Navbar/Navbar';
 import { SidebarNav } from '../../components/SidebarNav/SidebarNav';
 import {
   GetCurrentUserQuery,
-  GetUsersWorkoutsQuery,
   useCreateWorkoutMutation,
   useGetCurrentUserQuery,
-  useGetUsersWorkoutsQuery,
 } from '../../graphql/generated/graphql';
 import { MyWorkouts } from '../../components/Account/Workouts/MyWokouts/MyWorkouts';
 import { useEffect, useState } from 'react';
@@ -27,8 +25,8 @@ import moment from 'moment';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import router, { useRouter } from 'next/router';
-import { SyncLoader } from 'react-spinners';
+import { useRouter } from 'next/router';
+import SyncLoader from 'react-spinners/SyncLoader';
 
 interface WorkoutPageProps {}
 

@@ -12,14 +12,12 @@ import {
 } from '../../graphql/generated/graphql';
 import { TodaysWorkout } from '../../components/Account/Dashboard/TodaysWorkout/TodaysWorkout';
 import { TrendCard } from '../../components/Account/Dashboard/TrendCard/TrendCard';
-import { Recipes } from '../../components/Account/Dashboard/Recipes/Recipes';
-import { CaloriesGraph } from '../../components/Account/Dashboard/CaloriesGraph/CaloriesGraph';
 import { Wave } from '../../components/Svgs/Home/Wave';
 import { Logo } from '../../components/Svgs/Logo/Logo';
 import { SetupForm } from '../../components/Account/Dashboard/SetupForm/SetupForm';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { SyncLoader } from 'react-spinners';
+import SyncLoader from 'react-spinners/SyncLoader';
 
 interface DashboardPageProps {}
 

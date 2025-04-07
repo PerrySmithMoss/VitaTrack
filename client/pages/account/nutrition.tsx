@@ -3,10 +3,8 @@ import type { GetServerSideProps, NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
-import { SyncLoader } from 'react-spinners';
-import { Calories } from '../../components/Account/Nutrition/Calories';
+import SyncLoader from 'react-spinners/SyncLoader';
 import { FoodDiary } from '../../components/Account/Nutrition/FoodDiary';
-import { Macros } from '../../components/Account/Nutrition/Macros';
 import { Navbar } from '../../components/Navbar/Navbar';
 import { SidebarNav } from '../../components/SidebarNav/SidebarNav';
 import {

@@ -3,7 +3,7 @@ import type { GetServerSideProps, NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
-import { SyncLoader } from 'react-spinners';
+import SyncLoader from 'react-spinners/SyncLoader';
 import { MyProfile } from '../../components/Account/Profile/MyProfile';
 import { Navbar } from '../../components/Navbar/Navbar';
 import { SidebarNav } from '../../components/SidebarNav/SidebarNav';

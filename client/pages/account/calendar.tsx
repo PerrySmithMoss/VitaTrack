@@ -10,7 +10,7 @@ import {
 import { MySchedule } from '../../components/Account/Dashboard/MySchedule/MySchedule';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { SyncLoader } from 'react-spinners';
+import SyncLoader from 'react-spinners/SyncLoader';
 
 interface CalendarPageProps {}
 
