@@ -3,13 +3,14 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const config = {
-  isProduction: process.env.NODE_ENV! === "production",
+  isProduction: process.env.NODE_ENV === "production",
 
   serverEnv: process.env.SERVER_ENV,
   serverPort: process.env.PORT,
   serverDomain: process.env.SERVER_DOMAIN,
   clientURL: process.env.CLIENT_URL,
   serverURL: process.env.SERVER_URL,
+  defaultUserAvatarPath: process.env.DEFAULT_USER_AVATAR_PATH,
 
   databaseURL: process.env.DATABASE_URL,
 

@@ -1,6 +1,6 @@
 import express, { Application } from "express";
 import { createServer } from "http";
-import { config } from "../config/config";
+import { config } from "./config/config";
 import prisma from "./lib/prisma";
 import { ApolloServer } from "apollo-server-express";
 import {

@@ -2,7 +2,7 @@ import { MiddlewareFn } from "type-graphql";
 import { PrismaContext } from "../types/PrismaContext";
 import { verifyJwt } from "../utils/jwt.utils";
 import { reIssueAccessToken } from "../services/session.service";
-import { config } from "../../config/config";
+import { config } from "../config/config";
 
 const deserializeUser: MiddlewareFn<PrismaContext> = async (
   { context },

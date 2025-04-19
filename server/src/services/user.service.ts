@@ -1,7 +1,7 @@
 import qs from "qs";
 import axios from "axios";
 import { hash } from "argon2";
-import { config } from "../../config/config";
+import { config } from "../config/config";
 import prisma from "../lib/prisma";
 
 type UserInput = {
@@ -12,6 +12,12 @@ type UserInput = {
 
 export async function createUser(userInput: UserInput) {
   const hashedPassword = await hash(userInput.password);
+  const { isProduction, serverDomain, serverPort, defaultUserAvatarPath } =
+    config;
+
+  const avatarURL = isProduction
+    ? `${serverDomain}/${defaultUserAvatarPath}`
+    : `${serverDomain}:${serverPort}/${defaultUserAvatarPath}`;
 
   return await prisma.user.create({
     data: {
@@ -20,7 +26,7 @@ export async function createUser(userInput: UserInput) {
       password: hashedPassword,
       profile: {
         create: {
-          avatar: process.env.DEFAULT_USER_AVATAR,
+          avatar: avatarURL,
         },
       },
     },

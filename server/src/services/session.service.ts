@@ -1,4 +1,4 @@
-import { config } from "../../config/config";
+import { config } from "../config/config";
 import prisma from "../lib/prisma";
 import { signJwt, verifyJwt } from "../utils/jwt.utils";
 import { findUserById } from "./user.service";

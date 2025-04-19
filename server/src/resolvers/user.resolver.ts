@@ -15,12 +15,12 @@ import deserializeUser from "../middleware/deserializeUser";
 import { createUser, findUserByEmail } from "../services/user.service";
 import { createSession, invalidateSession } from "../services/session.service";
 import { signJwt } from "../utils/jwt.utils";
-import { config } from "../../config/config";
+import { config } from "../config/config";
 import argon2, { hash } from "argon2";
 import {
   accessTokenCookieOptions,
   refreshTokenCookieOptions,
-} from "../../constants/cookieOptions";
+} from "../constants/cookieOptions";
 import { validateEmail } from "../utils/validateEmail";
 
 @ObjectType()

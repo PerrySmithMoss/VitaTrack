@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import { CookieOptions } from "express";
 import { Resolver, Mutation, Arg, Ctx, Field, ObjectType } from "type-graphql";
-import { config } from "../../config/config";
+import { config } from "../config/config";
 import { createSession } from "../services/session.service";
 import {
   findAndUpdateUser,
@@ -13,7 +13,7 @@ import { signJwt } from "../utils/jwt.utils";
 import {
   accessTokenCookieOptions,
   refreshTokenCookieOptions,
-} from "../../constants/cookieOptions";
+} from "../constants/cookieOptions";
 
 @ObjectType()
 class SessionFieldError {
