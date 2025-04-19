@@ -1,0 +1,26 @@
+# Node stuff
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Build output
+dist
+*.tsbuildinfo
+
+# Env/config
+.env
+.env.*
+
+# Version control
+.git
+.gitignore
+
+# IDE/editor stuff
+.vscode
+.idea
+*.swp
+
+# Tests
+tests
+coverage
+__tests__
