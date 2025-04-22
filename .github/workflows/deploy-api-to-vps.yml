@@ -55,15 +55,16 @@ jobs:
             latest
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+        run: |
+          docker buildx build \
+            --push \
+            --file Dockerfile \
+            --tag ${{ steps.meta.outputs.tags }} \
+            --label ${{ steps.meta.outputs.labels }} \
+            --cache-from type=gha \
+            --cache-to type=gha,mode=max \
+            .
+        working-directory: ./server
 # TODO...
 #   deploy:
 #     runs-on: ubuntu-latest
