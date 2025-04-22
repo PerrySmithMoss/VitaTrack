@@ -34,13 +34,12 @@ jobs:
         #     server
         #   sparse-checkout-cone-mode: false
 
-      - name: Debug - List directories
+      - name: Verify Dockerfile exists
         run: |
-          echo "Root directory contents:"
+          cd ./server
           ls -la
-          echo "Server directory contents:"
-          ls -la ./server
-          echo "Current working directory: $(pwd)"
+          echo "Dockerfile content:"
+          cat Dockerfile
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -66,7 +65,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./server
-          file: Dockerfile
+          # file: Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
