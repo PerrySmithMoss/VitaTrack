@@ -65,12 +65,14 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./server
-          # file: Dockerfile
-          push: true
+          push: false # Set to false initially just to debug
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          # Add these options to see more detailed build output
+          no-cache: true
+          progress: plain
 # TODO...
 #   deploy:
 #     runs-on: ubuntu-latest

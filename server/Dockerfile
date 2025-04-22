@@ -3,11 +3,11 @@ FROM node:22.14.0-alpine AS builder
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY package.json yarn.lock ./
 COPY prisma ./prisma/
 
 # Install ALL dependencies (dev + prod)
-RUN npm ci
+RUN yarn install --frozen-lockfile
 
 # Copy and build source
 COPY tsconfig.json .
@@ -20,8 +20,8 @@ FROM node:22.14.0-alpine AS deps
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm ci --only=production
+COPY package.json yarn.lock ./
+RUN yarn install --production --frozen-lockfile
 
 # Stage 3: Final image
 FROM node:22.14.0-alpine AS runner
