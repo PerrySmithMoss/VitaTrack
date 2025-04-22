@@ -55,16 +55,21 @@ jobs:
             latest
 
       - name: Build and push Docker image
+        working-directory: ./server
         run: |
+          # Convert newline-separated tags and labels into multiple --tag and --label flags
+          TAGS="$(echo "${{ steps.meta.outputs.tags }}" | xargs -n1 echo --tag)"
+          LABELS="$(echo "${{ steps.meta.outputs.labels }}" | xargs -n1 echo --label)"
+              
           docker buildx build \
             --push \
             --file Dockerfile \
-            --tag ${{ steps.meta.outputs.tags }} \
-            --label ${{ steps.meta.outputs.labels }} \
+            $TAGS \
+            $LABELS \
             --cache-from type=gha \
             --cache-to type=gha,mode=max \
             .
-        working-directory: ./server
+
 # TODO...
 #   deploy:
 #     runs-on: ubuntu-latest
