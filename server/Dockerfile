@@ -1,5 +1,5 @@
 # Stage 1: Build
-FROM node:22.14.0-alpine AS builder
+FROM node:22.15.0-slim AS builder
 
 WORKDIR /app
 
@@ -13,10 +13,11 @@ RUN yarn install --frozen-lockfile
 COPY tsconfig.json .
 COPY src ./src
 
-RUN npx prisma generate && npm run build
+# Generate the Prisma Client and build app
+RUN npx prisma generate && yarn build
 
 # Stage 2: Production dependencies only
-FROM node:22.14.0-alpine AS deps
+FROM node:22.15.0-slim AS deps
 
 WORKDIR /app
 
@@ -24,7 +25,7 @@ COPY package.json yarn.lock ./
 RUN yarn install --production --frozen-lockfile
 
 # Stage 3: Final image
-FROM node:22.14.0-alpine AS runner
+FROM node:22.15.0-slim AS runner
 
 WORKDIR /app
 
