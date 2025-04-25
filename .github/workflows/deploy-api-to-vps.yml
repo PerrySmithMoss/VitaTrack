@@ -72,6 +72,18 @@ jobs:
           cache-to: type=gha,mode=max
           no-cache: true
           progress: plain
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        if: github.ref == 'refs/heads/master'
+        with:
+          tag_name: v1.0.${{ github.run_number }} # Example versioning
+          name: Release v1.0.${{ github.run_number }} # Release name
+          body: |
+            Automated release for commit ${{ github.sha }}
+            Docker image: ghcr.io/${{ github.repository }}:${{ github.sha }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 # TODO...
 #   deploy:
 #     runs-on: ubuntu-latest
