@@ -1,5 +1,5 @@
 # Stage 1: Build
-FROM node:22.15.0-slim AS builder
+FROM node:22.14.0-bullseye-slim AS builder
 
 WORKDIR /app
 
@@ -22,7 +22,7 @@ COPY src ./src
 RUN npx prisma generate && yarn build
 
 # Stage 2: Production dependencies only
-FROM node:22.15.0-slim AS deps
+FROM node:22.14.0-bullseye-slim AS deps
 
 WORKDIR /app
 
@@ -30,7 +30,7 @@ COPY package.json yarn.lock ./
 RUN yarn install --production --frozen-lockfile
 
 # Stage 3: Final image
-FROM node:22.15.0-slim AS runner
+FROM node:22.14.0-bullseye-slim AS runner
 
 WORKDIR /app
 
