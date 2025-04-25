@@ -3,6 +3,11 @@ FROM node:22.15.0-slim AS builder
 
 WORKDIR /app
 
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y libssl1.1 && \
+    rm -rf /var/lib/apt/lists/*
+
 COPY package.json yarn.lock ./
 COPY prisma ./prisma/
 
