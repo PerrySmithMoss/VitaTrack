@@ -39,9 +39,9 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
 COPY --from=deps /app/node_modules ./node_modules
 
-RUN chown -R nodeuser:root /app
+RUN chown -R node:node /app
 
-USER nodeuser
+USER node
 
 EXPOSE 5500
 
