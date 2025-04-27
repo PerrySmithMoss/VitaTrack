@@ -24,7 +24,7 @@ jobs:
     #     - run-tests
 
     env:
-      IMAGE_NAME: ghcr.io/perrysmithmoss/vita-track
+      IMAGE_NAME: ghcr.io/perrysmithmoss/vita-track:sha-${{ github.sha }}
 
     steps:
       - name: Checkout code
@@ -48,7 +48,6 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          # repository name must be all lowercase
           images: ${{ env.IMAGE_NAME }}
           tags: |
             type=sha,format=long
@@ -75,7 +74,7 @@ jobs:
           name: Release v1.0.${{ github.run_number }}
           body: |
             Automated release for commit ${{ github.sha }}
-            Docker image: ${{ env.IMAGE_NAME }}:${{ github.sha }}
+            Docker image: ${{ env.IMAGE_NAME }}
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -3,7 +3,6 @@ version: "3.9"
 services:
   postgres:
     image: postgres:17.4
-    container_name: postgres_db
     restart: unless-stopped
     secrets:
       - postgres_user
@@ -23,7 +22,7 @@ services:
     # build:
     #   context: ./server
     #   dockerfile: Dockerfile
-    image: ghcr.io/PerrySmithMoss/VitaTrack:0222879a3f423ff960397c19c2cc57f886c35160
+    image: ghcr.io/perrysmithmoss/vita-track:sha-077c30c56d2378603b9df10e922c4ccee61a758b
     ports:
       - "80:5500"
     env_file:
