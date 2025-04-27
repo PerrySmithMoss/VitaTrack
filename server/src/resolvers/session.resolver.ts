@@ -9,7 +9,7 @@ import {
   getGoogleUser,
 } from "../services/user.service";
 import { PrismaContext } from "../types/PrismaContext";
-import { signJwt } from "../utils/jwt.utils";
+import { signJwt } from "../utils/jwt";
 import {
   accessTokenCookieOptions,
   refreshTokenCookieOptions,

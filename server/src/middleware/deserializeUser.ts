@@ -1,6 +1,6 @@
 import { MiddlewareFn } from "type-graphql";
 import { PrismaContext } from "../types/PrismaContext";
-import { verifyJwt } from "../utils/jwt.utils";
+import { verifyJwt } from "../utils/jwt";
 import { reIssueAccessToken } from "../services/session.service";
 import { config } from "../config/config";
 
@@ -25,8 +25,8 @@ const deserializeUser: MiddlewareFn<PrismaContext> = async (
           httpOnly: true,
           domain: config.serverDomain,
           path: "/",
-          sameSite: config.serverEnv === "prod" ? "none" : "lax",
-          secure: config.serverEnv === "prod" ? true : false,
+          sameSite: config.serverEnv === "production" ? "none" : "lax",
+          secure: config.serverEnv === "production" ? true : false,
         });
       }
 
@@ -59,8 +59,8 @@ const deserializeUser: MiddlewareFn<PrismaContext> = async (
         httpOnly: true,
         domain: config.serverDomain,
         path: "/",
-        sameSite: config.serverEnv === "prod" ? "none" : "lax",
-        secure: config.serverEnv === "prod" ? true : false,
+        sameSite: config.serverEnv === "production" ? "none" : "lax",
+        secure: config.serverEnv === "production" ? true : false,
       });
     }
 

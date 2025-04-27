@@ -1,6 +1,6 @@
 import { config } from "../config/config";
 import prisma from "../lib/prisma";
-import { signJwt, verifyJwt } from "../utils/jwt.utils";
+import { signJwt, verifyJwt } from "../utils/jwt";
 import { findUserById } from "./user.service";
 
 export async function createSession(userId: string, userAgent: string) {

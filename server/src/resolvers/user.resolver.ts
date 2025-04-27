@@ -14,7 +14,7 @@ import { requireUser } from "../middleware/requireUser";
 import deserializeUser from "../middleware/deserializeUser";
 import { createUser, findUserByEmail } from "../services/user.service";
 import { createSession, invalidateSession } from "../services/session.service";
-import { signJwt } from "../utils/jwt.utils";
+import { signJwt } from "../utils/jwt";
 import { config } from "../config/config";
 import argon2, { hash } from "argon2";
 import {
@@ -445,20 +445,20 @@ export class UserResolver {
 
       await invalidateSession(sessionId);
 
-      if (config.serverEnv === "prod") {
+      if (config.serverEnv === "production") {
         ctx.res.clearCookie(config.accessTokenCookieName as string, {
           httpOnly: true,
           domain: config.serverDomain,
           path: "/",
-          sameSite: config.serverEnv === "prod" ? "none" : "lax",
-          secure: config.serverEnv === "prod" ? true : false,
+          sameSite: config.serverEnv === "production" ? "none" : "lax",
+          secure: config.serverEnv === "production" ? true : false,
         });
         ctx.res.clearCookie(config.refreshTokenCookieName as string, {
           httpOnly: true,
           domain: config.serverDomain,
           path: "/",
-          sameSite: config.serverEnv === "prod" ? "none" : "lax",
-          secure: config.serverEnv === "prod" ? true : false,
+          sameSite: config.serverEnv === "production" ? "none" : "lax",
+          secure: config.serverEnv === "production" ? true : false,
         });
       } else {
         ctx.res.clearCookie("accessToken");
