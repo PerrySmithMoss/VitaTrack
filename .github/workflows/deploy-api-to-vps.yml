@@ -45,7 +45,8 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository }}
+          # repository name must be all lowercase
+          images: ghcr.io/${{ github.repository_owner }}/vitatrack
           tags: |
             type=sha,format=long
             type=ref,event=branch
@@ -81,8 +82,8 @@ jobs:
 #         - build-and-push-image
 #     steps:
 #           This step not needed?
-#         - name: Checkout code
-#           uses: actions/checkout@v2
+# - name: Checkout code
+#   uses: actions/checkout@v4
 
 #         - name: create env file
 #           run: |
@@ -93,7 +94,7 @@ jobs:
 #           with:
 #               name: VitaTrack
 #               file: docker-stack.yaml
-#               host: perrysmithmoss.com # or IP address of VPS?
+#               host: ${{ secrets.VPS_IP }}
 #               user: deploy
 #               ssh_key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
-#               env_file: ./envfile
+#               # env_file: ./envfile
