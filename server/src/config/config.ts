@@ -20,11 +20,11 @@ export const config = {
 
   jwtPublicKey: loadSecret(
     "/run/secrets/vita-track_jwt_public_key",
-    "PUBLIC_KEY"
+    "JWT_PUBLIC_KEY"
   ),
   jwtPrivateKey: loadSecret(
     "/run/secrets/vita-track_jwt_private_key",
-    "PRIVATE_KEY"
+    "JWT_PRIVATE_KEY"
   ),
   accessTokenTtl: process.env.ACCESS_TOKEN_TTL || "15m",
   refreshTokenTtl: process.env.REFRESH_TOKEN_TTL || "7d",
