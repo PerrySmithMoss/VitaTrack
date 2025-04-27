@@ -1,27 +1,44 @@
 import dotenv from "dotenv";
+import { loadSecret } from "../utils/loadSecret";
 
 dotenv.config();
 
 export const config = {
   isProduction: process.env.NODE_ENV === "production",
 
-  serverEnv: process.env.SERVER_ENV,
-  serverPort: process.env.PORT,
+  serverEnv: process.env.SERVER_ENV || "development",
+  serverPort: process.env.PORT || 5500,
   serverDomain: process.env.SERVER_DOMAIN,
-  clientURL: process.env.CLIENT_URL,
   serverURL: process.env.SERVER_URL,
   defaultUserAvatarPath: process.env.DEFAULT_USER_AVATAR_PATH,
+  clientURL: process.env.CLIENT_URL,
 
-  databaseURL: process.env.DATABASE_URL,
+  databaseURL: loadSecret(
+    "/run/secrets/vita-track_database_url",
+    "DATABASE_URL"
+  ),
 
-  publicKey: process.env.PUBLIC_KEY,
-  privateKey: process.env.PRIVATE_KEY,
-  accessTokenTtl: process.env.ACCESS_TOKEN_TTL,
-  refreshTokenTtl: process.env.REFRESH_TOKEN_TTL,
-  accessTokenCookieName: process.env.ACCESS_TOKEN_COOKIE_NAME,
-  refreshTokenCookieName: process.env.REFRESH_TOKEN_COOKIE_NAME,
+  jwtPublicKey: loadSecret(
+    "/run/secrets/vita-track_jwt_public_key",
+    "PUBLIC_KEY"
+  ),
+  jwtPrivateKey: loadSecret(
+    "/run/secrets/vita-track_jwt_private_key",
+    "PRIVATE_KEY"
+  ),
+  accessTokenTtl: process.env.ACCESS_TOKEN_TTL || "15m",
+  refreshTokenTtl: process.env.REFRESH_TOKEN_TTL || "7d",
+  accessTokenCookieName: process.env.ACCESS_TOKEN_COOKIE_NAME || "accessToken",
+  refreshTokenCookieName:
+    process.env.REFRESH_TOKEN_COOKIE_NAME || "refreshToken",
 
-  googleClientID: process.env.GOOGLE_CLIENT_ID,
-  googleClientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  googleClientID: loadSecret(
+    "/run/secrets/vita-track_google_client_id",
+    "GOOGLE_CLIENT_ID"
+  ),
+  googleClientSecret: loadSecret(
+    "/run/secrets/vita-track_google_client_secret",
+    "GOOGLE_CLIENT_SECRET"
+  ),
   googleOauthRedirectUrl: process.env.GOOGLE_OAUTH_REDIRECT_URL,
 };
