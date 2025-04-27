@@ -74,9 +74,7 @@ jobs:
           name: Release v1.0.${{ github.run_number }}
           body: |
             Automated release for commit ${{ github.sha }}
-
-            Docker images:
-            ${{ join(fromJSON(steps.meta.outputs.json).tags, '\n- ') }}
+            Docker image: ${{ env.IMAGE_NAME }}
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
