@@ -1,23 +1,70 @@
-version: "3.8"
+version: "3.9"
 
 services:
-  db:
+  postgres:
     image: postgres:17.4
-    container_name: postgres
+    container_name: postgres_db
+    restart: unless-stopped
+    secrets:
+      - postgres_user
+      - postgres_password
     environment:
-      POSTGRES_DB: vita_track
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: adminpassword
+      - POSTGRES_DB=vita_track
+      - POSTGRES_USER_FILE=/run/secrets/postgres_user
+      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
     networks:
-      - server
+      - portfolio_network
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
 
+  api:
+    # build:
+    #   context: ./server
+    #   dockerfile: Dockerfile
+    image: ghcr.io/PerrySmithMoss/VitaTrack:0222879a3f423ff960397c19c2cc57f886c35160
+    ports:
+      - "80:5500"
+    env_file:
+      - ./server/.env.production
+    environment:
+      # Mapping secrets to env var names your app understands
+      DATABASE_URL: /run/secrets/vita-track_database_url
+      GOOGLE_CLIENT_ID: /run/secrets/vita-track_google_client_id
+      GOOGLE_CLIENT_SECRET: /run/secrets/vita-track_google_client_secret
+      JWT_PRIVATE_KEY: /run/secrets/vita-track_jwt_private_key
+      JWT_PUBLIC_KEY: /run/secrets/vita-track_jwt_public_key
+    secrets:
+      - vita-track_database_url
+      - vita-track_google_client_id
+      - vita-track_google_client_secret
+      - vita-track_jwt_private_key
+      - vita-track_jwt_public_key
+    depends_on:
+      - postgres
+    networks:
+      - portfolio_network
+
+networks:
+  portfolio_network:
+    external: true
+
 volumes:
   postgres_data:
 
-networks:
-  server:
-    driver: bridge
+secrets:
+  postgres_user:
+    external: true
+  postgres_password:
+    external: true
+  vita-track_database_url:
+    external: true
+  vita-track_google_client_id:
+    external: true
+  vita-track_google_client_secret:
+    external: true
+  vita-track_jwt_private_key:
+    external: true
+  vita-track_jwt_public_key:
+    external: true
