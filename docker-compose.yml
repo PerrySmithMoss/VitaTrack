@@ -22,7 +22,7 @@ services:
     # build:
     #   context: ./server
     #   dockerfile: Dockerfile
-    image: ghcr.io/perrysmithmoss/vita-track:sha-b2a21ea2cc66ba2a265130294c41379406a27d3b
+    image: ghcr.io/perrysmithmoss/vita-track:sha-3694885694abfb51388593deb98f76287ae6a2e6
     ports:
       - "80:5500"
     env_file:

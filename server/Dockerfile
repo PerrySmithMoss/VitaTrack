@@ -32,6 +32,9 @@ RUN yarn install --production --frozen-lockfile
 # Stage 3: Final image
 FROM node:22.14.0-bullseye-slim AS runner
 
+# Install tini (smallest init system to handle signals properly)
+RUN apt-get update && apt-get install -y tini && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 # Copy ONLY what's needed from previous stages
@@ -43,10 +46,20 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=builder /app/node_modules/@prisma /app/node_modules/@prisma
 COPY --from=builder /app/node_modules/.prisma /app/node_modules/.prisma
 
-RUN chown -R node:node /app
+# Copy entrypoint script 
+# TODO: is there anyway to get around this, so we don't have to have this 
+# dedicated step for loading and converting the DATABASE_URL to an 
+# environment variable?
+COPY scripts/deployment-entry.sh /deployment-entry.sh
+RUN chmod +x /deployment-entry.sh
 
+# Drop privileges
+RUN chown -R node:node /app
 USER node
+
+# Configure tini
+ENTRYPOINT ["/usr/bin/tini", "--"]
 
 EXPOSE 5500
 
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/server.js"]
+CMD ["/deployment-entry.sh"]
