@@ -3,7 +3,8 @@ version: "3.9"
 services:
   postgres:
     image: postgres:17.4
-    restart: unless-stopped
+    ports:
+      - "5432:5432"
     secrets:
       - postgres_user
       - postgres_password
@@ -15,16 +16,18 @@ services:
       - portfolio_network
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
 
   api:
     # build:
     #   context: ./server
     #   dockerfile: Dockerfile
-    image: ghcr.io/perrysmithmoss/vita-track:sha-3694885694abfb51388593deb98f76287ae6a2e6
+    image: ghcr.io/perrysmithmoss/vita-track:${GIT_COMMIT_HASH:latest}
     ports:
       - "80:5500"
+    deploy:
+      update_config:
+        # Wish version of blue/green deployments
+        order: start-first
     env_file:
       - ./server/.env.production
     environment:
