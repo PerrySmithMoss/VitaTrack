@@ -20,6 +20,8 @@ services:
         protocol: tcp
         published: 443
         target: 443
+    networks:
+      - portfolio_network
     volumes:
       - letsencrypt:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock
@@ -45,6 +47,8 @@ services:
 
   vita-track-api:
     image: ghcr.io/perrysmithmoss/vita-track:${GIT_COMMIT_HASH:-latest}
+    env_file:
+      - ./server/.env.production
     environment:
       - DATABASE_URL=/run/secrets/vita-track_database_url
       - GOOGLE_CLIENT_ID=/run/secrets/vita-track_google_client_id
@@ -80,6 +84,10 @@ networks:
     external: true
 
 secrets:
+  postgres_user:
+    external: true
+  postgres_password:
+    external: true
   vita-track_database_url:
     external: true
   vita-track_google_client_id:
