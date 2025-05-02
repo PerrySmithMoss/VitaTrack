@@ -6,7 +6,6 @@ services:
       - "--providers.docker.exposedbydefault=false"
       - "--entryPoints.websecure.address=:443"
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      # should we pass acme.email as an env or arg?
       - "--certificatesresolvers.myresolver.acme.email=${ACME_EMAIL}"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
       - "--entrypoints.web.address=:80"
@@ -61,7 +60,6 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.vita-track-api.loadbalancer.server.port=5500"
-      # should we pass web.rule=Host as an env or arg?
       - "traefik.http.routers.vita-track-api.rule=Host(`vita-track-api.perrysmithmoss.com`)"
       - "traefik.http.routers.vita-track-api.entrypoints=websecure"
       - "traefik.http.routers.vita-track-api.tls.certresolver=myresolver"

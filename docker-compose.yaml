@@ -21,7 +21,7 @@ services:
     # build:
     #   context: ./server
     #   dockerfile: Dockerfile
-    image: ghcr.io/perrysmithmoss/vita-track:${GIT_COMMIT_HASH:latest}
+    image: ghcr.io/perrysmithmoss/vita-track:${GIT_COMMIT_HASH:-latest}
     ports:
       - "80:5500"
     deploy:
