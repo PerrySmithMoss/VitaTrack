@@ -11,6 +11,7 @@ import {
   GetUsersWorkoutsQuery,
   useDeleteExerciseMutation,
   useGetUsersWorkoutsQuery,
+  StrengthSet,
 } from '../../../graphql/generated/graphql';
 import { useGlobalContext } from '../../../state/context/global.context';
 import { Popover } from '../../Popover/Popover';
@@ -19,6 +20,15 @@ interface ExerciseProps {
   exercise: IExercise;
   exIndex: number;
 }
+
+type EditableStrengthSetKey = 'notes' | 'reps' | 'setNumber' | 'weight';
+type EditableCardioSetKey =
+  | 'notes'
+  | 'seconds'
+  | 'distance'
+  | 'caloriesBurned'
+  | 'minutes'
+  | 'setNumber';
 
 export const Exercise: React.FC<ExerciseProps> = ({ exIndex, exercise }) => {
   const scrollRef = useRef<HTMLLIElement | null>(null);
@@ -46,9 +56,24 @@ export const Exercise: React.FC<ExerciseProps> = ({ exIndex, exercise }) => {
 
     let exercises: IExercise[] = [...workoutExercises];
 
-    exercises[exerciseIndex].strengthSets[setIndex][
-      (name as 'notes') || 'reps' || 'setNumber' || 'weight'
-    ] = value;
+    if (['notes', 'reps', 'setNumber', 'weight'].includes(name)) {
+      const typedName = name as EditableStrengthSetKey;
+
+      // Handle each property according to its expected type
+      if (typedName === 'setNumber') {
+        // Convert to number for setNumber or set to null if empty
+        exercises[exerciseIndex].strengthSets[setIndex][typedName] =
+          value === '' ? null : parseInt(value, 10);
+      } else if (
+        typedName === 'notes' ||
+        typedName === 'reps' ||
+        typedName === 'weight'
+      ) {
+        // These fields accept string or null
+        exercises[exerciseIndex].strengthSets[setIndex][typedName] =
+          value === '' ? null : value;
+      }
+    }
 
     setWorkoutExercises(exercises);
   };
@@ -62,13 +87,30 @@ export const Exercise: React.FC<ExerciseProps> = ({ exIndex, exercise }) => {
 
     let exercises: IExercise[] = [...workoutExercises];
 
-    exercises[exerciseIndex].cardioSets[setIndex][
-      (name as 'notes') ||
-        'seconds' ||
-        'distance' ||
-        'caloriesBurned' ||
-        'minutes'
-    ] = value;
+    // Check if the name is a valid editable property for CardioSet
+    if (
+      [
+        'notes',
+        'seconds',
+        'distance',
+        'caloriesBurned',
+        'minutes',
+        'setNumber',
+      ].includes(name)
+    ) {
+      const typedName = name as EditableCardioSetKey;
+
+      // Handle each property according to its expected type
+      if (typedName === 'setNumber') {
+        // Convert to number for setNumber or set to null if empty
+        exercises[exerciseIndex].cardioSets[setIndex][typedName] =
+          value === '' ? null : parseInt(value, 10);
+      } else {
+        // These fields accept string or null
+        exercises[exerciseIndex].cardioSets[setIndex][typedName] =
+          value === '' ? null : value;
+      }
+    }
 
     setWorkoutExercises(exercises);
   };
@@ -148,7 +190,9 @@ export const Exercise: React.FC<ExerciseProps> = ({ exIndex, exercise }) => {
                       <Popover>
                         <ul>
                           <li
-                            onClick={() => handleDeleteExercise(exercise.id, exIndex)}
+                            onClick={() =>
+                              handleDeleteExercise(exercise.id, exIndex)
+                            }
                             className="p-3 flex items-center space-x-1 text-red-500 rounded-md cursor-pointer hover:bg-gray-200"
                           >
                             <AiOutlineDelete
