@@ -12,12 +12,11 @@ type UserInput = {
 
 export async function createUser(userInput: UserInput) {
   const hashedPassword = await hash(userInput.password);
-  const { isProduction, serverDomain, serverPort, defaultUserAvatarPath } =
-    config;
+  const { isProduction, serverURL, serverPort, defaultUserAvatarPath } = config;
 
   const avatarURL = isProduction
-    ? `${serverDomain}/${defaultUserAvatarPath}`
-    : `${serverDomain}:${serverPort}/${defaultUserAvatarPath}`;
+    ? `${serverURL}/${defaultUserAvatarPath}`
+    : `${serverURL}:${serverPort}/${defaultUserAvatarPath}`;
 
   return await prisma.user.create({
     data: {
