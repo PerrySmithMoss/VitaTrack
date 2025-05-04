@@ -1,4 +1,4 @@
-schema: 'https://vita-track-api.perrysmithmoss.com/graphql'
+schema: './graphql.schema.json'
 documents: 'graphql/**/*/*.graphql'
 overwrite: true
 generates:
