@@ -58,7 +58,6 @@ export const MyProfile: React.FC<MyProfileProps> = () => {
     resolver: zodResolver(createUserSchema),
   });
 
-
   async function onSubmit(values: CreateUserInput) {
     try {
       updateUser(values);
@@ -172,7 +171,7 @@ export const MyProfile: React.FC<MyProfileProps> = () => {
             {errors.username?.message}
           </p>
         </div>
-        <div className='mb-5'>
+        <div className="mb-5">
           <label
             htmlFor="name"
             className="text-gray-800 font-medium leading-tight tracking-normal"
@@ -188,7 +187,6 @@ export const MyProfile: React.FC<MyProfileProps> = () => {
             defaultValue={data?.getCurrentUser?.data?.gender}
             aria-label="Gender"
             className="block mb-1 w-full max-w-[300px]  px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-brand-green focus:ring-brand-green focus:outline-none focus:ring focus:ring-opacity-40"
-            placeholder="Select your gender"
           >
             <option value="Female">Female</option>
             <option value="Male">Male</option>
@@ -197,7 +195,7 @@ export const MyProfile: React.FC<MyProfileProps> = () => {
             {errors.gender?.message}
           </p>
         </div>
-        <div className='mb-5'>
+        <div className="mb-5">
           <label
             htmlFor="name"
             className="text-gray-800 font-medium leading-tight tracking-normal"
@@ -220,7 +218,7 @@ export const MyProfile: React.FC<MyProfileProps> = () => {
             {errors.email?.message}
           </p>
         </div>
-        <div className='mb-5'>
+        <div className="mb-5">
           <label
             htmlFor="name"
             className="text-gray-800 font-medium leading-tight tracking-normal"

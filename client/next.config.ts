@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   images: {
     domains: [
-      'vitatrack.onrender.com',
+      'vita-track-api.perrysmithmoss.com',
       'nix-tag-images.s3.amazonaws.com',
       'assets.syndigo.cloud',
       'nutritionix-api.s3.amazonaws.com',

@@ -8,7 +8,7 @@ import {
 } from '../../../../graphql/generated/graphql';
 import { Modal } from '../../../Modals/Modal';
 import styles from './TodaysWorkout.module.css';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import moment from 'moment';
 import { useGlobalContext } from '../../../../state/context/global.context';
@@ -43,7 +43,7 @@ export const TodaysWorkout: React.FC<TodaysWorkoutProps> = () => {
     workoutExercises,
     setWorkoutExercises,
   } = useGlobalContext();
-  const router = useRouter()
+  const router = useRouter();
 
   const { data: todaysWorkout, refetch: fetchTodaysWorkout } =
     useGetUsersWorkoutByDateQuery();
@@ -95,18 +95,20 @@ export const TodaysWorkout: React.FC<TodaysWorkoutProps> = () => {
   }
 
   const handleViewWorkouts = () => {
-    router.push("/account/workouts")
-  }
+    router.push('/account/workouts');
+  };
 
   const handleAddWorkoutForToday = () => {
-    setWorkoutExercises([])
-    setIsAddWorkoutModalOpen(true)
-  }
+    setWorkoutExercises([]);
+    setIsAddWorkoutModalOpen(true);
+  };
 
   if (todaysWorkout?.getUsersWorkoutByDate.data) {
     return (
       <section className="mt-2">
-        <h2 className="text-2xl font-bold text-[#2b3042]">Today&apos;s Workout</h2>
+        <h2 className="text-2xl font-bold text-[#2b3042]">
+          Today&apos;s Workout
+        </h2>
         <div className="shadow h-[270px] min-w-[300px] rounded-lg mt-5 w-full  bg-[#fafafa] flex items-center flex-col justify-center">
           <div className="mt-6">
             <GiWeightLiftingUp size={70} color="#2b3042" />
@@ -140,8 +142,9 @@ export const TodaysWorkout: React.FC<TodaysWorkoutProps> = () => {
               >
                 <div>
                   <button
-                  onClick={handleViewWorkouts}
-                  className="rounded inline-flex my-0 mx-auto bg-gray-50 hover:bg-gray-100 px-7 border py-1">
+                    onClick={handleViewWorkouts}
+                    className="rounded inline-flex my-0 mx-auto bg-gray-50 hover:bg-gray-100 px-7 border py-1"
+                  >
                     View
                   </button>
                 </div>
@@ -154,10 +157,12 @@ export const TodaysWorkout: React.FC<TodaysWorkoutProps> = () => {
   }
   return (
     <section className="mt-2 pr-4">
-      <h2 className="text-2xl font-bold text-[#2b3042]">Today&apos;s Workout</h2>
+      <h2 className="text-2xl font-bold text-[#2b3042]">
+        Today&apos;s Workout
+      </h2>
       <div className="shadow h-[200px] xs:h-[270px] w-full xxs:w-[300px] rounded-lg mt-5  bg-[#fafafa] flex items-center flex-col justify-center">
         <p className="px-6 xxs:px-14 text-center font-medium text-lg leading-6">
-          You have not yet added a workout for today. 
+          You have not yet added a workout for today.
         </p>
         <div>
           <button
@@ -167,10 +172,10 @@ export const TodaysWorkout: React.FC<TodaysWorkoutProps> = () => {
             Add workout
           </button>
         </div>
-        <div className='mt-5'>
+        <div className="mt-5">
           <Link href="/account/workouts">
-            <span className='text-brand-green cursor-pointer hover:text-brand-green-hover'>
-            My workouts
+            <span className="text-brand-green cursor-pointer hover:text-brand-green-hover">
+              My workouts
             </span>
           </Link>
         </div>

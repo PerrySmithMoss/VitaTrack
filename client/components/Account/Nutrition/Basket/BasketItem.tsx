@@ -245,7 +245,12 @@ export const BasketItem: React.FC<BasketItemProps> = ({
       key={food.food_name}
       className="p-3 border-t border-b flex flow-row items-center space-x-3"
     >
-      <Image src={food.photo.thumb} height={35} width={35} />
+      <Image
+        src={food.photo.thumb}
+        height={35}
+        width={35}
+        alt={food.food_name}
+      />
       <div className="flex-grow w-full max-w-[280px]">
         {food.brand_name ? (
           <div className="flex-col flex">
