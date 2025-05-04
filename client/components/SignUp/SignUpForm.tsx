@@ -26,7 +26,6 @@ export const SignUpForm: React.FC<SignUpFormProps> = () => {
       onSuccess: () => handleSuccessfulSignUp(),
     });
 
-  console.log('user: ', data);
   function handleSuccessfulSignUp() {
     refetchCurrentUser();
 

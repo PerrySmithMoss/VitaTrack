@@ -36,7 +36,6 @@ export const SetupForm: React.FC<SetupFormProps> = () => {
     <div className="flex justify-center h-screen z-10">
       <main className={styles.formContainer}>
         <div className={styles.formOuter}>
-          <span></span>
           {formStep === 3 ? (
             <div className="min-h-[650px] flex flex-col flex-wrap">
               <div className="flex justify-center w-full flex-col px-16 mt-10">
