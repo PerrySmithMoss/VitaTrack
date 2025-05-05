@@ -2,7 +2,7 @@ import { MiddlewareFn } from "type-graphql";
 import { PrismaContext } from "../types/PrismaContext";
 import { verifyJwt } from "../utils/jwt";
 import { reIssueAccessToken } from "../services/session.service";
-import { config } from "../config/config";
+import { accessTokenCookieOptions } from "../constants/cookieOptions";
 
 const deserializeUser: MiddlewareFn<PrismaContext> = async (
   { context },
@@ -20,14 +20,11 @@ const deserializeUser: MiddlewareFn<PrismaContext> = async (
         // Set header & cookie with the new access token in response
         context.res.setHeader("x-access-token", newAccessToken);
 
-        context.res.cookie("accessToken", newAccessToken, {
-          maxAge: 900000, // 15 mins
-          httpOnly: true,
-          domain: config.serverDomain,
-          path: "/",
-          sameSite: config.serverEnv === "production" ? "none" : "lax",
-          secure: config.serverEnv === "production" ? true : false,
-        });
+        context.res.cookie(
+          "accessToken",
+          newAccessToken,
+          accessTokenCookieOptions
+        );
       }
 
       // Verify the new access token
@@ -54,14 +51,11 @@ const deserializeUser: MiddlewareFn<PrismaContext> = async (
     if (newAccessToken) {
       context.res.setHeader("x-access-token", newAccessToken);
 
-      context.res.cookie("accessToken", newAccessToken, {
-        maxAge: 900000, // 15 mins
-        httpOnly: true,
-        domain: config.serverDomain,
-        path: "/",
-        sameSite: config.serverEnv === "production" ? "none" : "lax",
-        secure: config.serverEnv === "production" ? true : false,
-      });
+      context.res.cookie(
+        "accessToken",
+        newAccessToken,
+        accessTokenCookieOptions
+      );
     }
 
     const result = verifyJwt(newAccessToken as string);

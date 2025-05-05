@@ -11,10 +11,10 @@ export const accessTokenCookieOptions: CookieOptions = {
     In my case, my client and server are currently on separate domains 
     so the domain option is being conditionally added. 
    */
-  ...(config.serverEnv === "development" && { domain: "localhost" }),
+  ...(config.serverEnv === "development" ? { domain: "localhost" } : {}), // No domain property in production
 
   sameSite: config.serverEnv === "production" ? "none" : "lax",
-  secure: config.serverEnv === "production" ? true : false,
+  secure: config.serverEnv === "production",
 };
 
 export const refreshTokenCookieOptions: CookieOptions = {

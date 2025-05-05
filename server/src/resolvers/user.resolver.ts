@@ -240,7 +240,6 @@ export class UserResolver {
 
       // set cookies
       ctx.res.cookie("accessToken", accessToken, accessTokenCookieOptions);
-
       ctx.res.cookie("refreshToken", refreshToken, refreshTokenCookieOptions);
 
       return {
@@ -441,25 +440,8 @@ export class UserResolver {
 
       await invalidateSession(sessionId);
 
-      if (config.serverEnv === "production") {
-        ctx.res.clearCookie(config.accessTokenCookieName as string, {
-          httpOnly: true,
-          domain: config.serverDomain,
-          path: "/",
-          sameSite: config.serverEnv === "production" ? "none" : "lax",
-          secure: config.serverEnv === "production" ? true : false,
-        });
-        ctx.res.clearCookie(config.refreshTokenCookieName as string, {
-          httpOnly: true,
-          domain: config.serverDomain,
-          path: "/",
-          sameSite: config.serverEnv === "production" ? "none" : "lax",
-          secure: config.serverEnv === "production" ? true : false,
-        });
-      } else {
-        ctx.res.clearCookie("accessToken");
-        ctx.res.clearCookie("refreshToken");
-      }
+      ctx.res.clearCookie(config.accessTokenCookieName);
+      ctx.res.clearCookie(config.refreshTokenCookieName);
 
       ctx.res.removeHeader("x-access-token");
 
