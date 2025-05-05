@@ -13,10 +13,10 @@ import SyncLoader from 'react-spinners/SyncLoader';
 interface LoginFormProps {}
 
 export const LoginForm: React.FC<LoginFormProps> = () => {
+  const [code, setCode] = useState<string | null>(null);
   const processedCodeRef = useRef<string | null>(null);
   const isInitialMountRef = useRef(true);
   const router = useRouter();
-  const { code } = router.query;
   const { refetch: refetchCurrentUser } =
     useGetCurrentUserQuery<GetCurrentUserQuery>();
 
@@ -65,6 +65,15 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
       [name]: value,
     });
   }
+
+  useEffect(() => {
+    if (!router.isReady) return;
+
+    const queryCode = router.query.code;
+    if (typeof queryCode === 'string') {
+      setCode(queryCode);
+    }
+  }, [router.isReady, router.query]);
 
   // Handle OAuth code - using an approach that guarantees it runs only once
   useEffect(() => {
