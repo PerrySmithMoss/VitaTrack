@@ -15,8 +15,7 @@ import SyncLoader from 'react-spinners/SyncLoader';
 interface CalendarPageProps {}
 
 const CalendarPage: NextPage<CalendarPageProps> = () => {
-  const { data, isLoading, isError, error } =
-    useGetCurrentUserQuery<GetCurrentUserQuery>();
+  const { data, isLoading } = useGetCurrentUserQuery<GetCurrentUserQuery>();
 
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
@@ -26,7 +25,7 @@ const CalendarPage: NextPage<CalendarPageProps> = () => {
 
     // Handle authentication redirect after we know we're on the client
     // and the query has finished loading with no user data
-    if (mounted && !isLoading && !data?.getCurrentUser?.data) {
+    if (mounted && !isLoading && !data?.getCurrentUser?.data?.id) {
       router.push('/');
     }
   }, [mounted, isLoading, data, router]);
@@ -35,7 +34,7 @@ const CalendarPage: NextPage<CalendarPageProps> = () => {
     return null;
   }
 
-  if (data?.getCurrentUser?.data?.id) {
+  if (!isLoading && data?.getCurrentUser?.data?.id) {
     return (
       <>
         <Head>
@@ -62,6 +61,7 @@ const CalendarPage: NextPage<CalendarPageProps> = () => {
       </>
     );
   }
+
   return (
     <div className="flex justify-center items-center h-screen">
       <SyncLoader color={'#00CC99'} size={25} />

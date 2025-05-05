@@ -111,7 +111,7 @@ const WorkoutPage: NextPage<WorkoutPageProps> = () => {
 
     // Handle authentication redirect after we know we're on the client
     // and the query has finished loading with no user data
-    if (mounted && !isLoading && !data?.getCurrentUser?.data) {
+    if (mounted && !isLoading && !data?.getCurrentUser?.data?.id) {
       router.push('/');
     }
   }, [mounted, isLoading, data, router]);
@@ -120,7 +120,7 @@ const WorkoutPage: NextPage<WorkoutPageProps> = () => {
     return null;
   }
 
-  if (data?.getCurrentUser?.data?.id) {
+  if (!isLoading && data?.getCurrentUser?.data?.id) {
     return (
       <>
         <Head>

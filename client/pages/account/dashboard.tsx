@@ -42,7 +42,7 @@ const DashboardPage: NextPage<DashboardPageProps> = () => {
 
     // Handle authentication redirect after we know we're on the client
     // and the query has finished loading with no user data
-    if (mounted && !isLoading && !user?.getCurrentUser?.data) {
+    if (mounted && !isLoading && !user?.getCurrentUser?.data?.id) {
       router.push('/');
     }
   }, [mounted, isLoading, user, router]);
