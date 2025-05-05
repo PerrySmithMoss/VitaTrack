@@ -5,10 +5,9 @@ WORKDIR /app
 
 # Install system dependencies
 RUN apt-get update && \
-    apt-get install -y \
-    python3 \
-    make \
-    g++ && \
+    apt-get install -y python3 make g++ && \
+    ln -s /usr/bin/python3 /usr/bin/python && \
+    npm install -g node-gyp && \
     rm -rf /var/lib/apt/lists/*
 
 COPY package.json yarn.lock ./
@@ -28,6 +27,13 @@ RUN npx prisma generate && yarn build
 FROM node:22.14.0-bullseye-slim AS deps
 
 WORKDIR /app
+
+# Install production dependencies
+RUN apt-get update && \
+    apt-get install -y python3 make g++ && \
+    ln -s /usr/bin/python3 /usr/bin/python && \
+    npm install -g node-gyp && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY package.json yarn.lock ./
 RUN yarn install --production --frozen-lockfile
@@ -49,10 +55,6 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=builder /app/node_modules/@prisma /app/node_modules/@prisma
 COPY --from=builder /app/node_modules/.prisma /app/node_modules/.prisma
 
-# Copy entrypoint script 
-# TODO: is there anyway to get around this, so we don't have to have this 
-# dedicated step for loading and converting the DATABASE_URL to an 
-# environment variable?
 COPY scripts/deployment-entry.sh /deployment-entry.sh
 RUN chmod +x /deployment-entry.sh
 
