@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   GetCurrentUserQuery,
   useGetCurrentUserQuery,
@@ -8,34 +8,39 @@ import {
 } from '../../graphql/generated/graphql';
 import { getGoogleOAuthURL } from '../../utils/getGoogleOAuthURL';
 import styles from './Login.module.css';
+import SyncLoader from 'react-spinners/SyncLoader';
 
 interface LoginFormProps {}
 
 export const LoginForm: React.FC<LoginFormProps> = () => {
-  const {
-    push,
-    query: { code },
-  } = useRouter();
-  const [codeParam, setCodeParam] = useState('');
-
+  const processedCodeRef = useRef<string | null>(null);
+  const isInitialMountRef = useRef(true);
+  const router = useRouter();
+  const { code } = router.query;
   const { refetch: refetchCurrentUser } =
     useGetCurrentUserQuery<GetCurrentUserQuery>();
 
   function handleSuccessfulSignUp() {
     refetchCurrentUser();
 
-    push('/account/dashboard');
+    router.push('/account/dashboard');
   }
 
-  const { mutate: loginUsingGoogleCredentails } = useGoogleOauthHandlerMutation(
+  const { mutate: loginUsingGoogleCredentials } = useGoogleOauthHandlerMutation(
     {
       onSuccess: () => handleSuccessfulSignUp(),
+      onError: (error) => {
+        console.error('Google OAuth login error:', error);
+      },
     }
   );
 
-  const { mutate: loginUsingEmailAndPasswordCredentails } =
+  const { mutate: loginUsingEmailAndPasswordCredentials } =
     useLoginUserWithEmailAndPasswordMutation({
       onSuccess: () => handleSuccessfulSignUp(),
+      onError: (error) => {
+        console.error('Email login error:', error);
+      },
     });
 
   const [user, setUser] = useState({
@@ -46,7 +51,7 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    loginUsingEmailAndPasswordCredentails({
+    loginUsingEmailAndPasswordCredentials({
       email: user.email,
       password: user.password,
     });
@@ -61,12 +66,27 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
     });
   }
 
+  // Handle OAuth code - using an approach that guarantees it runs only once
   useEffect(() => {
-    setCodeParam(code as string);
-    if (code) {
-      loginUsingGoogleCredentails({ code: code as string });
+    // Skip the first render in development (React 18 StrictMode double invocation)
+    if (isInitialMountRef.current) {
+      isInitialMountRef.current = false;
+      return;
     }
-  }, [code]);
+
+    // Only attempt to login if we have a code and it's a string
+    // AND we haven't processed this exact code before
+    if (code && typeof code === 'string' && processedCodeRef.current !== code) {
+      // Mark this code as processed immediately to prevent duplicate calls
+      processedCodeRef.current = code;
+
+      // Use setTimeout to ensure this runs after the current JS execution cycle
+      // This helps avoid any duplicate calls during React's rendering phases
+      setTimeout(() => {
+        loginUsingGoogleCredentials({ code });
+      }, 0);
+    }
+  }, [code, loginUsingGoogleCredentials]);
 
   return (
     <form onSubmit={onSubmit}>
@@ -163,6 +183,11 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
           </a> */}
         </div>
       </div>
+      {code && (
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          <SyncLoader color={'#00CC99'} size={25} />
+        </div>
+      )}
     </form>
   );
 };

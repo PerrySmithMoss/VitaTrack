@@ -24,12 +24,17 @@ const Home: NextPage<HomeProps> = () => {
     setMounted(true);
   });
 
+  useEffect(() => {
+    // Redirect to dashboard if user is already logged in
+    if (data?.getCurrentUser?.data && !isLoading && mounted) {
+      router.push('/account/dashboard');
+    }
+  }, [data, isLoading, mounted, router]);
+
   if (isLoading || !mounted) {
     return null;
   }
-  if (data?.getCurrentUser?.data && !isLoading) {
-    router.push('/account/dashboard');
-  }
+
   return (
     <>
       <Head>
