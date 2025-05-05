@@ -5,130 +5,132 @@ export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: string;
-  String: string;
-  Boolean: boolean;
-  Int: number;
-  Float: number;
-  DateTime: any;
+  ID: { input: string; output: string; }
+  String: { input: string; output: string; }
+  Boolean: { input: boolean; output: boolean; }
+  Int: { input: number; output: number; }
+  Float: { input: number; output: number; }
+  DateTime: { input: any; output: any; }
 };
 
 export type CardioSet = {
   __typename?: 'CardioSet';
-  caloriesBurned?: Maybe<Scalars['String']>;
-  createdAt: Scalars['DateTime'];
-  distance?: Maybe<Scalars['String']>;
+  caloriesBurned?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  distance?: Maybe<Scalars['String']['output']>;
   exercise: Exercise;
-  exerciseId: Scalars['ID'];
-  id: Scalars['Int'];
-  minutes?: Maybe<Scalars['String']>;
-  notes?: Maybe<Scalars['String']>;
-  seconds?: Maybe<Scalars['String']>;
-  setNumber?: Maybe<Scalars['Int']>;
-  updatedAt: Scalars['DateTime'];
+  exerciseId: Scalars['ID']['output'];
+  id: Scalars['Int']['output'];
+  minutes?: Maybe<Scalars['String']['output']>;
+  notes?: Maybe<Scalars['String']['output']>;
+  seconds?: Maybe<Scalars['String']['output']>;
+  setNumber?: Maybe<Scalars['Int']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
 };
 
 export type CardioSetInput = {
-  caloriesBurned?: InputMaybe<Scalars['String']>;
-  distance?: InputMaybe<Scalars['String']>;
-  minutes?: InputMaybe<Scalars['String']>;
-  notes?: InputMaybe<Scalars['String']>;
-  seconds?: InputMaybe<Scalars['String']>;
-  setNumber?: InputMaybe<Scalars['Int']>;
+  caloriesBurned?: InputMaybe<Scalars['String']['input']>;
+  distance?: InputMaybe<Scalars['String']['input']>;
+  minutes?: InputMaybe<Scalars['String']['input']>;
+  notes?: InputMaybe<Scalars['String']['input']>;
+  seconds?: InputMaybe<Scalars['String']['input']>;
+  setNumber?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type CurrCardioSet = {
-  caloriesBurned?: InputMaybe<Scalars['String']>;
-  distance?: InputMaybe<Scalars['String']>;
-  id?: InputMaybe<Scalars['Int']>;
-  minutes?: InputMaybe<Scalars['String']>;
-  notes?: InputMaybe<Scalars['String']>;
-  seconds?: InputMaybe<Scalars['String']>;
-  setNumber?: InputMaybe<Scalars['Int']>;
+  caloriesBurned?: InputMaybe<Scalars['String']['input']>;
+  distance?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  minutes?: InputMaybe<Scalars['String']['input']>;
+  notes?: InputMaybe<Scalars['String']['input']>;
+  seconds?: InputMaybe<Scalars['String']['input']>;
+  setNumber?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type CurrExercises = {
   cardioSets?: InputMaybe<Array<CurrCardioSet>>;
-  category: Scalars['String'];
-  exerciseType: Scalars['String'];
-  id?: InputMaybe<Scalars['Int']>;
-  name: Scalars['String'];
+  category: Scalars['String']['input'];
+  exerciseType: Scalars['String']['input'];
+  id?: InputMaybe<Scalars['Int']['input']>;
+  name: Scalars['String']['input'];
   strengthSets?: InputMaybe<Array<CurrStrengthSet>>;
-  unilateral?: InputMaybe<Scalars['Boolean']>;
+  unilateral?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type CurrStrengthSet = {
-  id?: InputMaybe<Scalars['Int']>;
-  notes?: InputMaybe<Scalars['String']>;
-  reps?: InputMaybe<Scalars['String']>;
-  setNumber?: InputMaybe<Scalars['Int']>;
-  weight?: InputMaybe<Scalars['String']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+  notes?: InputMaybe<Scalars['String']['input']>;
+  reps?: InputMaybe<Scalars['String']['input']>;
+  setNumber?: InputMaybe<Scalars['Int']['input']>;
+  weight?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Exercise = {
   __typename?: 'Exercise';
   cardioSets: Array<CardioSet>;
-  category: Scalars['String'];
-  createdAt: Scalars['DateTime'];
-  exerciseType: Scalars['String'];
-  id: Scalars['Int'];
-  name: Scalars['String'];
+  category: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  exerciseType: Scalars['String']['output'];
+  id: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
   strengthSets: Array<StrengthSet>;
-  unilateral?: Maybe<Scalars['Boolean']>;
-  updatedAt: Scalars['DateTime'];
+  unilateral?: Maybe<Scalars['Boolean']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
   workout: Workout;
-  workoutId: Scalars['Int'];
+  workoutId: Scalars['Int']['output'];
 };
 
 export type ExercisesInput = {
   cardioSets?: InputMaybe<Array<CardioSetInput>>;
-  category: Scalars['String'];
-  exerciseType: Scalars['String'];
-  name: Scalars['String'];
+  category: Scalars['String']['input'];
+  exerciseType: Scalars['String']['input'];
+  name: Scalars['String']['input'];
   strengthSets?: InputMaybe<Array<StrengthSetInput>>;
-  unilateral?: InputMaybe<Scalars['Boolean']>;
+  unilateral?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type Food = {
   __typename?: 'Food';
-  calories: Scalars['Int'];
-  carbohydrate: Scalars['Float'];
-  createdAt: Scalars['DateTime'];
-  fat: Scalars['Float'];
-  id: Scalars['ID'];
-  mealName: Scalars['String'];
-  name: Scalars['String'];
-  numOfServings: Scalars['Float'];
+  calories: Scalars['Int']['output'];
+  carbohydrate: Scalars['Float']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  fat: Scalars['Float']['output'];
+  id: Scalars['ID']['output'];
+  mealName: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  numOfServings: Scalars['Float']['output'];
   nutrition: Array<Nutrition>;
-  nutritionId: Scalars['ID'];
-  protein: Scalars['Float'];
-  servingSize: Scalars['String'];
-  sodium: Scalars['Float'];
-  sugar: Scalars['Float'];
-  updatedAt: Scalars['DateTime'];
+  nutritionId: Scalars['ID']['output'];
+  protein: Scalars['Float']['output'];
+  servingSize: Scalars['String']['output'];
+  sodium: Scalars['Float']['output'];
+  sugar: Scalars['Float']['output'];
+  updatedAt: Scalars['DateTime']['output'];
   user: User;
-  userId: Scalars['String'];
+  userId: Scalars['String']['output'];
 };
 
 export type FoodFieldError = {
   __typename?: 'FoodFieldError';
-  field: Scalars['String'];
-  message: Scalars['String'];
+  field: Scalars['String']['output'];
+  message: Scalars['String']['output'];
 };
 
 export type FoodInput = {
-  calories: Scalars['Int'];
-  carbohydrate: Scalars['Float'];
-  fat: Scalars['Float'];
-  mealName: Scalars['String'];
-  name: Scalars['String'];
-  numOfServings: Scalars['Float'];
-  protein: Scalars['Float'];
-  servingSize: Scalars['String'];
-  sodium: Scalars['Float'];
-  sugar: Scalars['Float'];
+  calories: Scalars['Int']['input'];
+  carbohydrate: Scalars['Float']['input'];
+  fat: Scalars['Float']['input'];
+  mealName: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  numOfServings: Scalars['Float']['input'];
+  protein: Scalars['Float']['input'];
+  servingSize: Scalars['String']['input'];
+  sodium: Scalars['Float']['input'];
+  sugar: Scalars['Float']['input'];
 };
 
 export type FoodResponse = {
@@ -145,61 +147,61 @@ export type FoodResponseIterable = {
 
 export type FoodResponseSimple = {
   __typename?: 'FoodResponseSimple';
-  data?: Maybe<Scalars['String']>;
+  data?: Maybe<Scalars['String']['output']>;
   errors?: Maybe<Array<FoodFieldError>>;
 };
 
 export type FoodResponseSuccess = {
   __typename?: 'FoodResponseSuccess';
   errors?: Maybe<Array<FoodFieldError>>;
-  message?: Maybe<Scalars['String']>;
+  message?: Maybe<Scalars['String']['output']>;
 };
 
 export type FoodsInput = {
-  calories: Scalars['Int'];
-  carbohydrate: Scalars['Float'];
-  fat: Scalars['Float'];
-  mealName: Scalars['String'];
-  name: Scalars['String'];
-  numOfServings: Scalars['Float'];
-  protein: Scalars['Float'];
-  servingSize: Scalars['String'];
-  sodium: Scalars['Float'];
-  sugar: Scalars['Float'];
+  calories: Scalars['Int']['input'];
+  carbohydrate: Scalars['Float']['input'];
+  fat: Scalars['Float']['input'];
+  mealName: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  numOfServings: Scalars['Float']['input'];
+  protein: Scalars['Float']['input'];
+  servingSize: Scalars['String']['input'];
+  sodium: Scalars['Float']['input'];
+  sugar: Scalars['Float']['input'];
 };
 
 export type Goals = {
   __typename?: 'Goals';
-  calories?: Maybe<Scalars['Int']>;
-  carbohydrate?: Maybe<Scalars['Int']>;
-  createdAt: Scalars['DateTime'];
-  currentWeight?: Maybe<Scalars['Float']>;
-  dailySteps: Scalars['Int'];
-  fat?: Maybe<Scalars['Int']>;
-  goalWeight?: Maybe<Scalars['Float']>;
-  id: Scalars['ID'];
-  protein?: Maybe<Scalars['Int']>;
-  startingWeight?: Maybe<Scalars['Float']>;
-  updatedAt: Scalars['DateTime'];
+  calories?: Maybe<Scalars['Int']['output']>;
+  carbohydrate?: Maybe<Scalars['Int']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  currentWeight?: Maybe<Scalars['Float']['output']>;
+  dailySteps: Scalars['Int']['output'];
+  fat?: Maybe<Scalars['Int']['output']>;
+  goalWeight?: Maybe<Scalars['Float']['output']>;
+  id: Scalars['ID']['output'];
+  protein?: Maybe<Scalars['Int']['output']>;
+  startingWeight?: Maybe<Scalars['Float']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
   user: User;
-  userId: Scalars['ID'];
+  userId: Scalars['ID']['output'];
 };
 
 export type GoalsFieldError = {
   __typename?: 'GoalsFieldError';
-  field: Scalars['String'];
-  message: Scalars['String'];
+  field: Scalars['String']['output'];
+  message: Scalars['String']['output'];
 };
 
 export type GoalsInput = {
-  calories?: InputMaybe<Scalars['Int']>;
-  carbohydrate?: InputMaybe<Scalars['Int']>;
-  currentWeight?: InputMaybe<Scalars['Float']>;
-  dailySteps?: InputMaybe<Scalars['Int']>;
-  fat?: InputMaybe<Scalars['Int']>;
-  goalWeight?: InputMaybe<Scalars['Float']>;
-  protein?: InputMaybe<Scalars['Int']>;
-  startingWeight?: InputMaybe<Scalars['Float']>;
+  calories?: InputMaybe<Scalars['Int']['input']>;
+  carbohydrate?: InputMaybe<Scalars['Int']['input']>;
+  currentWeight?: InputMaybe<Scalars['Float']['input']>;
+  dailySteps?: InputMaybe<Scalars['Int']['input']>;
+  fat?: InputMaybe<Scalars['Int']['input']>;
+  goalWeight?: InputMaybe<Scalars['Float']['input']>;
+  protein?: InputMaybe<Scalars['Int']['input']>;
+  startingWeight?: InputMaybe<Scalars['Float']['input']>;
 };
 
 export type GoalsResponse = {
@@ -210,8 +212,8 @@ export type GoalsResponse = {
 
 export type LogoutUserResponse = {
   __typename?: 'LogoutUserResponse';
-  message: Scalars['String'];
-  success: Scalars['Boolean'];
+  message: Scalars['String']['output'];
+  success: Scalars['Boolean']['output'];
 };
 
 export type Mutation = {
@@ -223,9 +225,9 @@ export type Mutation = {
   addNutritionWithFoods: NutritionResponse;
   createUser: UserResponse;
   createWorkout: WorkoutResponse;
-  deleteExercise: Scalars['Boolean'];
+  deleteExercise: Scalars['Boolean']['output'];
   deleteFoodFromMealByDate: FoodResponseSuccess;
-  deleteWorkout: Scalars['Boolean'];
+  deleteWorkout: Scalars['Boolean']['output'];
   editWorkout: WorkoutResponse;
   finishUserSetup: UserResponse;
   googleOauthHandler: SessionResponse;
@@ -237,15 +239,15 @@ export type Mutation = {
 
 
 export type MutationAddFoodArgs = {
-  date: Scalars['DateTime'];
+  date: Scalars['DateTime']['input'];
   foodInput: FoodInput;
-  nutritionId: Scalars['Int'];
+  nutritionId: Scalars['Int']['input'];
 };
 
 
 export type MutationAddFoodsv2Args = {
   foodInput: Array<FoodInput>;
-  nutritionId: Scalars['Int'];
+  nutritionId: Scalars['Int']['input'];
 };
 
 
@@ -267,74 +269,74 @@ export type MutationAddNutritionWithFoodsArgs = {
 
 
 export type MutationCreateUserArgs = {
-  email: Scalars['String'];
-  password: Scalars['String'];
-  username: Scalars['String'];
+  email: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+  username: Scalars['String']['input'];
 };
 
 
 export type MutationCreateWorkoutArgs = {
-  bodyweight?: InputMaybe<Scalars['Float']>;
-  endTime: Scalars['String'];
+  bodyweight?: InputMaybe<Scalars['Float']['input']>;
+  endTime: Scalars['String']['input'];
   exercises?: InputMaybe<Array<ExercisesInput>>;
-  name: Scalars['String'];
-  notes?: InputMaybe<Scalars['String']>;
-  startTime: Scalars['String'];
+  name: Scalars['String']['input'];
+  notes?: InputMaybe<Scalars['String']['input']>;
+  startTime: Scalars['String']['input'];
 };
 
 
 export type MutationDeleteExerciseArgs = {
-  exerciseId: Scalars['Float'];
+  exerciseId: Scalars['Float']['input'];
 };
 
 
 export type MutationDeleteFoodFromMealByDateArgs = {
-  date?: InputMaybe<Scalars['DateTime']>;
-  foodId: Scalars['Int'];
-  mealName: Scalars['String'];
+  date?: InputMaybe<Scalars['DateTime']['input']>;
+  foodId: Scalars['Int']['input'];
+  mealName: Scalars['String']['input'];
 };
 
 
 export type MutationDeleteWorkoutArgs = {
-  workoutId: Scalars['Float'];
+  workoutId: Scalars['Float']['input'];
 };
 
 
 export type MutationEditWorkoutArgs = {
-  bodyweight?: InputMaybe<Scalars['Float']>;
-  endTime: Scalars['String'];
+  bodyweight?: InputMaybe<Scalars['Float']['input']>;
+  endTime: Scalars['String']['input'];
   exercises?: InputMaybe<Array<CurrExercises>>;
-  name: Scalars['String'];
-  notes?: InputMaybe<Scalars['String']>;
-  startTime: Scalars['String'];
-  workoutId: Scalars['Float'];
+  name: Scalars['String']['input'];
+  notes?: InputMaybe<Scalars['String']['input']>;
+  startTime: Scalars['String']['input'];
+  workoutId: Scalars['Float']['input'];
 };
 
 
 export type MutationFinishUserSetupArgs = {
-  currentWeight: Scalars['Float'];
-  gender: Scalars['String'];
-  goalWeight: Scalars['Float'];
-  weightGoal: Scalars['String'];
+  currentWeight: Scalars['Float']['input'];
+  gender: Scalars['String']['input'];
+  goalWeight: Scalars['Float']['input'];
+  weightGoal: Scalars['String']['input'];
 };
 
 
 export type MutationGoogleOauthHandlerArgs = {
-  code: Scalars['String'];
+  code: Scalars['String']['input'];
 };
 
 
 export type MutationLoginUserWithEmailAndPasswordArgs = {
-  email: Scalars['String'];
-  password: Scalars['String'];
+  email: Scalars['String']['input'];
+  password: Scalars['String']['input'];
 };
 
 
 export type MutationUpdateUserArgs = {
-  email: Scalars['String'];
-  gender: Scalars['String'];
-  password: Scalars['String'];
-  username: Scalars['String'];
+  email: Scalars['String']['input'];
+  gender: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+  username: Scalars['String']['input'];
 };
 
 
@@ -344,31 +346,31 @@ export type MutationUpsertUserGoalsArgs = {
 
 export type Nutrition = {
   __typename?: 'Nutrition';
-  calories?: Maybe<Scalars['Int']>;
-  carbohydrate?: Maybe<Scalars['Int']>;
-  createdAt: Scalars['DateTime'];
-  date: Scalars['DateTime'];
-  fat?: Maybe<Scalars['Int']>;
+  calories?: Maybe<Scalars['Int']['output']>;
+  carbohydrate?: Maybe<Scalars['Int']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  date: Scalars['DateTime']['output'];
+  fat?: Maybe<Scalars['Int']['output']>;
   foods: Array<Food>;
-  id: Scalars['ID'];
-  protein?: Maybe<Scalars['Int']>;
-  updatedAt: Scalars['DateTime'];
+  id: Scalars['ID']['output'];
+  protein?: Maybe<Scalars['Int']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
   user: User;
-  userId: Scalars['ID'];
+  userId: Scalars['ID']['output'];
 };
 
 export type NutritionFieldError = {
   __typename?: 'NutritionFieldError';
-  field: Scalars['String'];
-  message: Scalars['String'];
+  field: Scalars['String']['output'];
+  message: Scalars['String']['output'];
 };
 
 export type NutritionInput = {
-  calories?: InputMaybe<Scalars['Int']>;
-  carbohydrate?: InputMaybe<Scalars['Int']>;
-  date: Scalars['DateTime'];
-  fat?: InputMaybe<Scalars['Int']>;
-  protein?: InputMaybe<Scalars['Int']>;
+  calories?: InputMaybe<Scalars['Int']['input']>;
+  carbohydrate?: InputMaybe<Scalars['Int']['input']>;
+  date: Scalars['DateTime']['input'];
+  fat?: InputMaybe<Scalars['Int']['input']>;
+  protein?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type NutritionResponse = {
@@ -385,12 +387,12 @@ export type NutritionResponseIterable = {
 
 export type Profile = {
   __typename?: 'Profile';
-  avatar?: Maybe<Scalars['String']>;
-  avatarId?: Maybe<Scalars['String']>;
-  bio?: Maybe<Scalars['String']>;
-  id: Scalars['ID'];
+  avatar?: Maybe<Scalars['String']['output']>;
+  avatarId?: Maybe<Scalars['String']['output']>;
+  bio?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
   user: Array<User>;
-  userId: Scalars['String'];
+  userId: Scalars['String']['output'];
 };
 
 export type Query = {
@@ -401,45 +403,45 @@ export type Query = {
   getCurrentUsersGoals: GoalsResponse;
   getCurrentUsersNutrition: NutritionResponseIterable;
   getCurrentUsersNutritionByDate: NutritionResponse;
-  getCurrentUsersRemainingCaloriesByDate: Scalars['Int'];
+  getCurrentUsersRemainingCaloriesByDate: Scalars['Int']['output'];
   getUsersWorkoutByDate: WorkoutResponse;
   getUsersWorkouts: WorkoutResponseIterable;
 };
 
 
 export type QueryGetCurrentUsersFoodByDateArgs = {
-  date?: InputMaybe<Scalars['DateTime']>;
+  date?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 
 export type QueryGetCurrentUsersNutritionByDateArgs = {
-  date?: InputMaybe<Scalars['DateTime']>;
+  date?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 
 export type QueryGetCurrentUsersRemainingCaloriesByDateArgs = {
-  date?: InputMaybe<Scalars['DateTime']>;
+  date?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 
 export type QueryGetUsersWorkoutByDateArgs = {
-  date?: InputMaybe<Scalars['DateTime']>;
+  date?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type Session = {
   __typename?: 'Session';
-  createdAt: Scalars['DateTime'];
-  updatedAt: Scalars['DateTime'];
+  createdAt: Scalars['DateTime']['output'];
+  updatedAt: Scalars['DateTime']['output'];
   user: Array<User>;
-  userAgent: Scalars['String'];
-  userId: Scalars['String'];
-  valid: Scalars['Boolean'];
+  userAgent: Scalars['String']['output'];
+  userId: Scalars['String']['output'];
+  valid: Scalars['Boolean']['output'];
 };
 
 export type SessionFieldError = {
   __typename?: 'SessionFieldError';
-  field: Scalars['String'];
-  message: Scalars['String'];
+  field: Scalars['String']['output'];
+  message: Scalars['String']['output'];
 };
 
 export type SessionResponse = {
@@ -450,47 +452,47 @@ export type SessionResponse = {
 
 export type StrengthSet = {
   __typename?: 'StrengthSet';
-  createdAt: Scalars['DateTime'];
+  createdAt: Scalars['DateTime']['output'];
   exercise: Exercise;
-  exerciseId: Scalars['ID'];
-  id: Scalars['Int'];
-  notes?: Maybe<Scalars['String']>;
-  reps?: Maybe<Scalars['String']>;
-  setNumber?: Maybe<Scalars['Int']>;
-  updatedAt: Scalars['DateTime'];
-  weight?: Maybe<Scalars['String']>;
+  exerciseId: Scalars['ID']['output'];
+  id: Scalars['Int']['output'];
+  notes?: Maybe<Scalars['String']['output']>;
+  reps?: Maybe<Scalars['String']['output']>;
+  setNumber?: Maybe<Scalars['Int']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
+  weight?: Maybe<Scalars['String']['output']>;
 };
 
 export type StrengthSetInput = {
-  notes?: InputMaybe<Scalars['String']>;
-  reps?: InputMaybe<Scalars['String']>;
-  setNumber?: InputMaybe<Scalars['Int']>;
-  weight?: InputMaybe<Scalars['String']>;
+  notes?: InputMaybe<Scalars['String']['input']>;
+  reps?: InputMaybe<Scalars['String']['input']>;
+  setNumber?: InputMaybe<Scalars['Int']['input']>;
+  weight?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type TokenResponse = {
   __typename?: 'TokenResponse';
-  access_token: Scalars['String'];
-  id_token: Scalars['String'];
+  access_token: Scalars['String']['output'];
+  id_token: Scalars['String']['output'];
 };
 
 export type User = {
   __typename?: 'User';
-  createdAt: Scalars['DateTime'];
-  email: Scalars['String'];
-  gender: Scalars['String'];
-  hasGoals: Scalars['Boolean'];
-  id: Scalars['String'];
+  createdAt: Scalars['DateTime']['output'];
+  email: Scalars['String']['output'];
+  gender: Scalars['String']['output'];
+  hasGoals: Scalars['Boolean']['output'];
+  id: Scalars['String']['output'];
   profile?: Maybe<Profile>;
   session?: Maybe<Session>;
-  updatedAt: Scalars['DateTime'];
-  username: Scalars['String'];
+  updatedAt: Scalars['DateTime']['output'];
+  username: Scalars['String']['output'];
 };
 
 export type UserFieldError = {
   __typename?: 'UserFieldError';
-  field: Scalars['String'];
-  message: Scalars['String'];
+  field: Scalars['String']['output'];
+  message: Scalars['String']['output'];
 };
 
 export type UserResponse = {
@@ -501,23 +503,23 @@ export type UserResponse = {
 
 export type Workout = {
   __typename?: 'Workout';
-  bodyweight?: Maybe<Scalars['Float']>;
-  createdAt: Scalars['DateTime'];
-  endTime: Scalars['String'];
+  bodyweight?: Maybe<Scalars['Float']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  endTime: Scalars['String']['output'];
   exercises: Array<Exercise>;
-  id: Scalars['Int'];
-  name: Scalars['String'];
-  notes?: Maybe<Scalars['String']>;
-  startTime: Scalars['String'];
-  updatedAt: Scalars['DateTime'];
+  id: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+  notes?: Maybe<Scalars['String']['output']>;
+  startTime: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
   user: User;
-  userId: Scalars['String'];
+  userId: Scalars['String']['output'];
 };
 
 export type WorkoutFieldError = {
   __typename?: 'WorkoutFieldError';
-  field: Scalars['String'];
-  message: Scalars['String'];
+  field: Scalars['String']['output'];
+  message: Scalars['String']['output'];
 };
 
 export type WorkoutResponse = {
@@ -534,8 +536,8 @@ export type WorkoutResponseIterable = {
 
 export type AddFoodMutationVariables = Exact<{
   foodInput: FoodInput;
-  date: Scalars['DateTime'];
-  nutritionId: Scalars['Int'];
+  date: Scalars['DateTime']['input'];
+  nutritionId: Scalars['Int']['input'];
 }>;
 
 
@@ -557,9 +559,9 @@ export type AddNutritionWithFoodsMutationVariables = Exact<{
 export type AddNutritionWithFoodsMutation = { __typename?: 'Mutation', addNutritionWithFoods: { __typename?: 'NutritionResponse', errors?: Array<{ __typename?: 'NutritionFieldError', field: string, message: string }> | null, data?: { __typename?: 'Nutrition', id: string, createdAt: any, updatedAt: any, date: any, calories?: number | null, protein?: number | null, fat?: number | null, carbohydrate?: number | null, userId: string } | null } };
 
 export type CreateUserMutationVariables = Exact<{
-  password: Scalars['String'];
-  email: Scalars['String'];
-  username: Scalars['String'];
+  password: Scalars['String']['input'];
+  email: Scalars['String']['input'];
+  username: Scalars['String']['input'];
 }>;
 
 
@@ -567,46 +569,46 @@ export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __type
 
 export type CreateWorkoutMutationVariables = Exact<{
   exercises: Array<ExercisesInput> | ExercisesInput;
-  endTime: Scalars['String'];
-  startTime: Scalars['String'];
-  name: Scalars['String'];
-  notes?: InputMaybe<Scalars['String']>;
-  bodyweight?: InputMaybe<Scalars['Float']>;
+  endTime: Scalars['String']['input'];
+  startTime: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  notes?: InputMaybe<Scalars['String']['input']>;
+  bodyweight?: InputMaybe<Scalars['Float']['input']>;
 }>;
 
 
 export type CreateWorkoutMutation = { __typename?: 'Mutation', createWorkout: { __typename?: 'WorkoutResponse', errors?: { __typename?: 'WorkoutFieldError', field: string, message: string } | null, data?: { __typename?: 'Workout', id: number, createdAt: any, updatedAt: any, name: string, startTime: string, endTime: string, bodyweight?: number | null, notes?: string | null, userId: string, exercises: Array<{ __typename?: 'Exercise', id: number, createdAt: any, updatedAt: any, name: string, category: string, exerciseType: string, unilateral?: boolean | null, workoutId: number, strengthSets: Array<{ __typename?: 'StrengthSet', id: number, createdAt: any, updatedAt: any, setNumber?: number | null, weight?: string | null, reps?: string | null, notes?: string | null, exerciseId: string }>, cardioSets: Array<{ __typename?: 'CardioSet', id: number, createdAt: any, updatedAt: any, setNumber?: number | null, minutes?: string | null, seconds?: string | null, distance?: string | null, caloriesBurned?: string | null, notes?: string | null, exerciseId: string }> }> } | null } };
 
 export type DeleteExerciseMutationVariables = Exact<{
-  exerciseId: Scalars['Float'];
+  exerciseId: Scalars['Float']['input'];
 }>;
 
 
 export type DeleteExerciseMutation = { __typename?: 'Mutation', deleteExercise: boolean };
 
 export type DeleteFoodFromMealByDateMutationVariables = Exact<{
-  mealName: Scalars['String'];
-  foodId: Scalars['Int'];
-  date?: InputMaybe<Scalars['DateTime']>;
+  mealName: Scalars['String']['input'];
+  foodId: Scalars['Int']['input'];
+  date?: InputMaybe<Scalars['DateTime']['input']>;
 }>;
 
 
 export type DeleteFoodFromMealByDateMutation = { __typename?: 'Mutation', deleteFoodFromMealByDate: { __typename?: 'FoodResponseSuccess', message?: string | null, errors?: Array<{ __typename?: 'FoodFieldError', field: string, message: string }> | null } };
 
 export type DeleteWorkoutMutationVariables = Exact<{
-  workoutId: Scalars['Float'];
+  workoutId: Scalars['Float']['input'];
 }>;
 
 
 export type DeleteWorkoutMutation = { __typename?: 'Mutation', deleteWorkout: boolean };
 
 export type EditWorkoutMutationVariables = Exact<{
-  endTime: Scalars['String'];
-  startTime: Scalars['String'];
-  name: Scalars['String'];
-  workoutId: Scalars['Float'];
-  bodyweight?: InputMaybe<Scalars['Float']>;
-  notes?: InputMaybe<Scalars['String']>;
+  endTime: Scalars['String']['input'];
+  startTime: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  workoutId: Scalars['Float']['input'];
+  bodyweight?: InputMaybe<Scalars['Float']['input']>;
+  notes?: InputMaybe<Scalars['String']['input']>;
   exercises?: InputMaybe<Array<CurrExercises> | CurrExercises>;
 }>;
 
@@ -614,25 +616,25 @@ export type EditWorkoutMutationVariables = Exact<{
 export type EditWorkoutMutation = { __typename?: 'Mutation', editWorkout: { __typename?: 'WorkoutResponse', errors?: { __typename?: 'WorkoutFieldError', field: string, message: string } | null, data?: { __typename?: 'Workout', id: number, createdAt: any, updatedAt: any, name: string, startTime: string, endTime: string, bodyweight?: number | null, notes?: string | null, userId: string, exercises: Array<{ __typename?: 'Exercise', id: number, createdAt: any, updatedAt: any, name: string, category: string, exerciseType: string, unilateral?: boolean | null, workoutId: number, strengthSets: Array<{ __typename?: 'StrengthSet', id: number, createdAt: any, updatedAt: any, setNumber?: number | null, weight?: string | null, reps?: string | null, notes?: string | null, exerciseId: string }>, cardioSets: Array<{ __typename?: 'CardioSet', id: number, createdAt: any, updatedAt: any, setNumber?: number | null, minutes?: string | null, seconds?: string | null, distance?: string | null, caloriesBurned?: string | null, notes?: string | null, exerciseId: string }> }> } | null } };
 
 export type FinishUserSetupMutationVariables = Exact<{
-  goalWeight: Scalars['Float'];
-  currentWeight: Scalars['Float'];
-  gender: Scalars['String'];
-  weightGoal: Scalars['String'];
+  goalWeight: Scalars['Float']['input'];
+  currentWeight: Scalars['Float']['input'];
+  gender: Scalars['String']['input'];
+  weightGoal: Scalars['String']['input'];
 }>;
 
 
 export type FinishUserSetupMutation = { __typename?: 'Mutation', finishUserSetup: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'UserFieldError', field: string, message: string }> | null, data?: { __typename?: 'User', id: string, createdAt: any, updatedAt: any, email: string, username: string, hasGoals: boolean, gender: string } | null } };
 
 export type GoogleOauthHandlerMutationVariables = Exact<{
-  code: Scalars['String'];
+  code: Scalars['String']['input'];
 }>;
 
 
 export type GoogleOauthHandlerMutation = { __typename?: 'Mutation', googleOauthHandler: { __typename?: 'SessionResponse', data?: { __typename?: 'TokenResponse', access_token: string, id_token: string } | null, errors?: Array<{ __typename?: 'SessionFieldError', field: string, message: string }> | null } };
 
 export type LoginUserWithEmailAndPasswordMutationVariables = Exact<{
-  password: Scalars['String'];
-  email: Scalars['String'];
+  password: Scalars['String']['input'];
+  email: Scalars['String']['input'];
 }>;
 
 
@@ -644,10 +646,10 @@ export type LogoutUserMutationVariables = Exact<{ [key: string]: never; }>;
 export type LogoutUserMutation = { __typename?: 'Mutation', logoutUser: { __typename?: 'LogoutUserResponse', message: string, success: boolean } };
 
 export type UpdateUserMutationVariables = Exact<{
-  password: Scalars['String'];
-  email: Scalars['String'];
-  gender: Scalars['String'];
-  username: Scalars['String'];
+  password: Scalars['String']['input'];
+  email: Scalars['String']['input'];
+  gender: Scalars['String']['input'];
+  username: Scalars['String']['input'];
 }>;
 
 
@@ -666,7 +668,7 @@ export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 export type GetCurrentUserQuery = { __typename?: 'Query', getCurrentUser?: { __typename?: 'UserResponse', data?: { __typename?: 'User', id: string, email: string, username: string, hasGoals: boolean, gender: string, profile?: { __typename?: 'Profile', avatar?: string | null, bio?: string | null, id: string } | null, session?: { __typename?: 'Session', userId: string, valid: boolean, userAgent: string, createdAt: any, updatedAt: any } | null } | null } | null };
 
 export type GetCurrentUsersFoodByDateQueryVariables = Exact<{
-  date?: InputMaybe<Scalars['DateTime']>;
+  date?: InputMaybe<Scalars['DateTime']['input']>;
 }>;
 
 
@@ -678,7 +680,7 @@ export type GetCurrentUsersGoalsQueryVariables = Exact<{ [key: string]: never; }
 export type GetCurrentUsersGoalsQuery = { __typename?: 'Query', getCurrentUsersGoals: { __typename?: 'GoalsResponse', errors?: Array<{ __typename?: 'GoalsFieldError', field: string, message: string }> | null, data?: { __typename?: 'Goals', id: string, createdAt: any, updatedAt: any, startingWeight?: number | null, currentWeight?: number | null, dailySteps: number, goalWeight?: number | null, calories?: number | null, protein?: number | null, fat?: number | null, carbohydrate?: number | null } | null } };
 
 export type GetCurrentUsersRemainingCaloriesByDateQueryVariables = Exact<{
-  date?: InputMaybe<Scalars['DateTime']>;
+  date?: InputMaybe<Scalars['DateTime']['input']>;
 }>;
 
 
@@ -695,7 +697,7 @@ export type GetCurrentUsersNutritionQueryVariables = Exact<{ [key: string]: neve
 export type GetCurrentUsersNutritionQuery = { __typename?: 'Query', getCurrentUsersNutrition: { __typename?: 'NutritionResponseIterable', errors?: Array<{ __typename?: 'NutritionFieldError', field: string, message: string }> | null, data?: Array<{ __typename?: 'Nutrition', id: string, createdAt: any, updatedAt: any, calories?: number | null, protein?: number | null, fat?: number | null, carbohydrate?: number | null, userId: string }> | null } };
 
 export type GetCurrentUsersNutritionByDateQueryVariables = Exact<{
-  date?: InputMaybe<Scalars['DateTime']>;
+  date?: InputMaybe<Scalars['DateTime']['input']>;
 }>;
 
 

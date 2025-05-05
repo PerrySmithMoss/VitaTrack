@@ -11,6 +11,14 @@ const nextConfig: NextConfig = {
       'd2eawub7utcl6.cloudfront.net',
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: `${process.env.NEXT_PUBLIC_SERVER_ENDPOINT}/:path*`,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
