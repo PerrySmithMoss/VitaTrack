@@ -22,6 +22,7 @@ import {
   refreshTokenCookieOptions,
 } from "../constants/cookieOptions";
 import { validateEmail } from "../utils/validateEmail";
+import { SignOptions } from "jsonwebtoken";
 
 @ObjectType()
 class UserFieldError {
@@ -124,27 +125,22 @@ export class UserResolver {
         };
       }
 
-      // create a session
       const session = await createSession(
         user.id,
         ctx.req.get("user-agent") || ""
       );
 
-      // create an access token
       const accessToken = signJwt(
         { ...user, session: session.userId },
-        { expiresIn: config.accessTokenTtl }
+        { expiresIn: config.accessTokenTtl as SignOptions["expiresIn"] }
       );
 
-      // create a refresh token
       const refreshToken = signJwt(
         { ...user, session: session.userId },
-        { expiresIn: config.refreshTokenTtl }
+        { expiresIn: config.refreshTokenTtl as SignOptions["expiresIn"] }
       );
 
-      // set cookies
       ctx.res.cookie("accessToken", accessToken, accessTokenCookieOptions);
-
       ctx.res.cookie("refreshToken", refreshToken, refreshTokenCookieOptions);
 
       return {
@@ -233,13 +229,13 @@ export class UserResolver {
       // create an access token
       const accessToken = signJwt(
         { ...registeredUser, session: session.userId },
-        { expiresIn: config.accessTokenTtl }
+        { expiresIn: config.accessTokenTtl as SignOptions["expiresIn"] }
       );
 
       // create a refresh token
       const refreshToken = signJwt(
         { ...registeredUser, session: session.userId },
-        { expiresIn: config.refreshTokenTtl }
+        { expiresIn: config.refreshTokenTtl as SignOptions["expiresIn"] }
       );
 
       // set cookies

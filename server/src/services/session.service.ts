@@ -1,3 +1,4 @@
+import { SignOptions } from "jsonwebtoken";
 import { config } from "../config/config";
 import prisma from "../lib/prisma";
 import { signJwt, verifyJwt } from "../utils/jwt";
@@ -61,7 +62,7 @@ export async function reIssueAccessToken(refreshToken: string) {
 
   const accessToken = signJwt(
     { ...user, session: session.userId },
-    { expiresIn: config.accessTokenTtl }
+    { expiresIn: config.accessTokenTtl as SignOptions["expiresIn"] }
   );
 
   return accessToken;

@@ -14,6 +14,7 @@ import {
   accessTokenCookieOptions,
   refreshTokenCookieOptions,
 } from "../constants/cookieOptions";
+import { SignOptions } from "jsonwebtoken";
 
 @ObjectType()
 class SessionFieldError {
@@ -50,7 +51,7 @@ export class SessionResolver {
     @Arg("code") code: string
   ) {
     // first change the escaped characters back to normal characters
-    const formattedCode = code.replace("%2F", "/");
+    const formattedCode = decodeURIComponent(code);
 
     try {
       const { id_token, access_token } = await getGoogleOAuthTokens(
@@ -73,7 +74,6 @@ export class SessionResolver {
         };
       }
 
-      // upsert the user
       const user = await findAndUpdateUser(googleUser.email, {
         email: googleUser.email,
         // We could split the name we get from googleUser on the first space
@@ -83,27 +83,22 @@ export class SessionResolver {
         picture: googleUser.picture,
       });
 
-      // create a session
       const session = await createSession(
         user.id,
         ctx.req.get("user-agent") || ""
       );
 
-      // create an access token
       const accessToken = signJwt(
         { ...user, session: session.userId },
-        { expiresIn: config.accessTokenTtl }
+        { expiresIn: config.accessTokenTtl as SignOptions["expiresIn"] }
       );
 
-      // create a refresh token
       const refreshToken = signJwt(
         { ...user, session: session.userId },
-        { expiresIn: config.refreshTokenTtl }
+        { expiresIn: config.refreshTokenTtl as SignOptions["expiresIn"] }
       );
 
-      // set cookies
       ctx.res.cookie("accessToken", accessToken, accessTokenCookieOptions);
-
       ctx.res.cookie("refreshToken", refreshToken, refreshTokenCookieOptions);
 
       return {
@@ -114,7 +109,7 @@ export class SessionResolver {
         errors: [
           {
             field: "error",
-            message: error,
+            message: error || "An unexpected error occurred.",
           },
         ],
       };
