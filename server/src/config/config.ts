@@ -18,14 +18,7 @@ export const config = {
     "DATABASE_URL"
   ),
 
-  jwtPublicKey: loadSecret(
-    "/run/secrets/vita-track_jwt_public_key",
-    "JWT_PUBLIC_KEY"
-  ),
-  jwtPrivateKey: loadSecret(
-    "/run/secrets/vita-track_jwt_private_key",
-    "JWT_PRIVATE_KEY"
-  ),
+  jwtSecret: loadSecret("/run/secrets/vita-track_jwt_secret", "JWT_SECRET"),
   accessTokenTtl: process.env.ACCESS_TOKEN_TTL || "15m",
   refreshTokenTtl: process.env.REFRESH_TOKEN_TTL || "7d",
   accessTokenCookieName: process.env.ACCESS_TOKEN_COOKIE_NAME || "accessToken",
