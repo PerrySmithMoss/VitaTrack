@@ -35,14 +35,12 @@ services:
       DATABASE_URL: /run/secrets/vita-track_database_url
       GOOGLE_CLIENT_ID: /run/secrets/vita-track_google_client_id
       GOOGLE_CLIENT_SECRET: /run/secrets/vita-track_google_client_secret
-      JWT_PRIVATE_KEY: /run/secrets/vita-track_jwt_private_key
-      JWT_PUBLIC_KEY: /run/secrets/vita-track_jwt_public_key
+      JWT_SECRET: /run/secrets/vita-track_jwt_secret
     secrets:
       - vita-track_database_url
       - vita-track_google_client_id
       - vita-track_google_client_secret
-      - vita-track_jwt_private_key
-      - vita-track_jwt_public_key
+      - vita-track_jwt_secret
     depends_on:
       - postgres
     networks:
@@ -66,7 +64,5 @@ secrets:
     external: true
   vita-track_google_client_secret:
     external: true
-  vita-track_jwt_private_key:
-    external: true
-  vita-track_jwt_public_key:
+  vita-track_jwt_secret:
     external: true
