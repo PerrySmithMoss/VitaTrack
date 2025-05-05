@@ -15,21 +15,50 @@ import {
 interface NutritionPageProps {}
 
 const NutritionPage: NextPage<NutritionPageProps> = () => {
-  const { data, isLoading } = useGetCurrentUserQuery<GetCurrentUserQuery>();
+  const { data, isLoading, isError, error } =
+    useGetCurrentUserQuery<GetCurrentUserQuery>();
 
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
-  });
+
+    // Handle authentication redirect after we know we're on the client
+    // and the query has finished loading with no user data
+    if (mounted && !isLoading && !data?.getCurrentUser?.data) {
+      router.push('/');
+    }
+  }, [mounted, isLoading, data, router]);
 
   if (isLoading || !mounted) {
-    return null;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <SyncLoader color={'#00CC99'} size={25} />
+      </div>
+    );
   }
-  if (!data?.getCurrentUser?.data) {
-    router.push('/');
+
+  if (isError) {
+    console.error('Authentication error:', error);
+    // Don't redirect here - let the useEffect handle it
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">
+            Authentication error. Please try logging in again.
+          </p>
+          <button
+            onClick={() => router.push('/')}
+            className="px-4 py-2 bg-brand-green hover:bg-brand-green-hover text-white rounded"
+          >
+            Return to Login
+          </button>
+        </div>
+      </div>
+    );
   }
+
   if (data?.getCurrentUser?.data) {
     return (
       <>
@@ -81,19 +110,31 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery(
-    useGetCurrentUserQuery.getKey(),
-    useGetCurrentUserQuery.fetcher(
-      undefined,
-      context.req.headers as Record<string, string>
-    )
-  );
+  try {
+    await queryClient.prefetchQuery(
+      useGetCurrentUserQuery.getKey(),
+      useGetCurrentUserQuery.fetcher(
+        undefined,
+        context.req.headers as Record<string, string>
+      )
+    );
 
-  return {
-    props: {
-      dehydratedState: dehydrate(queryClient),
-    },
-  };
+    return {
+      props: {
+        dehydratedState: dehydrate(queryClient),
+      },
+    };
+  } catch (error) {
+    console.error('Error prefetching user data:', error);
+
+    // If prefetching fails, redirect to login
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    };
+  }
 };
 
 export default NutritionPage;

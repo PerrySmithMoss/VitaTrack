@@ -26,8 +26,12 @@ const DashboardPage: NextPage<DashboardPageProps> = () => {
   const router = useRouter();
 
   const { data: usersGoals } = useGetCurrentUsersGoalsQuery();
-  const { data: user, isLoading } =
-    useGetCurrentUserQuery<GetCurrentUserQuery>();
+  const {
+    data: user,
+    isLoading,
+    isError,
+    error,
+  } = useGetCurrentUserQuery<GetCurrentUserQuery>();
 
   const { mutate: logoutUser } = useLogoutUserMutation({
     onSuccess: () => router.push('/'),
@@ -39,14 +43,89 @@ const DashboardPage: NextPage<DashboardPageProps> = () => {
 
   useEffect(() => {
     setMounted(true);
-  });
+
+    // Handle authentication redirect after we know we're on the client
+    // and the query has finished loading with no user data
+    if (mounted && !isLoading && !user?.getCurrentUser?.data) {
+      router.push('/');
+    }
+  }, [mounted, isLoading, user, router]);
 
   if (isLoading || !mounted) {
-    return null;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <SyncLoader color={'#00CC99'} size={25} />
+      </div>
+    );
   }
-  if (!user?.getCurrentUser?.data) {
-    router.push('/');
+
+  if (isError) {
+    console.error('Authentication error:', error);
+    // Don't redirect here - let the useEffect handle it
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">
+            Authentication error. Please try logging in again.
+          </p>
+          <button
+            onClick={() => router.push('/')}
+            className="px-4 py-2 bg-brand-green hover:bg-brand-green-hover text-white rounded"
+          >
+            Return to Login
+          </button>
+        </div>
+      </div>
+    );
   }
+
+  // User is authenticated but needs to complete setup
+  if (
+    !isLoading &&
+    user?.getCurrentUser?.data &&
+    !user.getCurrentUser.data.hasGoals
+  ) {
+    return (
+      <>
+        <Head>
+          <title>Dashboard | VitaTrack</title>
+          <meta
+            name="description"
+            content="VitaTrack is a one stop shop to track all of your nutrition and gym performance."
+          />
+          <link rel="icon" href="/favicon.ico" />
+        </Head>
+        <div className="bg-white relative">
+          <div className="absolute bottom-0 z-0 w-full">
+            <Wave />
+          </div>
+          <div className="absolute top-0 w-full border-b">
+            <div className="flex items-center py-3 justify-between">
+              <div className="flex space-x-2 items-center mx-24">
+                <div>
+                  <Logo height={26} width={32} />
+                </div>
+                <h1 className="text-[24px] font-bold text-gray-700">
+                  VitaTrack
+                </h1>
+              </div>
+              <div className="mx-24">
+                <button
+                  onClick={handleLogOut}
+                  className="cursor-pointer text-brand-green hover:text-brand-green-hover"
+                >
+                  Log out
+                </button>
+              </div>
+            </div>
+          </div>
+          <SetupForm />
+        </div>
+      </>
+    );
+  }
+
+  // User is fully authenticated with goals set up
   if (!isLoading && user?.getCurrentUser?.data?.hasGoals) {
     return (
       <>
@@ -87,56 +166,15 @@ const DashboardPage: NextPage<DashboardPageProps> = () => {
                     />
                   </section>
                 </div>
-                {/* <div className="grid grid-cols-12 gap-10 mt-10">
-                  <Recipes />
-                  <CaloriesGraph />
-                </div> */}
               </div>
             </main>
           </div>
         </div>
       </>
     );
-  } else if (!isLoading && user?.getCurrentUser?.data?.hasGoals === false) {
-    return (
-      <>
-        <Head>
-          <title>Dashboard | VitaTrack</title>
-          <meta
-            name="description"
-            content="VitaTrack is a one stop shop to track all of your nutrition and gym performance."
-          />
-          <link rel="icon" href="/favicon.ico" />
-        </Head>
-        <div className="bg-white relative">
-          <div className="absolute bottom-0 z-0 w-full">
-            <Wave />
-          </div>
-          <div className="absolute top-0 w-full border-b">
-            <div className="flex items-center py-3 justify-between">
-              <div className="flex space-x-2 items-center mx-24">
-                <div>
-                  <Logo height={26} width={32} />
-                </div>
-                <h1 className="text-[24px] font-bold text-gray-700">
-                  VitaTrack
-                </h1>
-              </div>
-              <div className="mx-24">
-                <button
-                  onClick={handleLogOut}
-                  className="cursor-pointer text-brand-green hover:text-brand-green-hover"
-                >
-                  Log out
-                </button>
-              </div>
-            </div>
-          </div>
-          <SetupForm />
-        </div>
-      </>
-    );
   }
+
+  // Fallback loading screen (this should rarely be reached)
   return (
     <div className="flex justify-center items-center h-screen">
       <SyncLoader color={'#00CC99'} size={25} />
@@ -147,7 +185,7 @@ const DashboardPage: NextPage<DashboardPageProps> = () => {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   // const cookie = context.req.cookies['refreshToken'];
 
-  // Not working in production due to the front-end and back-end being on different domians
+  // // Enable this for production when front-end and back-end are on the same domain
   // if (!cookie) {
   //   return {
   //     redirect: {
@@ -159,19 +197,31 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery(
-    useGetCurrentUserQuery.getKey(),
-    useGetCurrentUserQuery.fetcher(
-      undefined,
-      context.req.headers as Record<string, string>
-    )
-  );
+  try {
+    await queryClient.prefetchQuery(
+      useGetCurrentUserQuery.getKey(),
+      useGetCurrentUserQuery.fetcher(
+        undefined,
+        context.req.headers as Record<string, string>
+      )
+    );
 
-  return {
-    props: {
-      dehydratedState: dehydrate(queryClient),
-    },
-  };
+    return {
+      props: {
+        dehydratedState: dehydrate(queryClient),
+      },
+    };
+  } catch (error) {
+    console.error('Error prefetching user data:', error);
+
+    // If prefetching fails, redirect to login
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    };
+  }
 };
 
 export default DashboardPage;

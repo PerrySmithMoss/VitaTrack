@@ -21,19 +21,20 @@ const Home: NextPage<HomeProps> = () => {
   const { data, isLoading } = useGetCurrentUserQuery<GetCurrentUserQuery>();
 
   useEffect(() => {
-    setMounted(true);
-  });
-
-  useEffect(() => {
     // Redirect to dashboard if user is already logged in
     if (data?.getCurrentUser?.data && !isLoading && mounted) {
       router.push('/account/dashboard');
     }
   }, [data, isLoading, mounted, router]);
 
-  if (isLoading || !mounted) {
-    return null;
-  }
+  useEffect(() => {
+    setMounted(true);
+
+    // Redirect to dashboard if user is already logged in
+    if (data?.getCurrentUser?.data && !isLoading && mounted) {
+      router.push('/account/dashboard');
+    }
+  }, [mounted, isLoading, data, router]);
 
   return (
     <>
