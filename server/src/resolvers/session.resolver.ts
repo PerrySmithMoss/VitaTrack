@@ -5,7 +5,7 @@ import { config } from "../config/config";
 import { createSession } from "../services/session.service";
 import {
   findAndUpdateUser,
-  getGoogleOAuthTokensV2,
+  getGoogleOAuthTokens,
   getGoogleUser,
 } from "../services/user.service";
 import { PrismaContext } from "../types/PrismaContext";
@@ -53,7 +53,7 @@ export class SessionResolver {
     const formattedCode = code.replace("%2F", "/");
 
     try {
-      const { id_token, access_token } = await getGoogleOAuthTokensV2(
+      const { id_token, access_token } = await getGoogleOAuthTokens(
         formattedCode
       );
 

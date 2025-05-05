@@ -40,5 +40,4 @@ export const config = {
     "/run/secrets/vita-track_google_client_secret",
     "GOOGLE_CLIENT_SECRET"
   ),
-  googleOauthRedirectUrl: process.env.GOOGLE_OAUTH_REDIRECT_URL,
 };
