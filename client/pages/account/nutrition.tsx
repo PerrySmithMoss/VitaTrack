@@ -32,31 +32,7 @@ const NutritionPage: NextPage<NutritionPageProps> = () => {
   }, [mounted, isLoading, data, router]);
 
   if (isLoading || !mounted) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <SyncLoader color={'#00CC99'} size={25} />
-      </div>
-    );
-  }
-
-  if (isError) {
-    console.error('Authentication error:', error);
-    // Don't redirect here - let the useEffect handle it
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="text-center">
-          <p className="text-red-500 mb-4">
-            Authentication error. Please try logging in again.
-          </p>
-          <button
-            onClick={() => router.push('/')}
-            className="px-4 py-2 bg-brand-green hover:bg-brand-green-hover text-white rounded"
-          >
-            Return to Login
-          </button>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   if (data?.getCurrentUser?.data) {

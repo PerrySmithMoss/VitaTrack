@@ -115,19 +115,31 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery(
-    useGetCurrentUserQuery.getKey(),
-    useGetCurrentUserQuery.fetcher(
-      undefined,
-      context.req.headers as Record<string, string>
-    )
-  );
+  try {
+    await queryClient.prefetchQuery(
+      useGetCurrentUserQuery.getKey(),
+      useGetCurrentUserQuery.fetcher(
+        undefined,
+        context.req.headers as Record<string, string>
+      )
+    );
 
-  return {
-    props: {
-      dehydratedState: dehydrate(queryClient),
-    },
-  };
+    return {
+      props: {
+        dehydratedState: dehydrate(queryClient),
+      },
+    };
+  } catch (error) {
+    console.error('Error prefetching user data:', error);
+
+    // If prefetching fails, redirect to login
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    };
+  }
 };
 
 export default Home;
