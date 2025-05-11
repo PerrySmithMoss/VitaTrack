@@ -18,6 +18,8 @@ import { SetupForm } from '../../components/Account/Dashboard/SetupForm/SetupFor
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import SyncLoader from 'react-spinners/SyncLoader';
+import { withAuth } from '../../hoc/withAuth';
+import { LoadingPage } from '../../components/Loaders/LoadingPage';
 
 interface DashboardPageProps {}
 
@@ -42,13 +44,14 @@ const DashboardPage: NextPage<DashboardPageProps> = () => {
 
     // Handle authentication redirect after we know we're on the client
     // and the query has finished loading with no user data
-    if (mounted && !isLoading && !user?.getCurrentUser?.data?.id) {
+    if (mounted && !isLoading && !user?.getCurrentUser?.data) {
       router.push('/');
     }
   }, [mounted, isLoading, user, router]);
 
-  if (isLoading || !mounted) {
-    return null;
+  // Show nothing during initial client-side hydration or while loading user data
+  if (!mounted || isLoading || !user?.getCurrentUser?.data?.id) {
+    return <LoadingPage pageTitle="VitaTrack" />;
   }
 
   // User is authenticated but needs to complete setup
@@ -154,46 +157,6 @@ const DashboardPage: NextPage<DashboardPageProps> = () => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  // const cookie = context.req.cookies['refreshToken'];
-
-  // // Enable this for production when front-end and back-end are on the same domain
-  // if (!cookie) {
-  //   return {
-  //     redirect: {
-  //       destination: '/',
-  //       permanent: false,
-  //     },
-  //   };
-  // }
-
-  const queryClient = new QueryClient();
-
-  try {
-    await queryClient.prefetchQuery(
-      useGetCurrentUserQuery.getKey(),
-      useGetCurrentUserQuery.fetcher(
-        undefined,
-        context.req.headers as Record<string, string>
-      )
-    );
-
-    return {
-      props: {
-        dehydratedState: dehydrate(queryClient),
-      },
-    };
-  } catch (error) {
-    console.error('Error prefetching user data:', error);
-
-    // If prefetching fails, redirect to login
-    return {
-      redirect: {
-        destination: '/',
-        permanent: false,
-      },
-    };
-  }
-};
+export const getServerSideProps: GetServerSideProps = withAuth();
 
 export default DashboardPage;

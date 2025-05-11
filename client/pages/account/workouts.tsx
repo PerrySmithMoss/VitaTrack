@@ -27,6 +27,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouter } from 'next/router';
 import SyncLoader from 'react-spinners/SyncLoader';
+import { withAuth } from '../../hoc/withAuth';
 
 interface WorkoutPageProps {}
 
@@ -427,46 +428,6 @@ const WorkoutPage: NextPage<WorkoutPageProps> = () => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  // const cookie = context.req.cookies['refreshToken'];
-
-  // Not working in production due to the front-end and back-end being on different domians
-  // if (!cookie) {
-  //   return {
-  //     redirect: {
-  //       destination: '/',
-  //       permanent: false,
-  //     },
-  //   };
-  // }
-
-  const queryClient = new QueryClient();
-
-  try {
-    await queryClient.prefetchQuery(
-      useGetCurrentUserQuery.getKey(),
-      useGetCurrentUserQuery.fetcher(
-        undefined,
-        context.req.headers as Record<string, string>
-      )
-    );
-
-    return {
-      props: {
-        dehydratedState: dehydrate(queryClient),
-      },
-    };
-  } catch (error) {
-    console.error('Error prefetching user data:', error);
-
-    // If prefetching fails, redirect to login
-    return {
-      redirect: {
-        destination: '/',
-        permanent: false,
-      },
-    };
-  }
-};
+export const getServerSideProps: GetServerSideProps = withAuth();
 
 export default WorkoutPage;

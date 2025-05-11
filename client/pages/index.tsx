@@ -1,4 +1,3 @@
-import { dehydrate, QueryClient } from '@tanstack/react-query';
 import type { GetServerSideProps, NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -12,6 +11,8 @@ import {
   GetCurrentUserQuery,
   useGetCurrentUserQuery,
 } from '../graphql/generated/graphql';
+import { withAuth } from '../hoc/withAuth';
+import { LoadingPage } from '../components/Loaders/LoadingPage';
 
 interface HomeProps {}
 
@@ -24,10 +25,15 @@ const Home: NextPage<HomeProps> = () => {
     setMounted(true);
 
     // Redirect to dashboard if user is already logged in
-    if (data?.getCurrentUser?.data && !isLoading && mounted) {
+    if (mounted && data?.getCurrentUser?.data && !isLoading) {
       router.push('/account/dashboard');
     }
   }, [mounted, isLoading, data, router]);
+
+  // Show nothing during initial client-side hydration or while loading user data
+  if (!mounted || isLoading || data?.getCurrentUser?.data?.id) {
+    return <LoadingPage pageTitle="VitaTrack" />;
+  }
 
   return (
     <>
@@ -39,7 +45,6 @@ const Home: NextPage<HomeProps> = () => {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
       <main className="bg-white relative">
         <div className="absolute bottom-0 z-0 w-full">
           <Wave />
@@ -75,12 +80,10 @@ const Home: NextPage<HomeProps> = () => {
                 <p className="mt-6 text-sm text-center text-gray-400">
                   Don&#x27;t have an account yet?{' '}
                   <Link
-                    className="cursor-pointer focus:outline-none focus:underline hover:underline"
+                    className="text-blue-500 cursor-pointer focus:outline-none focus:underline hover:underline"
                     href="/sign-up"
                   >
-                    <span className="text-blue-500 cursor-pointer focus:outline-none focus:underline hover:underline">
-                      Sign up
-                    </span>
+                    Sign up
                   </Link>
                   .
                 </p>
@@ -93,46 +96,6 @@ const Home: NextPage<HomeProps> = () => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  // const cookie = context.req.cookies['refreshToken'];
-
-  // Not working in production due to the front-end and back-end being on different domians
-  // if (!cookie) {
-  //   return {
-  //     redirect: {
-  //       destination: '/',
-  //       permanent: false,
-  //     },
-  //   };
-  // }
-
-  const queryClient = new QueryClient();
-
-  try {
-    await queryClient.prefetchQuery(
-      useGetCurrentUserQuery.getKey(),
-      useGetCurrentUserQuery.fetcher(
-        undefined,
-        context.req.headers as Record<string, string>
-      )
-    );
-
-    return {
-      props: {
-        dehydratedState: dehydrate(queryClient),
-      },
-    };
-  } catch (error) {
-    console.error('Error prefetching user data:', error);
-
-    // If prefetching fails, redirect to login
-    return {
-      redirect: {
-        destination: '/',
-        permanent: false,
-      },
-    };
-  }
-};
+export const getServerSideProps: GetServerSideProps = withAuth();
 
 export default Home;
