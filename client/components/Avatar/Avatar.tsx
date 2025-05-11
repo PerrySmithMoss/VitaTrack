@@ -19,7 +19,7 @@ export const Avatar: React.FC<AvatarProps> = ({
   alt,
   ...rest
 }) => {
-  const src = avatarUrl ?? '/assets/images/default-avatar.jpg';
+  const src = avatarUrl || '/assets/images/default-avatar.jpg';
   const finalAlt = alt ?? defaultAlt;
   const finalWidth = typeof width === 'number' ? width : defaultSize;
   const finalHeight = typeof height === 'number' ? height : defaultSize;
