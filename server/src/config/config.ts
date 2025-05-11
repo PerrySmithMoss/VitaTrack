@@ -10,7 +10,6 @@ export const config = {
   serverPort: process.env.PORT || 5500,
   serverDomain: process.env.SERVER_DOMAIN,
   serverURL: process.env.SERVER_URL,
-  defaultUserAvatarPath: process.env.DEFAULT_USER_AVATAR_PATH,
   clientURL: process.env.CLIENT_URL,
 
   databaseURL: loadSecret(

@@ -1,3 +1,5 @@
+import "dotenv/config"; // Load env vars before anything else
+
 import express, { Application } from "express";
 import { createServer } from "http";
 import { config } from "./config/config";
@@ -12,29 +14,29 @@ import {
   SessionResolver,
   UserResolver,
   WorkoutResolver,
+  GoalsResolver,
+  NutritionResolver,
+  FoodResolver,
 } from "./resolvers/index";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import { GoalsResolver } from "./resolvers/goals.resolver";
-import { NutritionResolver } from "./resolvers/nutrition.resolver";
-import { FoodResolver } from "./resolvers/food.resolver";
+// import { deserializeUser } from './middleware/deserializeUser'; // future enhancement
 
 const app: Application = express();
 const httpServer = createServer(app);
 
 const corsOptions = {
-  origin: config.clientURL as string,
-  optionsSuccessStatus: 200,
+  origin: config.clientURL,
   credentials: true,
+  optionsSuccessStatus: 200,
 };
 
-async function main() {
-  app.use(express.static("public"));
-  app.use(cors(corsOptions));
-  app.use(cookieParser());
+async function startServer() {
+  try {
+    app.use(cors(corsOptions));
+    app.use(cookieParser());
 
-  const apolloServer = new ApolloServer({
-    schema: await buildSchema({
+    const schema = await buildSchema({
       resolvers: [
         SessionResolver,
         UserResolver,
@@ -43,35 +45,45 @@ async function main() {
         NutritionResolver,
         FoodResolver,
       ],
-      // @TODO: For some reason this is running multiple times
-      // globalMiddlewares: [deserializeUser],
-    }),
-    context: ({ req, res }) => ({ prisma, req, res }),
-    introspection: process.env.NODE_ENV !== "production",
-    csrfPrevention: true,
-    plugins: [
-      ApolloServerPluginDrainHttpServer({ httpServer }),
-      ApolloServerPluginLandingPageLocalDefault({ embed: true }),
-    ],
-    cache: "bounded",
-  });
+      validate: false,
+      // globalMiddlewares: [deserializeUser], // optional for auth
+    });
 
-  await apolloServer.start();
+    const apolloServer = new ApolloServer({
+      schema,
+      context: ({ req, res }) => ({ prisma, req, res }),
+      introspection: config.isProduction,
+      csrfPrevention: true,
+      cache: "bounded",
+      plugins: [
+        ApolloServerPluginDrainHttpServer({ httpServer }),
+        ApolloServerPluginLandingPageLocalDefault({ embed: true }),
+      ],
+    });
 
-  apolloServer.applyMiddleware({
-    app,
-    cors: corsOptions,
-  });
+    await apolloServer.start();
+    apolloServer.applyMiddleware({ app, cors: corsOptions });
 
-  httpServer.listen(config.serverPort, () =>
-    console.log(`🚀  Server running at ${config.serverURL}`)
-  );
+    httpServer.listen(config.serverPort, () => {
+      console.log(`🚀 Server ready at ${config.serverURL}`);
+    });
+
+    const shutdown = async () => {
+      console.log("🛑 Shutting down...");
+      await prisma.$disconnect();
+      httpServer.close(() => {
+        console.log("✅ Server closed");
+        process.exit(0);
+      });
+    };
+
+    process.on("SIGINT", shutdown);
+    process.on("SIGTERM", shutdown);
+  } catch (err) {
+    console.error("❌ Failed to start server:", err);
+    await prisma.$disconnect();
+    process.exit(1);
+  }
 }
 
-main()
-  .catch((err) => {
-    console.log(err);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+startServer();
