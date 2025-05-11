@@ -8,6 +8,8 @@ import {
 } from '../../graphql/generated/graphql';
 import { useGlobalContext } from '../../state/context/global.context';
 import { useRouter } from 'next/router';
+import Image from 'next/image';
+import { Avatar } from '../Avatar/Avatar';
 
 interface NavbarProps {}
 
@@ -68,10 +70,12 @@ export const Navbar: React.FC<NavbarProps> = () => {
             </button> */}
             <div className="flex items-center space-x-1">
               <div className="flex items-center">
-                <img
+                <Avatar
                   className="w-9 h-9 rounded-full"
-                  src={data?.getCurrentUser?.data?.profile?.avatar as string}
+                  avatarUrl={data?.getCurrentUser?.data?.profile?.avatar}
                   alt="Avatar"
+                  width={36}
+                  height={36}
                 />
               </div>
               <p className="font-bold pl-1">

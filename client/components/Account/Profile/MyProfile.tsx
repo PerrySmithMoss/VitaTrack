@@ -8,6 +8,7 @@ import styles from './Profile.module.css';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { object, string, TypeOf } from 'zod';
+import { Avatar } from '../../Avatar/Avatar';
 
 interface MyProfileProps {}
 
@@ -84,11 +85,12 @@ export const MyProfile: React.FC<MyProfileProps> = () => {
       <div className="flex items-center space-x-10">
         <div className="flex rounded-lg mt-8">
           <div className="relative rounded-full">
-            <img
-              src={data?.getCurrentUser?.data?.profile?.avatar as string}
+            <Avatar
+              avatarUrl={data?.getCurrentUser?.data?.profile?.avatar}
               alt="Avatar"
-              // className={`${styles.avatar} h-full w-full rounded-full cursor-pointer relative`}
-              className={`h-[100px] w-[100px] rounded-full relative`}
+              height={85}
+              width={85}
+              className={`rounded-full relative`}
             />
             {/* <div
               style={{ transform: 'translate(50%, 0%)' }}
