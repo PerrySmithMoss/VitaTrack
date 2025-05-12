@@ -96,6 +96,8 @@ const Home: NextPage<HomeProps> = () => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = withAuth();
+export const getServerSideProps: GetServerSideProps = withAuth({
+  requireAuth: false,
+});
 
 export default Home;
