@@ -24,11 +24,17 @@ export const SetupForm: React.FC<SetupFormProps> = () => {
   });
 
   const handleCompleteEditingGoals = () => {
+    const { gender, weightGoal, currentWeight, goalWeight } = formAnswers;
+    const parsedCurrentWeight = parseFloat(currentWeight);
+    const parsedGoalWeight = goalWeight
+      ? parseFloat(goalWeight)
+      : parsedCurrentWeight;
+
     mutate({
-      gender: formAnswers.gender,
-      weightGoal: formAnswers.weightGoal,
-      currentWeight: parseFloat(formAnswers.currentWeight),
-      goalWeight: parseFloat(formAnswers.goalWeight),
+      gender: gender,
+      weightGoal: weightGoal,
+      currentWeight: parsedCurrentWeight,
+      goalWeight: parsedGoalWeight,
     });
   };
 
