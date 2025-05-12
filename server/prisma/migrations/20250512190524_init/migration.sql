@@ -2,7 +2,7 @@
 CREATE TABLE "Profile" (
     "id" SERIAL NOT NULL,
     "bio" TEXT,
-    "avatar" TEXT DEFAULT 'https://vitatrack.up.railway.app/images/default-avatar.jpg',
+    "avatar" TEXT,
     "avatarId" TEXT,
     "userId" TEXT NOT NULL,
 
