@@ -111,28 +111,30 @@ export const SetupForm: React.FC<SetupFormProps> = () => {
                     className="block w-1/2 px-4 py-3 mt-3 placeholder-gray-600 bg-white border border-gray-200 rounded-md focus:border-brand-green focus:ring-brand-green focus:outline-none focus:ring focus:ring-opacity-40"
                   />
                 </div>
-                <div className="mt-10">
-                  <h1 className="font-bold text-2xl text-gray-800">
-                    What is your goal weight?
-                  </h1>
-                  <p className="text-sm mt-1 text-gray-500">
-                    Don&apos;t worry. This doesn&apos;t affect your daily
-                    calorie goal and you can always change it later.
-                  </p>
-                  <input
-                    type="number"
-                    name="goalWeight"
-                    placeholder="Goal weight (lbs)"
-                    value={formAnswers.goalWeight}
-                    onChange={(e) =>
-                      setFormAnswers({
-                        ...formAnswers,
-                        goalWeight: e.target.value,
-                      })
-                    }
-                    className="block w-1/2 px-4 py-3 mt-4 placeholder-gray-600 bg-white border border-gray-200 rounded-md focus:border-brand-green focus:ring-brand-green focus:outline-none focus:ring focus:ring-opacity-40"
-                  />
-                </div>
+                {formAnswers.weightGoal !== 'Maintain weight' && (
+                  <div className="mt-10">
+                    <h1 className="font-bold text-2xl text-gray-800">
+                      What is your goal weight?
+                    </h1>
+                    <p className="text-sm mt-1 text-gray-500">
+                      Don&apos;t worry. This doesn&apos;t affect your daily
+                      calorie goal and you can always change it later.
+                    </p>
+                    <input
+                      type="number"
+                      name="goalWeight"
+                      placeholder="Goal weight (lbs)"
+                      value={formAnswers.goalWeight}
+                      onChange={(e) =>
+                        setFormAnswers({
+                          ...formAnswers,
+                          goalWeight: e.target.value,
+                        })
+                      }
+                      className="block w-1/2 px-4 py-3 mt-4 placeholder-gray-600 bg-white border border-gray-200 rounded-md focus:border-brand-green focus:ring-brand-green focus:outline-none focus:ring focus:ring-opacity-40"
+                    />
+                  </div>
+                )}
                 <div className="mt-14">
                   <div className="flex flex-row space-x-3 items-center w-full justify-between">
                     <div className="w-full">
