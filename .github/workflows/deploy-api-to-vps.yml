@@ -30,10 +30,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        # with:
-        #   sparse-checkout: |
-        #     server
-        #   sparse-checkout-cone-mode: false
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -91,7 +87,6 @@ jobs:
       - name: create env file
         run: |
           echo "GIT_COMMIT_HASH=${{ github.sha }}" >> ./envfile
-          echo "ACME_EMAIL=${{ secrets.ACME_EMAIL }}" >> ./envfile
 
       - name: Create server env file
         run: |
