@@ -13,6 +13,7 @@
   <li>Track workouts</li>
   <li>Track nutrition</li>
   <li>CRUD functionality on workouts/nutrition</li>
+  <li>CI/CD with automatic build and deployment</li>
 </ul>
 </div>
 <div>
@@ -23,8 +24,8 @@
   <li>GraphQL</li>
   <li>JWT</li>
   <li>Prisma ORM</li>
-  <li>Recharts</li>
-  <li>MySQL</li>
+  <li>PostgreSQL</li>
+  <li>Docker, docker compose, docker stack, docker secrets</li>
 </ul>
 </div>
 
