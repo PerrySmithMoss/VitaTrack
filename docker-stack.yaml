@@ -32,10 +32,6 @@ networks:
     external: true
 
 secrets:
-  postgres_user:
-    external: true
-  postgres_password:
-    external: true
   vita-track_database_url:
     external: true
   vita-track_google_client_id:
