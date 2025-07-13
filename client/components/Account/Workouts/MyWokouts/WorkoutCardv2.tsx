@@ -19,7 +19,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import { FiMoreVertical } from 'react-icons/fi';
 import { Popover } from '../../../Popover/Popover';
 import { AiOutlineDelete } from 'react-icons/ai';
-import { useOnClickOutside } from '../../../../hooks/useOnClickOutside';
 
 interface WorkoutCardv2Props {
   workout: Workout;
@@ -371,7 +370,6 @@ export const WorkoutCardv2: React.FC<WorkoutCardv2Props> = ({ workout }) => {
                           // }}
                           onChange={handleUserInputChange}
                           className="block cursor-pointer text-right text-gray-800 bg-transparent w-full outline-none"
-
                         />
                       </div>
                       <div className="flex items-center space-x-2">

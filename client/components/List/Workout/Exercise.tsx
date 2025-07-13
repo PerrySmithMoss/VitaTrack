@@ -11,7 +11,6 @@ import {
   GetUsersWorkoutsQuery,
   useDeleteExerciseMutation,
   useGetUsersWorkoutsQuery,
-  StrengthSet,
 } from '../../../graphql/generated/graphql';
 import { useGlobalContext } from '../../../state/context/global.context';
 import { Popover } from '../../Popover/Popover';

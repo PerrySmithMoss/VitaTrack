@@ -10,7 +10,6 @@ import {
 } from 'recharts';
 import {
   useGetCurrentUsersGoalsQuery,
-  useGetCurrentUsersNutritionByDateQuery,
   useGetCurrentUsersRemainingCaloriesByDateQuery,
   useUpsertUserGoalsMutation,
 } from '../../../graphql/generated/graphql';
@@ -104,15 +103,18 @@ const CustomLabel = ({
 const todaysDate = new Date().toISOString();
 
 export const Macros: React.FC<MacrosProps> = () => {
-  const { data: usersGoals, refetch: refetchUsersGoals } = useGetCurrentUsersGoalsQuery();
+  const { data: usersGoals, refetch: refetchUsersGoals } =
+    useGetCurrentUsersGoalsQuery();
   const { refetch: refetchUsersRemainingCalories } =
-  useGetCurrentUsersRemainingCaloriesByDateQuery({
-    date: todaysDate,
+    useGetCurrentUsersRemainingCaloriesByDateQuery({
+      date: todaysDate,
+    });
+  const { mutate } = useUpsertUserGoalsMutation({
+    onSuccess: () => {
+      refetchUsersGoals();
+      refetchUsersRemainingCalories();
+    },
   });
-  const { mutate } = useUpsertUserGoalsMutation({ onSuccess: () => {
-    refetchUsersGoals()
-    refetchUsersRemainingCalories()
-  } });
 
   const [isEditMacrosOpen, setIsEditMacrosModalOpen] = useState(false);
   const [caloriesInput, setCaloriesInput] = useState(
@@ -188,10 +190,10 @@ export const Macros: React.FC<MacrosProps> = () => {
         calculateGramsFromMacronutrient(
           calculatePercentage(
             usersGoals?.getCurrentUsersGoals.data?.carbohydrate === null ||
-            usersGoals?.getCurrentUsersGoals.data?.carbohydrate === undefined
+              usersGoals?.getCurrentUsersGoals.data?.carbohydrate === undefined
               ? 0
               : usersGoals?.getCurrentUsersGoals.data?.carbohydrate,
-              usersGoals?.getCurrentUsersGoals.data?.calories === null ||
+            usersGoals?.getCurrentUsersGoals.data?.calories === null ||
               usersGoals?.getCurrentUsersGoals.data?.calories === undefined
               ? 0
               : usersGoals?.getCurrentUsersGoals.data?.calories
@@ -206,10 +208,10 @@ export const Macros: React.FC<MacrosProps> = () => {
         calculateGramsFromMacronutrient(
           calculatePercentage(
             usersGoals?.getCurrentUsersGoals.data?.fat === null ||
-            usersGoals?.getCurrentUsersGoals.data?.fat === undefined
+              usersGoals?.getCurrentUsersGoals.data?.fat === undefined
               ? 0
               : usersGoals?.getCurrentUsersGoals.data?.fat,
-              usersGoals?.getCurrentUsersGoals.data?.calories === null ||
+            usersGoals?.getCurrentUsersGoals.data?.calories === null ||
               usersGoals?.getCurrentUsersGoals.data?.calories === undefined
               ? 0
               : usersGoals?.getCurrentUsersGoals.data?.calories
@@ -224,10 +226,10 @@ export const Macros: React.FC<MacrosProps> = () => {
         calculateGramsFromMacronutrient(
           calculatePercentage(
             usersGoals?.getCurrentUsersGoals.data?.protein === null ||
-            usersGoals?.getCurrentUsersGoals.data?.protein === undefined
+              usersGoals?.getCurrentUsersGoals.data?.protein === undefined
               ? 0
               : usersGoals?.getCurrentUsersGoals.data?.protein,
-              usersGoals?.getCurrentUsersGoals.data?.calories === null ||
+            usersGoals?.getCurrentUsersGoals.data?.calories === null ||
               usersGoals?.getCurrentUsersGoals.data?.calories === undefined
               ? 0
               : usersGoals?.getCurrentUsersGoals.data?.calories
@@ -253,9 +255,7 @@ export const Macros: React.FC<MacrosProps> = () => {
           </button>
         </div>
       </div>
-      <div
-        className="shadow w-[350px] h-[270px] rounded-lg cursor-pointer flex justify-center items-center bg-[#fafafa] hover:bg-gray-100 mt-3 pr-6"
-      >
+      <div className="shadow w-[350px] h-[270px] rounded-lg cursor-pointer flex justify-center items-center bg-[#fafafa] hover:bg-gray-100 mt-3 pr-6">
         <ResponsiveContainer>
           <PieChart layout="vertical">
             <Pie
@@ -275,9 +275,7 @@ export const Macros: React.FC<MacrosProps> = () => {
               <Label
                 content={
                   <CustomLabel
-                    labelText={`${
-                      usersGoals?.getCurrentUsersGoals.data?.calories
-                    }`}
+                    labelText={`${usersGoals?.getCurrentUsersGoals.data?.calories}`}
                     value={'Calories'}
                     viewBox={undefined}
                   />

@@ -35,7 +35,6 @@ import { BasketItem } from './Basket/BasketItem';
 interface FoodDiaryProps {}
 
 const todaysDate = new Date();
-const yesterdaysDate = new Date(Date.now() - 86400000);
 
 type mealNames =
   | 'Breakfast'

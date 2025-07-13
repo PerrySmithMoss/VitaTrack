@@ -1,14 +1,10 @@
 import React from 'react';
-import { Logo } from '../Svgs/Logo/Logo';
-import { IoMdNotificationsOutline } from 'react-icons/io';
 import {
   GetCurrentUserQuery,
   useGetCurrentUserQuery,
-  useLogoutUserMutation,
 } from '../../graphql/generated/graphql';
 import { useGlobalContext } from '../../state/context/global.context';
 import { useRouter } from 'next/router';
-import Image from 'next/image';
 import { Avatar } from '../Avatar/Avatar';
 
 interface NavbarProps {}

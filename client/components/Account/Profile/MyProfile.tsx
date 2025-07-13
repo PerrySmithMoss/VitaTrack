@@ -1,10 +1,8 @@
-import Image from 'next/image';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   useGetCurrentUserQuery,
   useUpdateUserMutation,
 } from '../../../graphql/generated/graphql';
-import styles from './Profile.module.css';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { object, string, TypeOf } from 'zod';

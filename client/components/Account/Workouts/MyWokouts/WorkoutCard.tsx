@@ -1,5 +1,4 @@
 import React from 'react';
-import { GiWeightLiftingUp, GiRun } from 'react-icons/gi';
 import { Workout } from '../../../../graphql/generated/graphql';
 
 interface WorkoutCardProps {
