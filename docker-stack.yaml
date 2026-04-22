@@ -13,15 +13,15 @@ services:
       - vita-track_google_client_id
       - vita-track_google_client_secret
       - vita-track_jwt_secret
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.services.vita-track-api.loadbalancer.server.port=5500"
-      - "traefik.http.routers.vita-track-api.rule=Host(`vita-track-api.perrysmithmoss.com`)"
-      - "traefik.http.routers.vita-track-api.entrypoints=websecure"
-      - "traefik.http.routers.vita-track-api.tls.certresolver=myresolver"
     networks:
       - portfolio_network
     deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.services.vita-track-api.loadbalancer.server.port=5500"
+        - "traefik.http.routers.vita-track-api.rule=Host(`vita-track-api.perrysmithmoss.com`)"
+        - "traefik.http.routers.vita-track-api.entrypoints=websecure"
+        - "traefik.http.routers.vita-track-api.tls.certresolver=myresolver"
       update_config:
         order: start-first
     depends_on:
