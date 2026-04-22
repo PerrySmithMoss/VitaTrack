@@ -1,5 +1,3 @@
-import qs from "qs";
-import axios from "axios";
 import { hash } from "argon2";
 import { config } from "../config/config";
 import prisma from "../lib/prisma";
@@ -96,28 +94,33 @@ export async function getGoogleOAuthTokens(
 ): Promise<GoogleTokensResult> {
   const url = "https://oauth2.googleapis.com/token";
 
-  const values = {
+  const values = new URLSearchParams({
     code,
-    client_id: config.googleClientID,
-    client_secret: config.googleClientSecret,
-    redirect_uri: config.clientURL,
+    client_id: config.googleClientID!,
+    client_secret: config.googleClientSecret!,
+    redirect_uri: config.clientURL!,
     grant_type: "authorization_code",
-  };
+  });
 
   try {
-    const res = await axios.post<GoogleTokensResult>(
-      url,
-      qs.stringify(values),
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      }
-    );
-    return res.data;
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: values.toString(),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error("Google OAuth Error:", errorData);
+      throw new Error(`Failed to fetch Google tokens: ${response.statusText}`);
+    }
+
+    return (await response.json()) as GoogleTokensResult;
   } catch (error: any) {
-    console.error("Caught error:", error.response.data.error);
-    throw new Error(error.message);
+    console.error("Caught error:", error.message);
+    throw error;
   }
 }
 
@@ -139,16 +142,21 @@ export async function getGoogleUser({
   id_token: string;
   access_token: string;
 }): Promise<GoogleUserResult> {
+  const url = `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${access_token}`;
+
   try {
-    const res = await axios.get<GoogleUserResult>(
-      `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${access_token}`,
-      {
-        headers: {
-          Authorization: `Bearer ${id_token}`,
-        },
-      }
-    );
-    return res.data;
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${id_token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch Google user: ${response.statusText}`);
+    }
+
+    return (await response.json()) as GoogleUserResult;
   } catch (error: any) {
     throw new Error(error.message);
   }
