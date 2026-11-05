@@ -1,11 +1,13 @@
+ARG NODE_IMAGE=node:22.23.4-bookworm-slim@sha256:5ec23b7c622b00547753bc6ffd78085dd868a68aeb41c8e0a1418f033e13d96d
+
 # Stage 1: Build
-FROM node:22.14.0-bullseye-slim AS builder
+FROM ${NODE_IMAGE} AS builder
 
 WORKDIR /app
 
 # Install system dependencies
 RUN apt-get update && \
-    apt-get install -y python3 make g++ && \
+    apt-get install -y --no-install-recommends ca-certificates openssl python3 make g++ && \
     ln -s /usr/bin/python3 /usr/bin/python && \
     npm install -g node-gyp && \
     rm -rf /var/lib/apt/lists/*
@@ -24,13 +26,13 @@ COPY src ./src
 RUN npx prisma generate && yarn build
 
 # Stage 2: Production dependencies only
-FROM node:22.14.0-bullseye-slim AS deps
+FROM ${NODE_IMAGE} AS deps
 
 WORKDIR /app
 
 # Install production dependencies
 RUN apt-get update && \
-    apt-get install -y python3 make g++ && \
+    apt-get install -y --no-install-recommends ca-certificates openssl python3 make g++ && \
     ln -s /usr/bin/python3 /usr/bin/python && \
     npm install -g node-gyp && \
     rm -rf /var/lib/apt/lists/*
@@ -39,10 +41,10 @@ COPY package.json yarn.lock ./
 RUN yarn install --production --frozen-lockfile
 
 # Stage 3: Final image
-FROM node:22.14.0-bullseye-slim AS runner
+FROM ${NODE_IMAGE} AS runner
 
 # Install tini (smallest init system to handle signals properly)
-RUN apt-get update && apt-get install -y tini && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates openssl tini && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
