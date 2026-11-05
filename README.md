@@ -44,3 +44,12 @@
 
 ![nutrition2](https://user-images.githubusercontent.com/59027997/199287171-036f0ec6-2862-4a57-9e9c-8d76dcb6ea03.png)
 </div>
+
+### VPS API releases
+
+The API workflow deploys an immutable image through its own restricted SSH
+account and the `VPS Production` environment. It cannot apply the Docker stack
+from this repository. An administrator owns the existing Swarm service
+configuration. See the
+[portfolio release runbook](https://github.com/PerrySmithMoss/perry-infra/blob/main/deploy/portfolio/README.md)
+for installation, production checks and rollback by digest and revision.

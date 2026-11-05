@@ -2,6 +2,11 @@ import { convertFloatToOneDecimalPlace } from '../utils/convertFloatToOneDecimal
 
 describe('converts a floating point number to one decimal place', () => {
   it('takes a number as an argument, if the number has 2 or more decimal points it will convert it to one decimal point', () => {
-    expect(convertFloatToOneDecimalPlace(3.333333)).toBe(3.3);
+    expect(convertFloatToOneDecimalPlace(3.333333, true)).toBe(3.3);
+  });
+
+  it('shows or hides zero according to the display option', () => {
+    expect(convertFloatToOneDecimalPlace(0, true)).toBe(0);
+    expect(convertFloatToOneDecimalPlace(0, false)).toBe('');
   });
 });
