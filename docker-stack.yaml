@@ -9,7 +9,8 @@ services:
       - GOOGLE_CLIENT_SECRET=/run/secrets/vita-track_google_client_secret
       - JWT_SECRET=/run/secrets/vita-track_jwt_secret
     secrets:
-      - vita-track_database_url
+      - source: vita-track_database_url_v2
+        target: vita-track_database_url
       - vita-track_google_client_id
       - vita-track_google_client_secret
       - vita-track_jwt_secret
@@ -32,7 +33,7 @@ networks:
     external: true
 
 secrets:
-  vita-track_database_url:
+  vita-track_database_url_v2:
     external: true
   vita-track_google_client_id:
     external: true
