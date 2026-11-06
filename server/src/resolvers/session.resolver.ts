@@ -1,7 +1,6 @@
 import "reflect-metadata";
 import { CookieOptions } from "express";
 import { Resolver, Mutation, Arg, Ctx, Field, ObjectType } from "type-graphql";
-import { config } from "../config/config";
 import { createSession } from "../services/session.service";
 import {
   findAndUpdateUser,
@@ -14,7 +13,6 @@ import {
   accessTokenCookieOptions,
   refreshTokenCookieOptions,
 } from "../constants/cookieOptions";
-import { SignOptions } from "jsonwebtoken";
 
 @ObjectType()
 class SessionFieldError {
@@ -83,20 +81,14 @@ export class SessionResolver {
         picture: googleUser.picture,
       });
 
-      const session = await createSession(
+      await createSession(
         user.id,
         ctx.req.get("user-agent") || ""
       );
 
-      const accessToken = signJwt(
-        { ...user, session: session.userId },
-        { expiresIn: config.accessTokenTtl as SignOptions["expiresIn"] }
-      );
+      const accessToken = signJwt(user.id, "access");
 
-      const refreshToken = signJwt(
-        { ...user, session: session.userId },
-        { expiresIn: config.refreshTokenTtl as SignOptions["expiresIn"] }
-      );
+      const refreshToken = signJwt(user.id, "refresh");
 
       ctx.res.cookie("accessToken", accessToken, accessTokenCookieOptions);
       ctx.res.cookie("refreshToken", refreshToken, refreshTokenCookieOptions);

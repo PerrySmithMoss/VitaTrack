@@ -1,6 +1,11 @@
 #!/bin/sh
 set -eu
 image=${1:?Pass the built API image tag}
+postgres_image=vitatrack-postgres:test
+repo_root=$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd)
+platform=$(docker image inspect --format '{{.Os}}/{{.Architecture}}' "$image")
+docker build --platform "$platform" -t "$postgres_image" "$repo_root/postgres"
+
 fixture="api-smoke-$$"
 database="$fixture-db"
 api="$fixture-server"
@@ -10,9 +15,9 @@ cleanup() {
 }
 trap cleanup EXIT
 docker network create "$fixture" >/dev/null
-docker run -d --name "$database" --network "$fixture" \
+docker run -d --platform "$platform" --name "$database" --network "$fixture" \
   -e POSTGRES_USER=fixture -e POSTGRES_PASSWORD=fixture -e POSTGRES_DB=fixture \
-  postgres:17.11-bookworm >/dev/null
+  "$postgres_image" >/dev/null
 for attempt in $(seq 1 40); do
   if docker exec "$database" pg_isready -h 127.0.0.1 -U fixture -d fixture >/dev/null 2>&1; then
     break
@@ -20,7 +25,7 @@ for attempt in $(seq 1 40); do
   sleep 1
 done
 docker exec "$database" pg_isready -h 127.0.0.1 -U fixture -d fixture >/dev/null
-docker run -d --name "$api" --network "$fixture" -p 127.0.0.1::5500 \
+docker run -d --platform "$platform" --name "$api" --network "$fixture" -p 127.0.0.1::5500 \
   -e DATABASE_URL="postgresql://fixture:fixture@$database:5432/fixture" \
   -e JWT_SECRET=fixture-signing-key-for-smoke-tests \
   -e CLIENT_URL=http://localhost -e SERVER_URL=http://localhost -e SERVER_DOMAIN=localhost \

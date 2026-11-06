@@ -1,43 +1,32 @@
 import jwt from "jsonwebtoken";
 import { config } from "../config/config";
 
-export function signJwt(object: Object, options?: jwt.SignOptions | undefined) {
-  return jwt.sign(object, config.jwtSecret, {
-    ...(options && options),
+type TokenUse = "access" | "refresh";
+
+export function signJwt(userId: string, tokenUse: TokenUse) {
+  const ttl = tokenUse === "access" ? config.accessTokenTtl : config.refreshTokenTtl;
+  return jwt.sign({ id: userId, session: userId, tokenUse }, config.jwtSecret, {
     algorithm: "HS256",
+    expiresIn: ttl as jwt.SignOptions["expiresIn"],
   });
 }
 
-interface Decoded {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
-  email: string;
-  password: null | string;
-  username: string;
-  session: string;
-  iat: number;
-  exp: number;
-}
+export function verifyJwt(token: unknown, tokenUse: TokenUse) {
+  const invalid = { expired: false, decoded: null };
+  if (typeof token !== "string") return invalid;
 
-interface JwtPayload {
-  decoded: Decoded;
-}
-
-export function verifyJwt(token: string) {
   try {
-    const decoded = jwt.verify(token, config.jwtSecret);
-    return {
-      valid: true,
-      expired: false,
-      decoded: decoded as JwtPayload,
-    };
-  } catch (e: any) {
-    // console.error(e);
-    return {
-      valid: false,
-      expired: e.message === "jwt expired",
-      decoded: null,
-    };
+    const decoded = jwt.verify(token, config.jwtSecret, { algorithms: ["HS256"] });
+    if (
+      typeof decoded === "string" ||
+      decoded.tokenUse !== tokenUse ||
+      typeof decoded.id !== "string" ||
+      decoded.session !== decoded.id
+    ) {
+      return invalid;
+    }
+    return { expired: false, decoded: { id: decoded.id, session: decoded.id } };
+  } catch (error) {
+    return { ...invalid, expired: error instanceof jwt.TokenExpiredError };
   }
 }

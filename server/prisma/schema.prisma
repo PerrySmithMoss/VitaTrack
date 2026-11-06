@@ -3,12 +3,13 @@
 
 datasource db {
   provider = "postgres"
-  url      = env("DATABASE_URL")
 }
 
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["interactiveTransactions"]
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "cjs"
+  importFileExtension = ""
 }
 
 model Profile {
@@ -66,7 +67,7 @@ model Nutrition {
   id           Int      @id @default(autoincrement())
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-  date         DateTime @unique
+  date         DateTime
   calories     Int?
   protein      Int?
   fat          Int?
@@ -74,6 +75,8 @@ model Nutrition {
   userId       String
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   foods        Food[]
+
+  @@unique([userId, date])
 }
 
 model Food {

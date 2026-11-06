@@ -1,5 +1,5 @@
 import React from 'react';
-import { Workout } from '../../../../graphql/generated/graphql';
+import type { Workout } from '../../../../graphql/generated/schema';
 
 interface WorkoutCardProps {
   workout: Workout;
@@ -7,7 +7,7 @@ interface WorkoutCardProps {
 
 export const WorkoutCard: React.FC<WorkoutCardProps> = ({ workout }) => {
   return (
-    <div className="relative bg-white pt-3 pb-1 px-2 rounded-3xl w-full  cursor-pointer border hover:shadow">
+    <div className="relative bg-white pt-3 pb-1 px-2 rounded-3xl w-full  cursor-pointer border hover:shadow-sm">
       {/* <div
         className={`text-white flex items-center absolute rounded-full py-4 px-4 shadow-xl ${
           workout.type === 'Cardio' ? 'bg-purple-500' : 'bg-blue-500'

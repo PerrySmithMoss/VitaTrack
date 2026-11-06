@@ -87,7 +87,7 @@ export const Calories: React.FC<CaloriesProps> = () => {
         </div>
       </div>
       <div
-        className="shadow w-[350px] h-[270px] rounded-lg cursor-pointer flex justify-center items-center bg-[#fafafa] hover:bg-gray-100 mt-3 pr-6"
+        className="shadow-sm w-[350px] h-[270px] rounded-lg cursor-pointer flex justify-center items-center bg-[#fafafa] hover:bg-gray-100 mt-3 pr-6"
       >
         <ResponsiveContainer width="100%" height={270}>
           <PieChart>

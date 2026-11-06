@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+
+if [ "${1:-}" != postgres ]; then
+  echo "Expected the postgres user" >&2
+  exit 1
+fi
+shift
+exec setpriv --reuid=postgres --regid=postgres --init-groups -- "$@"

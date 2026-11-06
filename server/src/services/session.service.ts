@@ -1,5 +1,3 @@
-import { SignOptions } from "jsonwebtoken";
-import { config } from "../config/config";
 import prisma from "../lib/prisma";
 import { signJwt, verifyJwt } from "../utils/jwt";
 import { findUserById } from "./user.service";
@@ -25,26 +23,8 @@ export async function createSession(userId: string, userAgent: string) {
   return session;
 }
 
-interface Decoded {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
-  email: string;
-  password: null | string;
-  username: string;
-  session: string;
-  iat: number;
-  exp: number;
-}
-
-interface IJwtPayload {
-  valid: boolean;
-  expired: boolean;
-  decoded: Decoded | null;
-}
-
 export async function reIssueAccessToken(refreshToken: string) {
-  const { decoded } = verifyJwt(refreshToken) as IJwtPayload;
+  const { decoded } = verifyJwt(refreshToken, "refresh");
 
   if (!decoded || !decoded.session) return false;
 
@@ -60,12 +40,7 @@ export async function reIssueAccessToken(refreshToken: string) {
 
   if (!user) return false;
 
-  const accessToken = signJwt(
-    { ...user, session: session.userId },
-    { expiresIn: config.accessTokenTtl as SignOptions["expiresIn"] }
-  );
-
-  return accessToken;
+  return signJwt(user.id, "access");
 }
 
 export async function invalidateSession(sessionId: string) {

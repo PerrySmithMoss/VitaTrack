@@ -13,7 +13,7 @@ interface MyProfileProps {}
 const createUserSchema = object({
   password: string(),
   email: string({
-    required_error: 'Email is required',
+    error: (issue) => issue.input === undefined ? 'Email is required' : undefined,
   })
     .email('Not a valid email')
     .min(5, {
@@ -24,18 +24,16 @@ const createUserSchema = object({
     })
     .refine(
       (val) => /^\S+$/.test(val),
-      () => ({
-        message: `Email must not include white space. Please remove any whitespace.`,
-      })
+      { error: 'Email must not include white space. Please remove any whitespace.' }
     ),
-  username: string({ required_error: 'Username is required' })
+  username: string({ error: (issue) => issue.input === undefined ? 'Username is required' : undefined })
     .min(1, {
       message: 'Username too short - should be 1 character minimum',
     })
     .max(100, {
       message: 'Username must be 100 characters or less.',
     }),
-  gender: string({ required_error: 'Gender is required' }),
+  gender: string({ error: (issue) => issue.input === undefined ? 'Gender is required' : undefined }),
 });
 
 type CreateUserInput = TypeOf<typeof createUserSchema>;
@@ -164,7 +162,7 @@ export const MyProfile: React.FC<MyProfileProps> = () => {
             autoSave="off"
             {...register('username')}
             defaultValue={data?.getCurrentUser?.data?.username}
-            className="block w-full mb-1 max-w-[300px]  px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-brand-green focus:ring-brand-green focus:outline-none focus:ring focus:ring-opacity-40"
+            className="block w-full mb-1 max-w-[300px]  px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-brand-green focus:ring-brand-green/40 focus:outline-hidden focus:ring-3"
             placeholder="Enter your username"
           />
           <p className="text-red-400 font-bold text-sm">
@@ -186,7 +184,7 @@ export const MyProfile: React.FC<MyProfileProps> = () => {
             autoSave="off"
             defaultValue={data?.getCurrentUser?.data?.gender}
             aria-label="Gender"
-            className="block mb-1 w-full max-w-[300px]  px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-brand-green focus:ring-brand-green focus:outline-none focus:ring focus:ring-opacity-40"
+            className="block mb-1 w-full max-w-[300px]  px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-brand-green focus:ring-brand-green/40 focus:outline-hidden focus:ring-3"
           >
             <option value="Female">Female</option>
             <option value="Male">Male</option>
@@ -211,7 +209,7 @@ export const MyProfile: React.FC<MyProfileProps> = () => {
             autoCapitalize="off"
             autoSave="off"
             aria-label="Email address"
-            className="block mb-1 w-full max-w-[300px]  px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-brand-green focus:ring-brand-green focus:outline-none focus:ring focus:ring-opacity-40"
+            className="block mb-1 w-full max-w-[300px]  px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-brand-green focus:ring-brand-green/40 focus:outline-hidden focus:ring-3"
             placeholder="Enter your email"
           />
           <p className="text-red-400 font-bold text-sm">
@@ -233,7 +231,7 @@ export const MyProfile: React.FC<MyProfileProps> = () => {
             autoCapitalize="off"
             autoSave="off"
             aria-label="Password"
-            className="block mb-1 w-full max-w-[300px] px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-brand-green focus:ring-brand-green focus:outline-none focus:ring focus:ring-opacity-40"
+            className="block mb-1 w-full max-w-[300px] px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-brand-green focus:ring-brand-green/40 focus:outline-hidden focus:ring-3"
             placeholder="Enter a new password"
           />
           <p className="text-red-400 font-bold text-sm">
@@ -246,7 +244,7 @@ export const MyProfile: React.FC<MyProfileProps> = () => {
         <div className="mt-5">
           <button
             type="submit"
-            className="px-12 py-2 tracking-wide text-white transition-colors duration-200 transform bg-brand-green hover:bg-brand-green-hover rounded-md focus:outline-none focus:bg-brand-green-hover focus:ring focus:ring-blue-300 focus:ring-opacity-50"
+            className="px-12 py-2 tracking-wide text-white transition-colors duration-200 transform bg-brand-green hover:bg-brand-green-hover rounded-md focus:outline-hidden focus:bg-brand-green-hover focus:ring-3 focus:ring-blue-300/50"
           >
             Save
           </button>

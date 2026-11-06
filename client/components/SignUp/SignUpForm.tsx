@@ -1,27 +1,28 @@
 import { useRouter } from 'next/router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   useGoogleOauthHandlerMutation,
   useCreateUserMutation,
   useGetCurrentUserQuery,
   GetCurrentUserQuery,
 } from '../../graphql/generated/graphql';
-import { getGoogleOAuthURL } from '../../utils/getGoogleOAuthURL';
+import {
+  consumeGoogleOAuthCode,
+  getGoogleOAuthURL,
+  startGoogleOAuth,
+} from '../../utils/getGoogleOAuthURL';
 import styles from './SignUp.module.css';
 import SyncLoader from 'react-spinners/SyncLoader';
 
 interface SignUpFormProps {}
 
 export const SignUpForm: React.FC<SignUpFormProps> = () => {
-  const [code, setCode] = useState<string | null>(null);
-  const processedCodeRef = useRef<string | null>(null);
-  const isInitialMountRef = useRef(true);
   const router = useRouter();
 
   const { refetch: refetchCurrentUser } =
     useGetCurrentUserQuery<GetCurrentUserQuery>();
 
-  const { mutate: createUserUsingGoogleCredentials } =
+  const { mutate: createUserUsingGoogleCredentials, isPending: isGoogleSignUpPending } =
     useGoogleOauthHandlerMutation({
       onSuccess: () => handleSuccessfulSignUp(),
       onError: (error) => {
@@ -70,33 +71,9 @@ export const SignUpForm: React.FC<SignUpFormProps> = () => {
   useEffect(() => {
     if (!router.isReady) return;
 
-    const queryCode = router.query.code;
-    if (typeof queryCode === 'string') {
-      setCode(queryCode);
-    }
-  }, [router.isReady, router.query]);
-
-  // Handle OAuth code - using an approach that guarantees it runs only once
-  useEffect(() => {
-    // Skip the first render in development (React 18 StrictMode double invocation)
-    if (isInitialMountRef.current) {
-      isInitialMountRef.current = false;
-      return;
-    }
-
-    // Only attempt to login if we have a code and it's a string
-    // AND we haven't processed this exact code before
-    if (code && typeof code === 'string' && processedCodeRef.current !== code) {
-      // Mark this code as processed immediately to prevent duplicate calls
-      processedCodeRef.current = code;
-
-      // Use setTimeout to ensure this runs after the current JS execution cycle
-      // This helps avoid any duplicate calls during React's rendering phases
-      setTimeout(() => {
-        createUserUsingGoogleCredentials({ code: code as string });
-      }, 0);
-    }
-  }, [code, createUserUsingGoogleCredentials]);
+    const code = consumeGoogleOAuthCode(router.query.code, router.query.state);
+    if (code) createUserUsingGoogleCredentials({ code });
+  }, [router.isReady, router.query.code, router.query.state, createUserUsingGoogleCredentials]);
 
   return (
     <form onSubmit={onSubmit}>
@@ -114,7 +91,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = () => {
           placeholder="janedoe@example.com"
           value={user.email}
           onChange={handleUserInputChange}
-          className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
+          className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-blue-400 focus:ring-blue-400/40 focus:outline-hidden focus:ring-3"
         />
       </div>
       <div className="mt-4">
@@ -131,7 +108,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = () => {
           placeholder="Your password"
           value={user.password}
           onChange={handleUserInputChange}
-          className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
+          className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-blue-400 focus:ring-blue-400/40 focus:outline-hidden focus:ring-3"
         />
       </div>
       <div className="mt-4">
@@ -147,11 +124,11 @@ export const SignUpForm: React.FC<SignUpFormProps> = () => {
           placeholder="Jane Doe"
           value={user.username}
           onChange={handleUserInputChange}
-          className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
+          className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-blue-400 focus:ring-blue-400/40 focus:outline-hidden focus:ring-3"
         />
       </div>
       <div className="mt-6">
-        <button className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-brand-green hover:bg-brand-green-hover rounded-md focus:outline-none focus:bg-brand-green-hover focus:ring focus:ring-blue-300 focus:ring-opacity-50">
+        <button className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-brand-green hover:bg-brand-green-hover rounded-md focus:outline-hidden focus:bg-brand-green-hover focus:ring-3 focus:ring-blue-300/50">
           Sign up
         </button>
       </div>
@@ -164,7 +141,8 @@ export const SignUpForm: React.FC<SignUpFormProps> = () => {
         <div className=" mt-5 flex-col flex space-y-4">
           <a
             href={getGoogleOAuthURL()}
-            className="w-full justify-center bg-white border shadow-md hover:bg-gray-100 px-4 py-3 font-semibold inline-flex items-center space-x-2 rounded"
+            onClick={startGoogleOAuth}
+            className="w-full justify-center bg-white border shadow-md hover:bg-gray-100 px-4 py-3 font-semibold inline-flex items-center space-x-2 rounded-sm"
           >
             <svg
               viewBox="0 0 24 24"
@@ -192,7 +170,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = () => {
             </svg>
             <span className="font-semibold text-sm">Sign up with Google</span>
           </a>
-          {/* <a className="w-full justify-center text-center bg-blue-500 shadow-md hover:bg-blue-700 px-4 py-3 font-semibold text-white inline-flex items-center space-x-2 rounded">
+          {/* <a className="w-full justify-center text-center bg-blue-500 shadow-md hover:bg-blue-700 px-4 py-3 font-semibold text-white inline-flex items-center space-x-2 rounded-sm">
             <svg
               className="w-5 h-5 fill-current"
               role="img"
@@ -205,7 +183,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = () => {
           </a> */}
         </div>
       </div>
-      {code && (
+      {isGoogleSignUpPending && (
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <SyncLoader color={'#00CC99'} size={25} />
         </div>

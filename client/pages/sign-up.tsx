@@ -53,10 +53,10 @@ const SignUpPage: NextPage<SignUpPageProps> = () => {
                 <p className="mt-6 text-sm text-center text-gray-400">
                   Already have an account?{' '}
                   <Link
-                    className="cursor-pointer focus:outline-none focus:underline hover:underline"
+                    className="cursor-pointer focus:outline-hidden focus:underline hover:underline"
                     href="/"
                   >
-                    <span className="text-blue-500 cursor-pointer focus:outline-none focus:underline hover:underline">
+                    <span className="text-blue-500 cursor-pointer focus:outline-hidden focus:underline hover:underline">
                       Log in
                     </span>
                   </Link>

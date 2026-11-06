@@ -28,7 +28,7 @@ const deserializeUser: MiddlewareFn<PrismaContext> = async (
       }
 
       // Verify the new access token
-      const result = verifyJwt(newAccessToken as string);
+      const result = verifyJwt(newAccessToken, "access");
 
       // Attach the decoded user to the response for later use
       context.res.locals.user = result.decoded;
@@ -37,7 +37,7 @@ const deserializeUser: MiddlewareFn<PrismaContext> = async (
   }
 
   // There is an access token
-  const { decoded, expired } = verifyJwt(accessToken);
+  const { decoded, expired } = verifyJwt(accessToken, "access");
 
   if (decoded) {
     // If there is an access token just attach the decoded user to the response for later use
@@ -58,11 +58,11 @@ const deserializeUser: MiddlewareFn<PrismaContext> = async (
       );
     }
 
-    const result = verifyJwt(newAccessToken as string);
+    const result = verifyJwt(newAccessToken, "access");
 
     context.res.locals.user = result.decoded;
-    return next();
   }
+  return next();
 };
 
 export default deserializeUser;

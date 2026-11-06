@@ -4,12 +4,13 @@ import express, { Application } from "express";
 import { createServer } from "http";
 import { config } from "./config/config";
 import prisma from "./lib/prisma";
-import { ApolloServer } from "apollo-server-express";
-import {
-  ApolloServerPluginDrainHttpServer,
-  ApolloServerPluginLandingPageLocalDefault,
-} from "apollo-server-core";
-import { buildSchema } from "type-graphql";
+import { ApolloServer } from "@apollo/server";
+import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
+import { ApolloServerPluginLandingPageLocalDefault } from "@apollo/server/plugin/landingPage/default";
+import { expressMiddleware } from "@as-integrations/express5";
+import { buildSchema, GraphQLISODateTime } from "type-graphql";
+import { GraphQLScalarType } from "graphql";
+import { PrismaContext } from "./types/PrismaContext";
 import {
   SessionResolver,
   UserResolver,
@@ -21,6 +22,11 @@ import {
 import cors from "cors";
 import cookieParser from "cookie-parser";
 // import { deserializeUser } from './middleware/deserializeUser'; // future enhancement
+
+const dateTimeScalar = new GraphQLScalarType({
+  ...GraphQLISODateTime.toConfig(),
+  name: "DateTime",
+});
 
 const app: Application = express();
 const httpServer = createServer(app);
@@ -45,16 +51,15 @@ async function startServer() {
         NutritionResolver,
         FoodResolver,
       ],
+      scalarsMap: [{ type: Date, scalar: dateTimeScalar }],
       validate: false,
       // globalMiddlewares: [deserializeUser], // optional for auth
     });
 
-    const apolloServer = new ApolloServer({
+    const apolloServer = new ApolloServer<PrismaContext>({
       schema,
-      context: ({ req, res }) => ({ prisma, req, res }),
       introspection: config.isProduction,
       csrfPrevention: true,
-      cache: "bounded",
       plugins: [
         ApolloServerPluginDrainHttpServer({ httpServer }),
         ApolloServerPluginLandingPageLocalDefault({ embed: true }),
@@ -62,7 +67,13 @@ async function startServer() {
     });
 
     await apolloServer.start();
-    apolloServer.applyMiddleware({ app, cors: corsOptions });
+    app.use(
+      "/graphql",
+      express.json(),
+      expressMiddleware(apolloServer, {
+        context: async ({ req, res }) => ({ prisma, req, res }),
+      })
+    );
 
     httpServer.listen(config.serverPort, () => {
       console.log(`🚀 Server ready at ${config.serverURL}`);

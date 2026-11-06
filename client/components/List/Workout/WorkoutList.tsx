@@ -1,5 +1,5 @@
 import React from 'react';
-import { Exercise as IExercise } from '../../../graphql/generated/graphql';
+import type { Exercise as IExercise } from '../../../graphql/generated/schema';
 import { useGlobalContext } from '../../../state/context/global.context';
 import { Exercise } from './Exercise';
 

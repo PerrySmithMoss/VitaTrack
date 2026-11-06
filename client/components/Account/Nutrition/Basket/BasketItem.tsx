@@ -251,7 +251,7 @@ export const BasketItem: React.FC<BasketItemProps> = ({
         width={35}
         alt={food.food_name}
       />
-      <div className="flex-grow w-full max-w-[280px]">
+      <div className="grow w-full max-w-[280px]">
         {food.brand_name ? (
           <div className="flex-col flex">
             <div>
@@ -280,13 +280,13 @@ export const BasketItem: React.FC<BasketItemProps> = ({
           id="servingQty"
           onChange={(e) => handleChangeQty(e, food.food_name)}
           value={quantity}
-          className="block p-2 w-full text-center bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded"
+          className="block p-2 w-full text-center bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm"
         />
       </div>
       <div className="w-[200px] pl-3">
         <select
           onChange={(e) => handleChangeMeasurement(e, food.food_name)}
-          className="block p-2 w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded"
+          className="block p-2 w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm"
           name="measurement"
           id="measurement"
         >

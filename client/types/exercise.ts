@@ -1,4 +1,4 @@
-import { Exercise, StrengthSet } from '../graphql/generated/graphql';
+import type { Exercise, StrengthSet } from '../graphql/generated/schema';
 
 export const ADD_EXERCISE_TO_WORKOUT = 'ADD_EXERCISE_TO_WORKOUT';
 export const ADD_SET_TO_EXERCISE = 'ADD_SET_TO_EXERCISE';

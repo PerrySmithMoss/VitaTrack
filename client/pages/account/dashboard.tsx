@@ -111,7 +111,7 @@ const DashboardPage: NextPage<DashboardPageProps> = () => {
           />
           <link rel="icon" href="/favicon.ico" />
         </Head>
-        <div className="relative min-h-screen h-full flex flex-col flex-auto flex-shrink-0 antialiased bg-white">
+        <div className="relative min-h-screen h-full flex flex-col flex-auto shrink-0 antialiased bg-white">
           <div className="flex h-screen w-full">
             <SidebarNav />
             <main className="w-full">
@@ -120,7 +120,7 @@ const DashboardPage: NextPage<DashboardPageProps> = () => {
                 <div className="flex items-center flex-wrap gap-6">
                   <TodaysMacros />
                   <TodaysWorkout />
-                  <section className="mt-2 flex-grow">
+                  <section className="mt-2 grow">
                     <h2 className="text-2xl font-bold text-[#2b3042]">
                       Trends
                     </h2>

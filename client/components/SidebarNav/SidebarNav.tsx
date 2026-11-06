@@ -28,7 +28,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = () => {
       {/* Mobile */}
       <aside
         className={
-          `fixed md:hidden overflow-hidden z-50 inset-0 transform ease-in-out bg-gray-900 bg-opacity-40
+          `fixed md:hidden overflow-hidden z-50 inset-0 transform ease-in-out bg-gray-900/40
         ` +
           (isSidebarOpen
             ? ' transition-opacity opacity-100 duration-500 translate-x-0'

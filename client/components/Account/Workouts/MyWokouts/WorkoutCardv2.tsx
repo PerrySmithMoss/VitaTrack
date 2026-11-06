@@ -2,12 +2,12 @@ import moment from 'moment';
 import React, { useRef, useState } from 'react';
 import ReactDatePicker from 'react-datepicker';
 import { GiWeightLiftingUp } from 'react-icons/gi';
+import type { Workout } from '../../../../graphql/generated/schema';
 import {
   GetUsersWorkoutsQuery,
   useDeleteWorkoutMutation,
   useEditWorkoutMutation,
   useGetUsersWorkoutsQuery,
-  Workout,
 } from '../../../../graphql/generated/graphql';
 import { useGlobalContext } from '../../../../state/context/global.context';
 import { WorkoutList } from '../../../List/Workout/WorkoutList';
@@ -144,7 +144,7 @@ export const WorkoutCardv2: React.FC<WorkoutCardv2Props> = ({ workout }) => {
 
   return (
     <>
-      <div className="shadow relative h-auto w-full xs:h-[320px] xs:w-[275px] p-6 rounded-lg mt-5   bg-[#fafafa] flex items-center flex-col justify-center">
+      <div className="shadow-sm relative h-auto w-full xs:h-[320px] xs:w-[275px] p-6 rounded-lg mt-5   bg-[#fafafa] flex items-center flex-col justify-center">
         <div className="mt-6">
           <GiWeightLiftingUp size={70} color="#2b3042" />
         </div>
@@ -282,7 +282,7 @@ export const WorkoutCardv2: React.FC<WorkoutCardv2Props> = ({ workout }) => {
           selector="addWorkoutModal"
           title="Edit Workout"
         >
-          <div className="relative flex  flex-col overflow-x-hidden w-full flex-grow flex-shrink min-h-0 overflow-auto">
+          <div className="relative flex  flex-col overflow-x-hidden w-full grow shrink min-h-0 overflow-auto">
             <div className="overflow-y-auto h-auto max-h-[600px] w-full">
               <section className="w-full flex flex-col mb-4 bg-gray-100">
                 <div className="">
@@ -292,20 +292,20 @@ export const WorkoutCardv2: React.FC<WorkoutCardv2Props> = ({ workout }) => {
                     name="name"
                     value={currWorkout.name}
                     onChange={handleUserInputChange}
-                    className="block border-t bg-transparent py-3 px-4  w-full outline-none"
+                    className="block border-t bg-transparent py-3 px-4  w-full outline-hidden"
                   />
                   <div className="mx-4">
                     <hr />
                   </div>
                   <div className="flex items-center">
-                    <div className="block border-l text-gray-800 bg-transparent py-3 px-4 w-full outline-none">
+                    <div className="block border-l text-gray-800 bg-transparent py-3 px-4 w-full outline-hidden">
                       <span>Start Time:</span>
                     </div>
-                    <div className="block text-gray-800 bg-transparent py-3 px-4 w-full outline-none">
+                    <div className="block text-gray-800 bg-transparent py-3 px-4 w-full outline-hidden">
                       <ReactDatePicker
                         selected={currWorkout.startDate}
                         // selected={moment(data.startTime) || moment()}
-                        onChange={(date) =>
+                        onChange={(date: Date | null) =>
                           setCurrWorkout({
                             ...currWorkout,
                             startDate: date as Date,
@@ -316,7 +316,7 @@ export const WorkoutCardv2: React.FC<WorkoutCardv2Props> = ({ workout }) => {
                         showTimeSelect
                         timeIntervals={1}
                         timeFormat="HH:mm"
-                        className="block cursor-pointer text-right text-gray-800 bg-transparent  w-full outline-none"
+                        className="block cursor-pointer text-right text-gray-800 bg-transparent  w-full outline-hidden"
                       />
                     </div>
                   </div>
@@ -324,15 +324,15 @@ export const WorkoutCardv2: React.FC<WorkoutCardv2Props> = ({ workout }) => {
                     <hr />
                   </div>
                   <div className="flex items-center">
-                    <div className="block border-l text-gray-800 bg-transparent py-3 px-4 w-full outline-none">
+                    <div className="block border-l text-gray-800 bg-transparent py-3 px-4 w-full outline-hidden">
                       <span>End Time:</span>
                     </div>
-                    <div className="block text-gray-800 bg-transparent py-3 px-4 w-full outline-none">
+                    <div className="block text-gray-800 bg-transparent py-3 px-4 w-full outline-hidden">
                       <ReactDatePicker
                         selected={currWorkout.endDate}
                         // selected={moment("September 6th, 2022 10:22 AM", 'MMMM Do, yyyy h:mm aa').toDate() || workout.endDate}
                         // selected={moment(data.endTime) || moment()}
-                        onChange={(date) =>
+                        onChange={(date: Date | null) =>
                           setCurrWorkout({
                             ...currWorkout,
                             endDate: date as Date,
@@ -343,7 +343,7 @@ export const WorkoutCardv2: React.FC<WorkoutCardv2Props> = ({ workout }) => {
                         showTimeSelect
                         timeIntervals={1}
                         timeFormat="HH:mm"
-                        className="block cursor-pointer text-right text-gray-800 bg-transparent w-full outline-none"
+                        className="block cursor-pointer text-right text-gray-800 bg-transparent w-full outline-hidden"
                       />
                     </div>
                   </div>
@@ -351,7 +351,7 @@ export const WorkoutCardv2: React.FC<WorkoutCardv2Props> = ({ workout }) => {
                     <hr />
                   </div>
                   <div className="flex items-center justify-between">
-                    <div className="block border-l text-gray-800 bg-transparent py-3 px-4 w-full outline-none">
+                    <div className="block border-l text-gray-800 bg-transparent py-3 px-4 w-full outline-hidden">
                       <span>Bodyweight</span>
                     </div>
                     <div className="flex items-center space-x-1 text-gray-800  py-3 px-4">
@@ -369,7 +369,7 @@ export const WorkoutCardv2: React.FC<WorkoutCardv2Props> = ({ workout }) => {
                           //   }
                           // }}
                           onChange={handleUserInputChange}
-                          className="block cursor-pointer text-right text-gray-800 bg-transparent w-full outline-none"
+                          className="block cursor-pointer text-right text-gray-800 bg-transparent w-full outline-hidden"
                         />
                       </div>
                       <div className="flex items-center space-x-2">
@@ -392,7 +392,7 @@ export const WorkoutCardv2: React.FC<WorkoutCardv2Props> = ({ workout }) => {
                     value={currWorkout.notes || ''}
                     name="notes"
                     onChange={handleUserInputChange}
-                    className="block  text-gray-800 border-b bg-transparent py-3 px-4 w-full outline-none"
+                    className="block  text-gray-800 border-b bg-transparent py-3 px-4 w-full outline-hidden"
                   />
                 </div>
               </section>
@@ -400,7 +400,7 @@ export const WorkoutCardv2: React.FC<WorkoutCardv2Props> = ({ workout }) => {
               <div className="mx-3 mt-4">
                 <button
                   onClick={handleAddExercise}
-                  className="rounded w-full py-2 bg-gray-100 hover:bg-gray-200  text-gray-800 focus:shadow-outline focus:outline-none"
+                  className="rounded-sm w-full py-2 bg-gray-100 hover:bg-gray-200  text-gray-800 focus:shadow-outline focus:outline-hidden"
                 >
                   Add Exercise
                 </button>
@@ -418,14 +418,14 @@ export const WorkoutCardv2: React.FC<WorkoutCardv2Props> = ({ workout }) => {
                     workout.exercises.length === 0
                       ? 'opacity-50 cursor-not-allowed'
                       : ''
-                  } rounded px-5 py-1.5 bg-brand-green hover:bg-brand-green-hover text-white focus:shadow-outline focus:outline-none`}
+                  } rounded-sm px-5 py-1.5 bg-brand-green hover:bg-brand-green-hover text-white focus:shadow-outline focus:outline-hidden`}
                 >
                   Save
                 </button>
                 <button
                   onClick={() => setIsEditWorkoutModalOpen(false)}
                   id="cancel"
-                  className="ml-3 rounded-sm px-3 hover:text-gray-600 focus:shadow-outline focus:outline-none"
+                  className="ml-3 rounded-xs px-3 hover:text-gray-600 focus:shadow-outline focus:outline-hidden"
                 >
                   Cancel
                 </button>

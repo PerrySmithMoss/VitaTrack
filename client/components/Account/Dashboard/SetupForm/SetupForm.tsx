@@ -114,7 +114,7 @@ export const SetupForm: React.FC<SetupFormProps> = () => {
                         currentWeight: e.target.value,
                       })
                     }
-                    className="block w-1/2 px-4 py-3 mt-3 placeholder-gray-600 bg-white border border-gray-200 rounded-md focus:border-brand-green focus:ring-brand-green focus:outline-none focus:ring focus:ring-opacity-40"
+                    className="block w-1/2 px-4 py-3 mt-3 placeholder-gray-600 bg-white border border-gray-200 rounded-md focus:border-brand-green focus:ring-brand-green/40 focus:outline-hidden focus:ring-3"
                   />
                 </div>
                 {formAnswers.weightGoal !== 'Maintain weight' && (
@@ -137,7 +137,7 @@ export const SetupForm: React.FC<SetupFormProps> = () => {
                           goalWeight: e.target.value,
                         })
                       }
-                      className="block w-1/2 px-4 py-3 mt-4 placeholder-gray-600 bg-white border border-gray-200 rounded-md focus:border-brand-green focus:ring-brand-green focus:outline-none focus:ring focus:ring-opacity-40"
+                      className="block w-1/2 px-4 py-3 mt-4 placeholder-gray-600 bg-white border border-gray-200 rounded-md focus:border-brand-green focus:ring-brand-green/40 focus:outline-hidden focus:ring-3"
                     />
                   </div>
                 )}
@@ -146,7 +146,7 @@ export const SetupForm: React.FC<SetupFormProps> = () => {
                     <div className="w-full">
                       <button
                         onClick={() => setFormStep(2)}
-                        className="border-2 hover:bg-brand-green hover:bg-opacity-10 text-brand-green border-brand-green uppercase font-bold transition-colors duration-200 transform w-full py-3 rounded"
+                        className="border-2 hover:bg-brand-green/10 text-brand-green border-brand-green uppercase font-bold transition-colors duration-200 transform w-full py-3 rounded-sm"
                       >
                         Back
                       </button>
@@ -154,7 +154,7 @@ export const SetupForm: React.FC<SetupFormProps> = () => {
                     <div className="w-full">
                       <button
                         onClick={handleCompleteEditingGoals}
-                        className="border-2 hover:border-brand-green-hover border-brand-green text-white bg-brand-green hover:bg-brand-green-hover uppercase font-bold transition-colors duration-200 transform w-full py-3 rounded"
+                        className="border-2 hover:border-brand-green-hover border-brand-green text-white bg-brand-green hover:bg-brand-green-hover uppercase font-bold transition-colors duration-200 transform w-full py-3 rounded-sm"
                       >
                         Complete
                       </button>
@@ -185,7 +185,7 @@ export const SetupForm: React.FC<SetupFormProps> = () => {
                           formAnswers.weightGoal === 'Lose weight'
                             ? 'border-brand-green font-bold'
                             : ' border-gray-300 hover:border-gray-400'
-                        } text-lg w-full py-3 rounded`}
+                        } text-lg w-full py-3 rounded-sm`}
                       >
                         Lose weight
                       </button>
@@ -202,7 +202,7 @@ export const SetupForm: React.FC<SetupFormProps> = () => {
                           formAnswers.weightGoal === 'Maintain weight'
                             ? 'border-brand-green font-bold'
                             : 'border-gray-300 hover:border-gray-400'
-                        } text-lg w-full py-3 rounded`}
+                        } text-lg w-full py-3 rounded-sm`}
                       >
                         Maintain weight
                       </button>
@@ -219,7 +219,7 @@ export const SetupForm: React.FC<SetupFormProps> = () => {
                           formAnswers.weightGoal === 'Gain weight'
                             ? 'border-brand-green font-bold'
                             : ' border-gray-300 hover:border-gray-400'
-                        } text-lg w-full py-3 rounded`}
+                        } text-lg w-full py-3 rounded-sm`}
                       >
                         Gain weight
                       </button>
@@ -229,7 +229,7 @@ export const SetupForm: React.FC<SetupFormProps> = () => {
                     <div className="w-full">
                       <button
                         onClick={() => setFormStep(1)}
-                        className="border-2 hover:bg-brand-green hover:bg-opacity-10 text-brand-green border-brand-green uppercase font-bold transition-colors duration-200 transform w-full py-3 rounded"
+                        className="border-2 hover:bg-brand-green/10 text-brand-green border-brand-green uppercase font-bold transition-colors duration-200 transform w-full py-3 rounded-sm"
                       >
                         Back
                       </button>
@@ -237,7 +237,7 @@ export const SetupForm: React.FC<SetupFormProps> = () => {
                     <div className="w-full">
                       <button
                         onClick={() => setFormStep(3)}
-                        className="border-2 hover:border-brand-green-hover border-brand-green text-white bg-brand-green hover:bg-brand-green-hover uppercase font-bold transition-colors duration-200 transform w-full py-3 rounded"
+                        className="border-2 hover:border-brand-green-hover border-brand-green text-white bg-brand-green hover:bg-brand-green-hover uppercase font-bold transition-colors duration-200 transform w-full py-3 rounded-sm"
                       >
                         Next
                       </button>
@@ -258,7 +258,7 @@ export const SetupForm: React.FC<SetupFormProps> = () => {
                 <div className="flex w-full mt-10">
                   <button
                     onClick={() => setFormStep(2)}
-                    className="text-white bg-brand-green uppercase font-bold transition-colors duration-200 transform hover:bg-brand-green-hover w-full py-3 rounded"
+                    className="text-white bg-brand-green uppercase font-bold transition-colors duration-200 transform hover:bg-brand-green-hover w-full py-3 rounded-sm"
                   >
                     Continue
                   </button>

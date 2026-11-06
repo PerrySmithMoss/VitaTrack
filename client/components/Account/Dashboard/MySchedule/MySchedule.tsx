@@ -1,10 +1,7 @@
 import React from 'react';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
-import format from 'date-fns/format';
-import parse from 'date-fns/parse';
-import startOfWeek from 'date-fns/startOfWeek';
-import getDay from 'date-fns/getDay';
-import enGB from 'date-fns/locale/en-GB';
+import { format, getDay, parse, startOfWeek } from 'date-fns';
+import { enGB } from 'date-fns/locale/en-GB';
 
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -35,12 +32,12 @@ export const MySchedule: React.FC<MyScheduleProps> = () => {
           <h3 className="text-2xl font-bold text-[#2b3042]">My Schedule</h3>
         </div>
         <div>
-          <button className="px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded">
+          <button className="px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-sm">
             View all
           </button>
         </div>
       </div>
-      <div className="shadow mt-5 rounded-lg cursor-pointer pt-4 pr-4 flex-1 justify-center items-center bg-[#fafafa]">
+      <div className="shadow-sm mt-5 rounded-lg cursor-pointer pt-4 pr-4 flex-1 justify-center items-center bg-[#fafafa]">
         <Calendar
           localizer={localizer}
           // events={myEventsList}

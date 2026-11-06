@@ -255,9 +255,9 @@ export const Macros: React.FC<MacrosProps> = () => {
           </button>
         </div>
       </div>
-      <div className="shadow w-[350px] h-[270px] rounded-lg cursor-pointer flex justify-center items-center bg-[#fafafa] hover:bg-gray-100 mt-3 pr-6">
+      <div className="shadow-sm w-[350px] h-[270px] rounded-lg cursor-pointer flex justify-center items-center bg-[#fafafa] hover:bg-gray-100 mt-3 pr-6">
         <ResponsiveContainer>
-          <PieChart layout="vertical">
+          <PieChart>
             <Pie
               data={data01}
               dataKey="value"
@@ -299,15 +299,15 @@ export const Macros: React.FC<MacrosProps> = () => {
           selector="editMacrosModal"
           title="Daily Nutrition Goals"
         >
-          <div className="relative flex  flex-col overflow-x-hidden w-full flex-grow flex-shrink min-h-0 overflow-auto">
+          <div className="relative flex  flex-col overflow-x-hidden w-full grow shrink min-h-0 overflow-auto">
             <div className="overflow-y-auto h-auto max-h-[600px] w-full">
               <section className="w-full flex flex-col mb-4">
                 <div>
                   <div className="flex items-center bg-gray-100 border-b border-t">
-                    <div className="block  text-gray-800 bg-transparent py-3 px-4 w-full outline-none">
+                    <div className="block  text-gray-800 bg-transparent py-3 px-4 w-full outline-hidden">
                       <span>Calories:</span>
                     </div>
-                    <div className="flex justify-end bg-gray-100 text-gray-800 bg-transparent py-3 px-4 w-full outline-none">
+                    <div className="flex justify-end bg-gray-100 text-gray-800 bg-transparent py-3 px-4 w-full outline-hidden">
                       <input
                         type="text"
                         name="calories"
@@ -326,12 +326,12 @@ export const Macros: React.FC<MacrosProps> = () => {
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <div className="block border-l text-gray-800 bg-transparent py-3 px-4 w-full outline-none">
+                    <div className="block border-l text-gray-800 bg-transparent py-3 px-4 w-full outline-hidden">
                       <span className="font-bold">Macronutrients</span>
                     </div>
                   </div>
                   <div className="flex items-center bg-gray-100 border-t">
-                    <div className="flex items-center gap-2 border-l text-gray-800 bg-transparent py-3 px-4 w-full outline-none">
+                    <div className="flex items-center gap-2 border-l text-gray-800 bg-transparent py-3 px-4 w-full outline-hidden">
                       <div>
                         <span>Protein</span>
                       </div>
@@ -347,7 +347,7 @@ export const Macros: React.FC<MacrosProps> = () => {
                         </span>
                       </div>
                     </div>
-                    <div className="flex justify-end text-gray-800 bg-transparent py-3 px-4 w-full outline-none">
+                    <div className="flex justify-end text-gray-800 bg-transparent py-3 px-4 w-full outline-hidden">
                       <select
                         name="protein"
                         onChange={(e) =>
@@ -372,7 +372,7 @@ export const Macros: React.FC<MacrosProps> = () => {
                     </div>
                   </div>
                   <div className="flex items-center bg-gray-100 border-t">
-                    <div className="flex items-center gap-2 border-l text-gray-800 bg-transparent py-3 px-4 w-full outline-none">
+                    <div className="flex items-center gap-2 border-l text-gray-800 bg-transparent py-3 px-4 w-full outline-hidden">
                       <div>
                         <span>Carbohydrates</span>
                       </div>
@@ -391,7 +391,7 @@ export const Macros: React.FC<MacrosProps> = () => {
                         </span>
                       </div>
                     </div>
-                    <div className="flex justify-end text-gray-800  bg-transparent py-3 px-4 w-full outline-none">
+                    <div className="flex justify-end text-gray-800  bg-transparent py-3 px-4 w-full outline-hidden">
                       <select
                         name="carbohydrates"
                         onChange={(e) =>
@@ -416,7 +416,7 @@ export const Macros: React.FC<MacrosProps> = () => {
                     </div>
                   </div>
                   <div className="flex items-center bg-gray-100 border-t">
-                    <div className="flex items-center gap-2 border-l text-gray-800 bg-transparent py-3 px-4 w-full outline-none">
+                    <div className="flex items-center gap-2 border-l text-gray-800 bg-transparent py-3 px-4 w-full outline-hidden">
                       <div>
                         <span>Fat</span>
                       </div>
@@ -432,7 +432,7 @@ export const Macros: React.FC<MacrosProps> = () => {
                         </span>
                       </div>
                     </div>
-                    <div className="flex justify-end text-gray-800 bg-transparent py-3 px-4 w-full outline-none">
+                    <div className="flex justify-end text-gray-800 bg-transparent py-3 px-4 w-full outline-hidden">
                       <select
                         name="fat"
                         value={fatInput}
@@ -455,7 +455,7 @@ export const Macros: React.FC<MacrosProps> = () => {
                     </div>
                   </div>
                   <div className="flex items-center border-b bg-gray-100 border-t">
-                    <div className="block border-l text-gray-800 bg-transparent py-3 px-4 w-full outline-none">
+                    <div className="block border-l text-gray-800 bg-transparent py-3 px-4 w-full outline-hidden">
                       <div>
                         <span className="font-bold text-sm">% Total</span>
                       </div>
@@ -483,7 +483,7 @@ export const Macros: React.FC<MacrosProps> = () => {
                 <button
                   disabled={proteinInput + carbohydrateInput + fatInput !== 100}
                   onClick={handleCompleteEditingMacros}
-                  className={`rounded px-5 py-1.5 bg-brand-green  text-white focus:shadow-outline focus:outline-none ${
+                  className={`rounded-sm px-5 py-1.5 bg-brand-green  text-white focus:shadow-outline focus:outline-hidden ${
                     proteinInput + carbohydrateInput + fatInput !== 100
                       ? `opacity-50 cursor-not-allowed`
                       : `hover:bg-brand-green-hover`
@@ -494,7 +494,7 @@ export const Macros: React.FC<MacrosProps> = () => {
                 <button
                   onClick={() => setIsEditMacrosModalOpen(false)}
                   id="cancel"
-                  className="ml-3 rounded-sm px-3 hover:text-gray-600 focus:shadow-outline focus:outline-none"
+                  className="ml-3 rounded-xs px-3 hover:text-gray-600 focus:shadow-outline focus:outline-hidden"
                 >
                   Cancel
                 </button>

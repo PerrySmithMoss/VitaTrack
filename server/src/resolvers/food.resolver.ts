@@ -201,6 +201,7 @@ export class FoodResolver {
             nutrition: {
               connect: {
                 id: nutritionId,
+                userId,
               },
             },
             user: {
@@ -211,6 +212,7 @@ export class FoodResolver {
           },
           where: {
             id: foodEntry.id,
+            userId,
           },
         });
       } else {
@@ -230,6 +232,7 @@ export class FoodResolver {
             nutrition: {
               connect: {
                 id: nutritionId,
+                userId,
               },
             },
             user: {
@@ -295,6 +298,7 @@ export class FoodResolver {
               nutrition: {
                 connect: {
                   id: nutritionId,
+                  userId,
                 },
               },
               user: {
@@ -730,6 +734,7 @@ export class FoodResolver {
         await ctx.prisma.food.delete({
           where: {
             id: foodItem.id,
+            userId,
           },
         });
         return {

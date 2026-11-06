@@ -161,10 +161,10 @@ export const TodaysMacros: React.FC<TodaysMacrosProps> = () => {
         Today&apos;s Macros
       </h2>
       <div
-        className={`${styles.todaysMacrosGraphWrapper} todaysMacrosGraphWrapper shadow relative rounded-lg cursor-pointer flex justify-center items-center bg-[#fafafa] hover:bg-gray-100 mt-5 pr-3 xs:pr-6`}
+        className={`${styles.todaysMacrosGraphWrapper} todaysMacrosGraphWrapper shadow-sm relative rounded-lg cursor-pointer flex justify-center items-center bg-[#fafafa] hover:bg-gray-100 mt-5 pr-3 xs:pr-6`}
       >
           <ResponsiveContainer >
-            <PieChart layout="vertical">
+            <PieChart>
               <Pie
                 data={data01}
                 dataKey="value"
