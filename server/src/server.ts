@@ -21,7 +21,7 @@ import {
 } from "./resolvers/index";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-// import { deserializeUser } from './middleware/deserializeUser'; // future enhancement
+import { foodData } from "./routes/foodData";
 
 const dateTimeScalar = new GraphQLScalarType({
   ...GraphQLISODateTime.toConfig(),
@@ -41,6 +41,7 @@ async function startServer() {
   try {
     app.use(cors(corsOptions));
     app.use(cookieParser());
+    app.post("/food-data", express.json({ limit: "2kb" }), foodData);
 
     const schema = await buildSchema({
       resolvers: [

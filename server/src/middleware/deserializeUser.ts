@@ -1,15 +1,13 @@
 import { MiddlewareFn } from "type-graphql";
+import type { Request, Response } from "express";
 import { PrismaContext } from "../types/PrismaContext";
 import { verifyJwt } from "../utils/jwt";
 import { reIssueAccessToken } from "../services/session.service";
 import { accessTokenCookieOptions } from "../constants/cookieOptions";
 
-const deserializeUser: MiddlewareFn<PrismaContext> = async (
-  { context },
-  next
-) => {
+export async function deserializeSession(req: Request, res: Response) {
   // Extract access and refresh token from the requests cookies
-  const { accessToken, refreshToken } = context.req.cookies;
+  const { accessToken, refreshToken } = req.cookies;
 
   if (!accessToken) {
     if (refreshToken) {
@@ -18,9 +16,9 @@ const deserializeUser: MiddlewareFn<PrismaContext> = async (
 
       if (newAccessToken) {
         // Set header & cookie with the new access token in response
-        context.res.setHeader("x-access-token", newAccessToken);
+        res.setHeader("x-access-token", newAccessToken);
 
-        context.res.cookie(
+        res.cookie(
           "accessToken",
           newAccessToken,
           accessTokenCookieOptions
@@ -31,9 +29,9 @@ const deserializeUser: MiddlewareFn<PrismaContext> = async (
       const result = verifyJwt(newAccessToken, "access");
 
       // Attach the decoded user to the response for later use
-      context.res.locals.user = result.decoded;
+      res.locals.user = result.decoded;
     }
-    return next();
+    return;
   }
 
   // There is an access token
@@ -41,17 +39,17 @@ const deserializeUser: MiddlewareFn<PrismaContext> = async (
 
   if (decoded) {
     // If there is an access token just attach the decoded user to the response for later use
-    context.res.locals.user = decoded;
-    return next();
+    res.locals.user = decoded;
+    return;
   }
 
   if (expired && refreshToken) {
     const newAccessToken = await reIssueAccessToken(refreshToken);
 
     if (newAccessToken) {
-      context.res.setHeader("x-access-token", newAccessToken);
+      res.setHeader("x-access-token", newAccessToken);
 
-      context.res.cookie(
+      res.cookie(
         "accessToken",
         newAccessToken,
         accessTokenCookieOptions
@@ -60,8 +58,12 @@ const deserializeUser: MiddlewareFn<PrismaContext> = async (
 
     const result = verifyJwt(newAccessToken, "access");
 
-    context.res.locals.user = result.decoded;
+    res.locals.user = result.decoded;
   }
+}
+
+const deserializeUser: MiddlewareFn<PrismaContext> = async ({ context }, next) => {
+  await deserializeSession(context.req, context.res);
   return next();
 };
 

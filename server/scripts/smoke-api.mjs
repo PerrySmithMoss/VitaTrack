@@ -43,6 +43,35 @@ assert.deepEqual(profile.data.getCurrentUsersNutrition.data, []);
 assert.deepEqual(profile.data.getUsersWorkouts.data, []);
 console.log('GraphQL registration, sign-in, nutrition and activity reads passed');
 
+if (process.env.SMOKE_FOOD_DATA_FIXTURE) {
+  async function lookup(action, value, cookie = '') {
+    const response = await fetch(new URL('/food-data', origin), {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', cookie },
+      body: JSON.stringify({ action, value }),
+      signal: AbortSignal.timeout(10000),
+    });
+    return { status: response.status, data: await response.json() };
+  }
+
+  assert.equal((await lookup('search', 'banana')).status, 401);
+  assert.equal((await lookup('search', 'banana', 'accessToken=forged')).status, 401);
+  const match = { id: 2709224, name: 'Banana, raw' };
+  assert.deepEqual(await lookup('search', 'banana', login.cookie), { status: 200, data: [match] });
+  assert.deepEqual(await lookup('details', match.id, login.cookie), {
+    status: 200,
+    data: {
+      ...match,
+      portions: [{ name: 'g', grams: 1 }, { name: '1 banana', grams: 126 }],
+      nutrientsPer100g: { calories: 89, protein: 1.09, fat: 0.33, carbohydrate: 22.84, sugar: 12.23, sodium: 1 },
+    },
+  });
+  assert.deepEqual(await lookup('search', 'rate limit', login.cookie), {
+    status: 502, data: { message: 'Food lookup is unavailable' },
+  });
+  console.log('Authenticated FoodData Central search, portions, nutrients, and provider errors passed');
+}
+
 const currentUserQuery = '{ getCurrentUser { data { id } } }';
 const sessionCookies = Object.fromEntries(login.cookie.split('; ').map(cookie => cookie.split('=')));
 for (const [cookie, use] of [['accessToken', 'access'], ['refreshToken', 'refresh']]) {

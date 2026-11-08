@@ -18,6 +18,10 @@ export const config = {
   ),
 
   jwtSecret: loadSecret("/run/secrets/vita-track_jwt_secret", "JWT_SECRET"),
+  usdaFdcApiKey: loadSecret(
+    "/run/secrets/vita-track_usda_fdc_api_key",
+    "USDA_FDC_API_KEY"
+  ),
   accessTokenTtl: process.env.ACCESS_TOKEN_TTL || "15m",
   refreshTokenTtl: process.env.REFRESH_TOKEN_TTL || "7d",
   accessTokenCookieName: process.env.ACCESS_TOKEN_COOKIE_NAME || "accessToken",

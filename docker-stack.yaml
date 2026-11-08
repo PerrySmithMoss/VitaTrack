@@ -14,6 +14,7 @@ services:
       - vita-track_google_client_id
       - vita-track_google_client_secret
       - vita-track_jwt_secret
+      - vita-track_usda_fdc_api_key
     networks:
       - portfolio_network
     deploy:
@@ -41,4 +42,6 @@ secrets:
   vita-track_google_client_secret:
     external: true
   vita-track_jwt_secret:
+    external: true
+  vita-track_usda_fdc_api_key:
     external: true
