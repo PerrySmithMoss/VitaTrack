@@ -1,5 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import Image from 'next/image';
+import React, { useEffect, useState } from 'react';
 
 import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -32,31 +31,20 @@ import useDebounce from '../../../hooks/useDebounce';
 import { FiChevronLeft } from 'react-icons/fi';
 import { BasketItem } from './Basket/BasketItem';
 import {
-  readNutritionixSearchResponse,
-  type NutritionixSearchFood,
-  type NutritionixSearchResults,
-} from '../../../utils/nutritionixSearch';
+  lookupFood,
+  portionNutrients,
+  type BasketFood,
+  type FoodDetails,
+  type FoodMatch,
+} from '../../../utils/foodLookup';
 
 interface FoodDiaryProps {}
 
 const todaysDate = new Date();
 
-function lookupFood(
-  action: 'search' | 'branded' | 'common',
-  value: string,
-  signal?: AbortSignal
-) {
-  return fetch('/api/nutritionix', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action, value }),
-    signal,
-  });
-}
-
 type FoodSearch = {
   query: string;
-  results: NutritionixSearchResults | null;
+  results: FoodMatch[] | null;
 };
 
 type mealNames =
@@ -81,9 +69,10 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
   const currentSearch = foodSearch?.query === searchTerm ? foodSearch : null;
   const foods = currentSearch?.results;
   const [foodDetailsUnavailable, setFoodDetailsUnavailable] = useState(false);
-  const [selectedFoods, setSelectedFoods] = useState<any[]>([]);
+  const [selectedFoods, setSelectedFoods] = useState<BasketFood[]>([]);
+  const [saveError, setSaveError] = useState(false);
 
-  const { data: usersGoals, refetch: refetchUsersGoals } =
+  const { data: usersGoals } =
     useGetCurrentUsersGoalsQuery();
 
   const { data: usersFood, refetch: refetchUsersFood } =
@@ -93,8 +82,18 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
     onSuccess: () => refetchUsersFood(),
   });
 
-  const { mutate: logFoods } = useAddNutritionWithFoodsMutation({
-    onSuccess: () => refetchUsersFood(),
+  const { mutate: logFoods, isPending: isSavingFoods } = useAddNutritionWithFoodsMutation({
+    onSuccess: ({ addNutritionWithFoods }) => {
+      if (!addNutritionWithFoods.data || addNutritionWithFoods.errors?.length) {
+        setSaveError(true);
+        return;
+      }
+      refetchUsersFood();
+      document.body.style.overflow = 'scroll';
+      setSelectedFoods([]);
+      setIsAddFoodDrawerOpen(false);
+    },
+    onError: () => setSaveError(true),
   });
 
   function sumBy(
@@ -139,37 +138,25 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
     return total;
   }
 
-  function sumOfSelectedFoodsMacros() {
-    const sum = selectedFoods.reduce(
-      (acc, curr) => {
-        return {
-          ...acc,
-          total_calories: acc.total_calories + curr.userMeasurements.calories,
-          total_fat: acc.total_fat + curr.userMeasurements.fat,
-          total_carbs: acc.total_carbs + curr.userMeasurements.carbs,
-          total_protein: acc.total_protein + curr.userMeasurements.protein,
-          total_sodium: acc.total_sodium + curr.userMeasurements.sodium,
-        };
-      },
-      {
-        total_calories: 0,
-        total_fat: 0,
-        total_carbs: 0,
-        total_protein: 0,
-        total_sodium: 0,
-      }
-    );
-    return sum;
-  }
+  const basketTotals = selectedFoods.reduce(
+    (sum, item) => {
+      const nutrients = portionNutrients(item);
+      return {
+        calories: sum.calories + nutrients.calories,
+        protein: sum.protein + nutrients.protein,
+        carbohydrate: sum.carbohydrate + nutrients.carbohydrate,
+        fat: sum.fat + nutrients.fat,
+        sodium: sum.sodium + nutrients.sodium,
+      };
+    },
+    { calories: 0, protein: 0, carbohydrate: 0, fat: 0, sodium: 0 }
+  );
+  const canLogFoods = !!mealNameToEdit && selectedFoods.length > 0 &&
+    selectedFoods.every(({ quantity }) => Number(quantity) >= 0.01 && Number(quantity) <= 10000);
 
   const handleChangeDate = (date: Date) => {
     setSelectedDate(date);
   };
-
-  const memoizedSumOfSelectedFoodsMacros = useMemo(
-    () => sumOfSelectedFoodsMacros(),
-    [selectedFoods]
-  );
 
   const handleGoForwardOneDay = () => {
     const tomorowsDate = selectedDate.setDate(selectedDate.getDate() + 1);
@@ -200,37 +187,17 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
     }
   };
 
-  const handleSelectFood = async (
-    food: NutritionixSearchFood,
-    type: 'branded' | 'common'
-  ) => {
+  const handleSelectFood = async (match: FoodMatch) => {
     setFoodDetailsUnavailable(false);
     try {
-      const value = type === 'branded' ? food.nix_item_id ?? '' : food.food_name;
-      const res = await lookupFood(type, value);
-      if (!res.ok) throw new Error('Food details request failed');
+      const food = await lookupFood<FoodDetails>('details', match.id);
+      const portion = food.portions[0];
+      if (!portion) throw new Error('Food details did not include a serving');
 
-      const foodJSON = await res.json();
-      const foodItem = Array.isArray(foodJSON?.foods) ? foodJSON.foods[0] : null;
-      if (!foodItem || typeof foodItem.food_name !== 'string') {
-        throw new Error('Food details response did not include a food');
-      }
-      const defaultFoodItem = {
-        ...foodItem,
-        userMeasurements: {
-          quantity: foodItem.serving_qty,
-          measure: foodItem.serving_unit,
-          servingWeight: foodItem.serving_weight_grams,
-          calories: Math.round(foodItem.nf_calories),
-          carbs: Math.round(foodItem.nf_total_carbohydrate),
-          protein: Math.round(foodItem.nf_protein),
-          fat: Math.round(foodItem.nf_total_fat),
-          sodium: Math.round(foodItem.nf_sodium),
-          sugar: Math.round(foodItem.nf_sugars),
-        },
-      };
-
-      setSelectedFoods((previous) => [...previous, defaultFoodItem]);
+      setSelectedFoods((previous) => previous.some((item) => item.food.id === food.id)
+        ? previous
+        : [...previous, { food, portion, quantity: '100' }]
+      );
       setSearchInput('');
       setFoodSearch(null);
     } catch {
@@ -239,54 +206,17 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
   };
 
   const handleLogFoods = () => {
-    const loggedFoods = selectedFoods.map((food) => {
-      if (
-        food.userMeasurements.measure === 'g' ||
-        food.userMeasurements.measure === 'gram' ||
-        food.userMeasurements.measure === 'grams'
-      ) {
-        return {
-          calories: convertFloatToOneDecimalPlacev2(
-            food.userMeasurements.calories
-          ),
-          fat: convertFloatToOneDecimalPlacev2(food.userMeasurements.fat),
-          carbohydrate: convertFloatToOneDecimalPlacev2(
-            food.userMeasurements.carbs
-          ),
-          protein: convertFloatToOneDecimalPlacev2(
-            food.userMeasurements.protein
-          ),
-          sodium: convertFloatToOneDecimalPlacev2(food.userMeasurements.sodium),
-          sugar: convertFloatToOneDecimalPlacev2(food.userMeasurements.sugar),
-          servingSize: food.userMeasurements.measure as string,
-          name: food.food_name as string,
-          numOfServings: food.userMeasurements.quantity as number,
-          mealName: mealNameToEdit as string,
-        };
-      } else {
-        return {
-          calories: convertFloatToOneDecimalPlacev2(
-            food.userMeasurements.calories
-          ),
-          fat: convertFloatToOneDecimalPlacev2(food.userMeasurements.fat),
-          carbohydrate: convertFloatToOneDecimalPlacev2(
-            food.userMeasurements.carbs
-          ),
-          protein: convertFloatToOneDecimalPlacev2(
-            food.userMeasurements.protein
-          ),
-          sodium: convertFloatToOneDecimalPlacev2(food.userMeasurements.sodium),
-          sugar: convertFloatToOneDecimalPlacev2(food.userMeasurements.sugar),
-          servingSize: food.userMeasurements.measure as string,
-          name: food.food_name as string,
-          numOfServings: food.userMeasurements.quantity as number,
-          mealName: mealNameToEdit as string,
-        };
-      }
-    });
+    if (!canLogFoods || !mealNameToEdit || isSavingFoods) return;
 
+    setSaveError(false);
     logFoods({
-      foods: loggedFoods,
+      foods: selectedFoods.map((item) => ({
+        ...portionNutrients(item),
+        servingSize: item.portion.name,
+        name: item.food.name,
+        numOfServings: Number(item.quantity),
+        mealName: mealNameToEdit,
+      })),
       nutritionInput: {
         calories: usersGoals?.getCurrentUsersGoals.data?.calories,
         carbohydrate: usersGoals?.getCurrentUsersGoals.data?.carbohydrate,
@@ -295,21 +225,13 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
         date: selectedDate.toISOString(),
       },
     });
-
-    if (typeof window != 'undefined' && window.document) {
-      document.body.style.overflow = 'scroll';
-    }
-
-    setSelectedFoods([]);
-    setIsAddFoodDrawerOpen(false);
   };
 
   useEffect(() => {
-    if (!searchTerm || debouncedSearchTerm !== searchTerm) return;
+    if (searchTerm.length < 2 || debouncedSearchTerm !== searchTerm) return;
 
     const controller = new AbortController();
-    lookupFood('search', searchTerm, controller.signal)
-      .then(readNutritionixSearchResponse)
+    lookupFood<FoodMatch[]>('search', searchTerm, controller.signal)
       .then((results) => {
         if (!controller.signal.aborted) {
           setFoodSearch({ query: searchTerm, results });
@@ -456,7 +378,7 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
             {/* <div className="flex items-center w-full mt-5"> */}
             <div className={styles.basketMacroBreakdown}>
               <div className={`${styles.basketMacroBreakdownCol}`}>
-                {/* {memoizedSumOfSelectedFoodsMacros.total_protein.toLocaleString()} */}
+                {/* {basketTotals.protein.toLocaleString(undefined, { maximumFractionDigits: 1 })} */}
                 {usersFood?.getCurrentUsersFoodByDate.data &&
                   convertFloatToOneDecimalPlacev2(
                     sumBy(
@@ -2396,6 +2318,7 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
                     }}
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-brand-green focus:border-brand-green w-full pl-3 p-2.5"
                     placeholder="Search"
+                    maxLength={120}
                   />
                   <div className="absolute top-[19px] right-0 flex items-center px-3 pointer-events-none">
                     <div>
@@ -2423,93 +2346,47 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
                       Could not load nutrition details for this food. Please try again.
                     </p>
                   )}
-                  {foods && foods.common.length === 0 && foods.branded.length === 0 && (
+                  {foods && foods.length === 0 && (
                     <p role="status" className="mt-2 text-sm text-gray-700">
                       No foods found.
                     </p>
                   )}
-                  {foods && (foods.common.length > 0 || foods.branded.length > 0) && (
+                  {!!foods?.length && (
                     <div
                       className={`border rounded-bl rounded-br absolute ${styles.foodChoicesList}`}
                     >
-                      <div>
-                        <p className="text-gray-500 font-semibold py-1  text-sm mt-2 pl-3 border-b">
-                          Common Foods {`(${foods.common.length})`}
-                        </p>
-                        <div>
-                          {foods.common.slice(0, 5).map((food) => (
-                            <div
-                              key={food.food_name}
-                              onClick={() =>
-                                handleSelectFood(food, 'common')
-                              }
-                              className="border-b px-4 p-1 flex items-center space-x-2 hover:bg-gray-100 cursor-pointer"
-                            >
-                              {typeof food.photo?.thumb === 'string' && food.photo.thumb && (
-                                <Image
-                                  src={food.photo.thumb}
-                                  height={30}
-                                  width={30}
-                                  alt={food.food_name}
-                                />
-                              )}
-                              <div>
-                                <p>{food.food_name}</p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="mt-3">
-                        <p className="text-gray-500 font-semibold py-1  text-sm mt-1 pl-3 border-b">
-                          Branded Foods {`(${foods.branded.length})`}
-                        </p>
-                        <div>
-                          {foods.branded.slice(0, 5).map((food) => (
-                            <div
-                              key={food.nix_item_id}
-                              onClick={() =>
-                                handleSelectFood(food, 'branded')
-                              }
-                              className="border-b px-4 p-1 flex items-center justify-between space-x-2 hover:bg-gray-100 cursor-pointer"
-                            >
-                              <div className="flex items-center space-x-2 ">
-                                {typeof food.photo?.thumb === 'string' && food.photo.thumb && (
-                                  <Image
-                                    src={food.photo.thumb}
-                                    height={30}
-                                    width={30}
-                                    alt={food.food_name}
-                                  />
-                                )}
-                                <div>
-                                  <p>{food.food_name}</p>
-                                </div>
-                              </div>
-                              {typeof food.nf_calories === 'number' && (
-                                <div className="flex flex-col items-center pr-1">
-                                  <div className="font-medium text-green-500">
-                                    {Math.round(food.nf_calories)}
-                                  </div>
-                                  <div>cal</div>
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+                      <p className="text-gray-500 font-semibold py-1 text-sm mt-2 pl-3 border-b">
+                        Common Foods
+                      </p>
+                      {foods.map((food) => (
+                        <button
+                          key={food.id}
+                          type="button"
+                          onClick={() => handleSelectFood(food)}
+                          className="block w-full border-b px-4 py-1 text-left hover:bg-gray-100"
+                        >
+                          {food.name}
+                        </button>
+                      ))}
+                      <p className="px-4 py-2 text-xs text-gray-600">
+                        Data from USDA FoodData Central
+                      </p>
                     </div>
                   )}
                 </div>
               </div>
               {selectedFoods.length > 0 && (
                 <ul className="mt-4">
-                  {selectedFoods.map((food: any) => (
+                  {selectedFoods.map((item) => (
                     <BasketItem
-                      key={food.food_name}
-                      food={food}
-                      selectedFoods={selectedFoods}
-                      setSelectedFoods={setSelectedFoods}
+                      key={item.food.id}
+                      item={item}
+                      onChange={(updated) => setSelectedFoods((previous) =>
+                        previous.map((food) => food.food.id === item.food.id ? updated : food)
+                      )}
+                      onRemove={() => setSelectedFoods((previous) =>
+                        previous.filter((food) => food.food.id !== item.food.id)
+                      )}
                     />
                   ))}
                 </ul>
@@ -2523,27 +2400,25 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
                     </div>
                     <div>
                       <span className="text-green-500">
-                        {Math.round(
-                          memoizedSumOfSelectedFoodsMacros.total_calories
-                        ).toLocaleString()}
+                        {basketTotals.calories.toLocaleString()}
                       </span>
                     </div>
                   </div>
                   <div className={styles.basketMacroBreakdown}>
                     <div className={`${styles.basketMacroBreakdownCol}`}>
-                      {memoizedSumOfSelectedFoodsMacros.total_protein.toLocaleString()}
+                      {basketTotals.protein.toLocaleString(undefined, { maximumFractionDigits: 1 })}
                       g<span>Protein</span>
                     </div>
                     <div className={`${styles.basketMacroBreakdownCol}`}>
-                      {memoizedSumOfSelectedFoodsMacros.total_carbs.toLocaleString()}
+                      {basketTotals.carbohydrate.toLocaleString(undefined, { maximumFractionDigits: 1 })}
                       g<span>Carbs</span>
                     </div>
                     <div className={`${styles.basketMacroBreakdownCol}`}>
-                      {memoizedSumOfSelectedFoodsMacros.total_fat.toLocaleString()}
+                      {basketTotals.fat.toLocaleString(undefined, { maximumFractionDigits: 1 })}
                       g<span>Fat</span>
                     </div>
                     <div className={`${styles.basketMacroBreakdownCol}`}>
-                      {memoizedSumOfSelectedFoodsMacros.total_sodium.toLocaleString()}
+                      {basketTotals.sodium.toLocaleString(undefined, { maximumFractionDigits: 1 })}
                       mg
                       <span>Sodium</span>
                     </div>
@@ -2569,28 +2444,19 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
                   </div> */}
                   <div>
                     <div>
-                      {selectedFoods.length === 0 ? (
-                        <button
-                          disabled={true}
-                          className="w-full cursor-not-allowed opacity-50 mt-8 py-2 bg-brand-green text-white text-bold rounded-sm hover:bg-brand-green-hover"
-                        >
-                          Log {selectedFoods.length} foods
-                        </button>
-                      ) : selectedFoods.length === 1 ? (
-                        <button
-                          onClick={handleLogFoods}
-                          className="w-full mt-8 py-2 bg-brand-green text-white text-bold rounded-sm hover:bg-brand-green-hover"
-                        >
-                          Log {selectedFoods.length} food
-                        </button>
-                      ) : (
-                        <button
-                          onClick={handleLogFoods}
-                          className="w-full mt-8 py-2 bg-brand-green text-white text-bold rounded-sm hover:bg-brand-green-hover"
-                        >
-                          Log {selectedFoods.length} foods
-                        </button>
+                      {saveError && (
+                        <p role="alert" className="mt-4 text-sm text-gray-700">
+                          Could not log these foods. Please try again.
+                        </p>
                       )}
+                      <button
+                        type="button"
+                        onClick={handleLogFoods}
+                        disabled={!canLogFoods || isSavingFoods}
+                        className="w-full mt-8 py-2 bg-brand-green text-white text-bold rounded-sm hover:bg-brand-green-hover disabled:opacity-50"
+                      >
+                        {isSavingFoods ? 'Saving…' : `Log ${selectedFoods.length} ${selectedFoods.length === 1 ? 'food' : 'foods'}`}
+                      </button>
                     </div>
                     <div className="flex justify-center mt-4 group">
                       <button

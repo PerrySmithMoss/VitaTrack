@@ -28,6 +28,8 @@ docker exec "$database" pg_isready -h 127.0.0.1 -U fixture -d fixture >/dev/null
 docker run -d --platform "$platform" --name "$api" --network "$fixture" -p 127.0.0.1::5500 \
   -e DATABASE_URL="postgresql://fixture:fixture@$database:5432/fixture" \
   -e JWT_SECRET=fixture-signing-key-for-smoke-tests \
+  -e USDA_FDC_API_KEY=fixture-usda-key -e NODE_OPTIONS=--require=/food-data-fixture.cjs \
+  --mount "type=bind,src=$repo_root/server/scripts/food-data-fixture.cjs,dst=/food-data-fixture.cjs,readonly" \
   -e CLIENT_URL=http://localhost -e SERVER_URL=http://localhost -e SERVER_DOMAIN=localhost \
   -e NODE_ENV=production "$image" >/dev/null
 origin="http://$(docker port "$api" 5500/tcp)"
@@ -44,7 +46,7 @@ if [ "$health" != healthy ]; then
   docker logs "$api" >&2
   exit 1
 fi
-if ! SMOKE_API_ORIGIN="$origin" node "$(dirname "$0")/smoke-api.mjs"; then
+if ! SMOKE_API_ORIGIN="$origin" SMOKE_FOOD_DATA_FIXTURE=1 node "$(dirname "$0")/smoke-api.mjs"; then
   docker logs "$api" >&2
   exit 1
 fi
