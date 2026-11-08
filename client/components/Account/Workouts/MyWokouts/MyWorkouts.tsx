@@ -1,8 +1,8 @@
 import React from 'react';
+import type { Workout } from '../../../../graphql/generated/schema';
 import {
   GetUsersWorkoutsQuery,
   useGetUsersWorkoutsQuery,
-  Workout,
 } from '../../../../graphql/generated/graphql';
 import { WorkoutCardv2 } from './WorkoutCardv2';
 

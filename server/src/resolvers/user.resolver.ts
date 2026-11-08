@@ -22,7 +22,6 @@ import {
   refreshTokenCookieOptions,
 } from "../constants/cookieOptions";
 import { validateEmail } from "../utils/validateEmail";
-import { SignOptions } from "jsonwebtoken";
 
 @ObjectType()
 class UserFieldError {
@@ -60,10 +59,8 @@ export class UserResolver {
   // @UseMiddleware(requireUser)
   async getCurrentUser(@Ctx() ctx: PrismaContext) {
     try {
-      const userId = ctx.res.locals.user.id;
-      if (!ctx.res.locals.user) {
-        return null;
-      }
+      const userId = ctx.res.locals.user?.id;
+      if (!userId) return null;
 
       const user = await ctx.prisma.user.findUnique({
         where: {
@@ -125,20 +122,14 @@ export class UserResolver {
         };
       }
 
-      const session = await createSession(
+      await createSession(
         user.id,
         ctx.req.get("user-agent") || ""
       );
 
-      const accessToken = signJwt(
-        { ...user, session: session.userId },
-        { expiresIn: config.accessTokenTtl as SignOptions["expiresIn"] }
-      );
+      const accessToken = signJwt(user.id, "access");
 
-      const refreshToken = signJwt(
-        { ...user, session: session.userId },
-        { expiresIn: config.refreshTokenTtl as SignOptions["expiresIn"] }
-      );
+      const refreshToken = signJwt(user.id, "refresh");
 
       ctx.res.cookie("accessToken", accessToken, accessTokenCookieOptions);
       ctx.res.cookie("refreshToken", refreshToken, refreshTokenCookieOptions);
@@ -221,22 +212,16 @@ export class UserResolver {
       const registeredUser = await createUser(userObj);
 
       // create a session
-      const session = await createSession(
+      await createSession(
         registeredUser.id,
         ctx.req.get("user-agent") || ""
       );
 
       // create an access token
-      const accessToken = signJwt(
-        { ...registeredUser, session: session.userId },
-        { expiresIn: config.accessTokenTtl as SignOptions["expiresIn"] }
-      );
+      const accessToken = signJwt(registeredUser.id, "access");
 
       // create a refresh token
-      const refreshToken = signJwt(
-        { ...registeredUser, session: session.userId },
-        { expiresIn: config.refreshTokenTtl as SignOptions["expiresIn"] }
-      );
+      const refreshToken = signJwt(registeredUser.id, "refresh");
 
       // set cookies
       ctx.res.cookie("accessToken", accessToken, accessTokenCookieOptions);

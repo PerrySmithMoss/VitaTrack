@@ -10,7 +10,7 @@ export const Recipes: React.FC<RecipesProps> = () => {
           <h3 className="text-2xl font-bold text-[#2b3042]">Recipes</h3>
         </div>
         <div>
-          <button className="px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded">
+          <button className="px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-sm">
             View all
           </button>
         </div>

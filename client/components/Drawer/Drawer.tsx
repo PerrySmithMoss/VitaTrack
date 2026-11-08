@@ -19,7 +19,7 @@ export const Drawer: React.FC<DrawerProps> = ({
     <div
       className={
         `fixed overflow-hidden z-50 inset-0 transform ease-in-out ${
-          size && 'bg-gray-900 bg-opacity-25'
+          size && 'bg-gray-900/25'
         }` +
         (isOpen
           ? ' transition-opacity opacity-100 duration-500 translate-x-0'

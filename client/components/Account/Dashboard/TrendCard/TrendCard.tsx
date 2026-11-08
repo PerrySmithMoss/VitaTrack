@@ -50,7 +50,7 @@ export const TrendCard: React.FC<TrendCardProps> = ({ title, value }) => {
   return (
     <>
       <div
-        className={`shadow h-[125px] w-full max-w-[325px] rounded-lg bg-[#fafafa] mt-5 flex flex-grow flex-1`}
+        className={`shadow-sm h-[125px] w-full max-w-[325px] rounded-lg bg-[#fafafa] mt-5 flex grow flex-1`}
       >
         <div className="pt-3 w-full px-4 flex flex-col h-full">
           <div className="flex items-center justify-between">
@@ -83,15 +83,15 @@ export const TrendCard: React.FC<TrendCardProps> = ({ title, value }) => {
           selector="editTrendModal"
           title={`Edit ${title}`}
         >
-          <div className="relative flex  flex-col overflow-x-hidden w-full flex-grow flex-shrink min-h-0 overflow-auto">
+          <div className="relative flex  flex-col overflow-x-hidden w-full grow shrink min-h-0 overflow-auto">
             <div className="overflow-y-auto h-auto max-h-[600px] w-full">
               <section className="w-full flex flex-col">
                 <div>
                   <div className="flex items-center bg-gray-100 border-b border-t">
-                    <div className="block  text-gray-800 bg-transparent py-3 px-4 w-full outline-none">
+                    <div className="block  text-gray-800 bg-transparent py-3 px-4 w-full outline-hidden">
                       <span>{title}:</span>
                     </div>
-                    <div className="flex justify-end bg-gray-100 text-gray-800 bg-transparent py-3 px-4 w-full outline-none">
+                    <div className="flex justify-end bg-gray-100 text-gray-800 bg-transparent py-3 px-4 w-full outline-hidden">
                       {title === 'Bodyweight' ? (
                         <input
                           type="number"
@@ -123,7 +123,7 @@ export const TrendCard: React.FC<TrendCardProps> = ({ title, value }) => {
                 <button
                   // disabled={proteinInput + carbohydrateInput + fatInput !== 100}
                   onClick={handleCompleteEditingMacros}
-                  className={`rounded px-5 py-1.5 bg-brand-green hover:bg-brand-green-hover  text-white focus:shadow-outline focus:outline-none 
+                  className={`rounded-sm px-5 py-1.5 bg-brand-green hover:bg-brand-green-hover  text-white focus:shadow-outline focus:outline-hidden
            
                   `}
                 >
@@ -132,7 +132,7 @@ export const TrendCard: React.FC<TrendCardProps> = ({ title, value }) => {
                 <button
                   onClick={() => setIsEditTrendModalOpen(false)}
                   id="cancel"
-                  className="ml-3 rounded-sm px-3 hover:text-gray-600 focus:shadow-outline focus:outline-none"
+                  className="ml-3 rounded-xs px-3 hover:text-gray-600 focus:shadow-outline focus:outline-hidden"
                 >
                   Cancel
                 </button>

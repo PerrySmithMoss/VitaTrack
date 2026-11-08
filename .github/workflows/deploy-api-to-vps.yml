@@ -52,21 +52,21 @@ jobs:
     env:
       NEXT_PUBLIC_SERVER_ENDPOINT: http://localhost:5500
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: "24"
+          node-version-file: .node-version
           cache: yarn
           cache-dependency-path: client/yarn.lock
       - run: yarn install --frozen-lockfile
-      - run: yarn test --runInBand
+      - run: yarn test
       - run: yarn build
 
   build-api-image:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: docker build --platform linux/amd64 -t portfolio-api-test ./server
       - name: Test migrations and authenticated API flows in the built image
         run: sh server/scripts/test-image.sh portfolio-api-test
@@ -88,13 +88,13 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -102,7 +102,7 @@ jobs:
 
       - name: Extract metadata for Docker
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
           images: ghcr.io/perrysmithmoss/vita-track
           tags: |
@@ -112,7 +112,7 @@ jobs:
 
       - name: Build and push Docker image
         id: build
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: ./server
           platforms: linux/amd64
@@ -129,7 +129,7 @@ jobs:
         run: |
           set -eu
           image="ghcr.io/perrysmithmoss/vita-track@$RELEASE_DIGEST"
-          scanner=aquasec/trivy:0.76.1@sha256:790fd66d1697395d8693d1acaa1ea702406a20f109b6fc7bac8db623eca6c06c
+          scanner=aquasec/trivy:0.76.2@sha256:8f6bb947dbc528902e11f2f5be52f7b519f6a39d5d148f41166f2040499768fb
           docker pull "$image"
           docker save -o "$RUNNER_TEMP/release.tar" "$image"
           mkdir -p "$RUNNER_TEMP/image-scan"
@@ -138,13 +138,13 @@ jobs:
 
       - name: Upload full release scan
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: api-image-vulnerabilities
           path: ${{ runner.temp }}/image-scan
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3
+        uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
         if: github.ref == 'refs/heads/master'
         with:
           tag_name: v1.0.${{ github.run_number }}

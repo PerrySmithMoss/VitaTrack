@@ -1,18 +1,19 @@
-ARG NODE_IMAGE=node:22.23.4-trixie-slim@sha256:be1e2a3dc2c4fd68cdfadad2a696a280e0d2749098bee509230174d72fb768c6
+ARG NODE_IMAGE=node:26.13.0-trixie-slim@sha256:5adad64f9a1fca2d51972caa65983634c8a774eb300d72b20f7f2a0f60368072
+
+FROM ${NODE_IMAGE} AS yarn-base
+RUN npm install --global yarn@1.22.22
 
 # Stage 1: Build
-FROM ${NODE_IMAGE} AS builder
+FROM yarn-base AS builder
 
 WORKDIR /app
 
 # Install system dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends ca-certificates openssl python3 make g++ && \
-    ln -s /usr/bin/python3 /usr/bin/python && \
-    npm install -g node-gyp && \
     rm -rf /var/lib/apt/lists/*
 
-COPY package.json yarn.lock ./
+COPY package.json yarn.lock prisma.config.ts ./
 COPY prisma ./prisma/
 
 # Install ALL dependencies (dev + prod)
@@ -23,18 +24,16 @@ COPY tsconfig.json .
 COPY src ./src
 
 # Generate the Prisma Client and build app
-RUN npx prisma generate && yarn build
+RUN yarn build
 
 # Stage 2: Production dependencies only
-FROM ${NODE_IMAGE} AS deps
+FROM yarn-base AS deps
 
 WORKDIR /app
 
 # Install production dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends ca-certificates openssl python3 make g++ && \
-    ln -s /usr/bin/python3 /usr/bin/python && \
-    npm install -g node-gyp && \
     rm -rf /var/lib/apt/lists/*
 
 COPY package.json yarn.lock ./
@@ -56,11 +55,8 @@ WORKDIR /app
 # Copy ONLY what's needed from previous stages
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 COPY --from=deps /app/node_modules ./node_modules
-
-# Copy Prisma generated client
-COPY --from=builder /app/node_modules/@prisma /app/node_modules/@prisma
-COPY --from=builder /app/node_modules/.prisma /app/node_modules/.prisma
 
 COPY scripts/deployment-entry.sh /deployment-entry.sh
 RUN chmod +x /deployment-entry.sh

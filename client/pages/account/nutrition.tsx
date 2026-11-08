@@ -46,7 +46,7 @@ const NutritionPage: NextPage<NutritionPageProps> = () => {
           />
           <link rel="icon" href="/favicon.ico" />
         </Head>
-        <div className="relative min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased bg-white">
+        <div className="relative min-h-screen flex flex-col flex-auto shrink-0 antialiased bg-white">
           <div className="flex h-screen w-full">
             <SidebarNav />
             <main className="w-full">

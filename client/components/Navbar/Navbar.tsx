@@ -39,7 +39,7 @@ export const Navbar: React.FC<NavbarProps> = () => {
                   } delay-150`}
                 ></div>
                 <div
-                  className={`bg-gray-400 h-[2px] w-7 rounded transform transition-all duration-300 ${
+                  className={`bg-gray-400 h-[2px] w-7 rounded-sm transform transition-all duration-300 ${
                     isSidebarOpen && 'translate-x-10'
                   }`}
                 ></div>
@@ -56,7 +56,7 @@ export const Navbar: React.FC<NavbarProps> = () => {
           <div className="flex items-center space-x-6">
             {/* <button
               type="button"
-              className="inline-flex relative items-center p-2 text-sm font-medium text-center text-white bg-[#f4f4ff] rounded-full hover:bg-gray-200 focus:ring focus:outline-none focus:ring-brand-green"
+              className="inline-flex relative items-center p-2 text-sm font-medium text-center text-white bg-[#f4f4ff] rounded-full hover:bg-gray-200 focus:ring-3 focus:outline-hidden focus:ring-brand-green"
             >
               <IoMdNotificationsOutline className=" text-gray-600" size={23} />
               <span className="sr-only">Notifications</span>

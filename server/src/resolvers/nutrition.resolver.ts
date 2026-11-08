@@ -134,6 +134,7 @@ export class NutritionResolver {
       // Check if the user has a nutrition entry for the specified date range
       const nutritionEntry = await ctx.prisma.nutrition.findFirst({
         where: {
+          userId,
           date: {
             lte: endOfDay,
             gte: startOfDay,
@@ -154,14 +155,10 @@ export class NutritionResolver {
             protein: nutritionInput.protein,
             fat: nutritionInput.fat,
             carbohydrate: nutritionInput.carbohydrate,
-            user: {
-              connect: {
-                id: userId,
-              },
-            },
           },
           where: {
             id: nutritionEntry.id,
+            userId,
           },
         });
       } else {
@@ -231,6 +228,7 @@ export class NutritionResolver {
       // Check if the user has a nutrition entry for the specified date range
       const nutritionEntry = await ctx.prisma.nutrition.findFirst({
         where: {
+          userId,
           date: {
             lte: endOfDay,
             gte: startOfDay,
@@ -247,14 +245,10 @@ export class NutritionResolver {
             protein: nutritionInput.protein,
             fat: nutritionInput.fat,
             carbohydrate: nutritionInput.carbohydrate,
-            user: {
-              connect: {
-                id: userId,
-              },
-            },
           },
           where: {
             id: nutritionEntry.id,
+            userId,
           },
         });
       } else {
@@ -297,9 +291,10 @@ export class NutritionResolver {
       const updatedNutrition = await ctx.prisma.nutrition.findUnique({
         where: {
           id: nutrition.id,
+          userId,
         },
         include: {
-          foods: true,
+          foods: { where: { userId } },
         },
       });
 
@@ -361,6 +356,7 @@ export class NutritionResolver {
       // Check if the user has a nutrition entry for the specified date range
       const nutritionEntry = await ctx.prisma.nutrition.findFirst({
         where: {
+          userId,
           date: {
             lte: endOfDay,
             gte: startOfDay,
@@ -387,14 +383,10 @@ export class NutritionResolver {
             protein: nutritionInput.protein,
             fat: nutritionInput.fat,
             carbohydrate: nutritionInput.carbohydrate,
-            user: {
-              connect: {
-                id: userId,
-              },
-            },
           },
           where: {
             id: nutritionEntry.id,
+            userId,
           },
         });
       } else {
@@ -440,9 +432,10 @@ export class NutritionResolver {
       const updatedNutrition = await ctx.prisma.nutrition.findUnique({
         where: {
           id: nutrition.id,
+          userId,
         },
         include: {
-          foods: true,
+          foods: { where: { userId } },
         },
       });
 

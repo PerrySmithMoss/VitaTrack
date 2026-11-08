@@ -3,7 +3,7 @@ const isServer = typeof window === 'undefined';
 const baseUrl = isServer ? process.env.NEXT_PUBLIC_SERVER_ENDPOINT : '/api'; // This hits the frontend proxy route
 
 export function customFetcher<TData, TVariables>(
-  query: string,
+  query: { toString(): string },
   variables?: TVariables,
   headers?: RequestInit['headers'] | undefined
 ) {
@@ -19,7 +19,7 @@ export function customFetcher<TData, TVariables>(
         },
         credentials: 'include',
       },
-      body: JSON.stringify({ query, variables }),
+      body: JSON.stringify({ query: query.toString(), variables }),
     });
 
     const json = await res.json();

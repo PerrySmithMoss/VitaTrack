@@ -91,6 +91,7 @@ out
 # Nuxt.js build / generate output
 .nuxt
 dist
+/src/generated/prisma/
 
 # Gatsby files
 .cache/

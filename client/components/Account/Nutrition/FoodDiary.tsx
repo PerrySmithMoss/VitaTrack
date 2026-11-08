@@ -11,8 +11,8 @@ import {
   AiOutlinePlus,
 } from 'react-icons/ai';
 import styles from './Nutrition.module.css';
+import type { Food } from '../../../graphql/generated/schema';
 import {
-  Food,
   useAddNutritionWithFoodsMutation,
   useDeleteFoodFromMealByDateMutation,
   useGetCurrentUsersFoodByDateQuery,
@@ -371,7 +371,7 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
                 type="button"
                 onClick={handleGoBackOneDay}
                 aria-label="Go to yesterday's date"
-                className="p-2 m-0 outline-none bg-[#00548F] rounded-l"
+                className="p-2 m-0 outline-hidden bg-[#00548F] rounded-l"
               >
                 <FaChevronLeft size={24} color="white" />
               </button>
@@ -380,11 +380,11 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
               <ReactDatePicker
                 dateFormat="do, MMMM, yyyy"
                 selected={selectedDate}
-                onChange={(date) => handleChangeDate(date as Date)}
+                onChange={(date: Date | null) => handleChangeDate(date as Date)}
                 onClickOutside={() => setIsShowingCalendar(!isShowingCalendar)}
                 open={isShowingCalendar}
                 onInputClick={() => setIsShowingCalendar(!isShowingCalendar)}
-                className="block cursor-pointer text-center text-[20px] text-white px-4 py-[5px] font-bold bg-[#00548F]  w-full outline-none"
+                className="block cursor-pointer text-center text-[20px] text-white px-4 py-[5px] font-bold bg-[#00548F]  w-full outline-hidden"
               />
             </div>
             <div className="flex items-center">
@@ -392,7 +392,7 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
                 type="button"
                 onClick={handleGoForwardOneDay}
                 aria-label="Go to tomorrow's date"
-                className="p-2 m-0 outline-none bg-[#00548F]"
+                className="p-2 m-0 outline-hidden bg-[#00548F]"
               >
                 <FaChevronRight size={24} color="white" />
               </button>
@@ -2420,7 +2420,7 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
                     id="searchExercises"
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-brand-green focus:border-brand-green w-full pl-3 p-2.5"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-brand-green focus:border-brand-green w-full pl-3 p-2.5"
                     placeholder="Search"
                   />
                   <div className="absolute top-[19px] right-0 flex items-center px-3 pointer-events-none">
@@ -2591,21 +2591,21 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
                       {selectedFoods.length === 0 ? (
                         <button
                           disabled={true}
-                          className="w-full cursor-not-allowed opacity-50 mt-8 py-2 bg-brand-green text-white text-bold rounded hover:bg-brand-green-hover"
+                          className="w-full cursor-not-allowed opacity-50 mt-8 py-2 bg-brand-green text-white text-bold rounded-sm hover:bg-brand-green-hover"
                         >
                           Log {selectedFoods.length} foods
                         </button>
                       ) : selectedFoods.length === 1 ? (
                         <button
                           onClick={handleLogFoods}
-                          className="w-full mt-8 py-2 bg-brand-green text-white text-bold rounded hover:bg-brand-green-hover"
+                          className="w-full mt-8 py-2 bg-brand-green text-white text-bold rounded-sm hover:bg-brand-green-hover"
                         >
                           Log {selectedFoods.length} food
                         </button>
                       ) : (
                         <button
                           onClick={handleLogFoods}
-                          className="w-full mt-8 py-2 bg-brand-green text-white text-bold rounded hover:bg-brand-green-hover"
+                          className="w-full mt-8 py-2 bg-brand-green text-white text-bold rounded-sm hover:bg-brand-green-hover"
                         >
                           Log {selectedFoods.length} foods
                         </button>

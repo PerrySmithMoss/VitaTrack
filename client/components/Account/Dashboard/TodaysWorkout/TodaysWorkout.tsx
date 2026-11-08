@@ -109,7 +109,7 @@ export const TodaysWorkout: React.FC<TodaysWorkoutProps> = () => {
         <h2 className="text-2xl font-bold text-[#2b3042]">
           Today&apos;s Workout
         </h2>
-        <div className="shadow h-[270px] min-w-[300px] rounded-lg mt-5 w-full  bg-[#fafafa] flex items-center flex-col justify-center">
+        <div className="shadow-sm h-[270px] min-w-[300px] rounded-lg mt-5 w-full  bg-[#fafafa] flex items-center flex-col justify-center">
           <div className="mt-6">
             <GiWeightLiftingUp size={70} color="#2b3042" />
           </div>
@@ -143,7 +143,7 @@ export const TodaysWorkout: React.FC<TodaysWorkoutProps> = () => {
                 <div>
                   <button
                     onClick={handleViewWorkouts}
-                    className="rounded inline-flex my-0 mx-auto bg-gray-50 hover:bg-gray-100 px-7 border py-1"
+                    className="rounded-sm inline-flex my-0 mx-auto bg-gray-50 hover:bg-gray-100 px-7 border py-1"
                   >
                     View
                   </button>
@@ -160,14 +160,14 @@ export const TodaysWorkout: React.FC<TodaysWorkoutProps> = () => {
       <h2 className="text-2xl font-bold text-[#2b3042]">
         Today&apos;s Workout
       </h2>
-      <div className="shadow h-[200px] xs:h-[270px] w-full xxs:w-[300px] rounded-lg mt-5  bg-[#fafafa] flex items-center flex-col justify-center">
+      <div className="shadow-sm h-[200px] xs:h-[270px] w-full xxs:w-[300px] rounded-lg mt-5  bg-[#fafafa] flex items-center flex-col justify-center">
         <p className="px-6 xxs:px-14 text-center font-medium text-lg leading-6">
           You have not yet added a workout for today.
         </p>
         <div>
           <button
             onClick={handleAddWorkoutForToday}
-            className="mt-5 rounded text-white inline-flex my-0 mx-auto bg-brand-green hover:bg-brand-green-hover px-7  py-2.5"
+            className="mt-5 rounded-sm text-white inline-flex my-0 mx-auto bg-brand-green hover:bg-brand-green-hover px-7  py-2.5"
           >
             Add workout
           </button>
@@ -187,7 +187,7 @@ export const TodaysWorkout: React.FC<TodaysWorkoutProps> = () => {
           selector="addWorkoutModal"
           title="Add Workout"
         >
-          <div className="relative flex  flex-col overflow-x-hidden w-full flex-grow flex-shrink min-h-0 overflow-auto">
+          <div className="relative flex  flex-col overflow-x-hidden w-full grow shrink min-h-0 overflow-auto">
             <div className="overflow-y-auto h-auto max-h-[600px] w-full">
               <section className="w-full flex flex-col mb-4 bg-gray-100">
                 <div className="">
@@ -197,19 +197,19 @@ export const TodaysWorkout: React.FC<TodaysWorkoutProps> = () => {
                     name="name"
                     value={workout.name}
                     onChange={handleUserInputChange}
-                    className="block border-t bg-transparent py-3 px-4  w-full outline-none"
+                    className="block border-t bg-transparent py-3 px-4  w-full outline-hidden"
                   />
                   <div className="mx-4">
                     <hr />
                   </div>
                   <div className="flex items-center">
-                    <div className="block border-l text-gray-800 bg-transparent py-3 px-4 w-full outline-none">
+                    <div className="block border-l text-gray-800 bg-transparent py-3 px-4 w-full outline-hidden">
                       <span>Start Time:</span>
                     </div>
-                    <div className="block text-gray-800 bg-transparent py-3 px-4 w-full outline-none">
+                    <div className="block text-gray-800 bg-transparent py-3 px-4 w-full outline-hidden">
                       <ReactDatePicker
                         selected={workout.startDate}
-                        onChange={(date) =>
+                        onChange={(date: Date | null) =>
                           setWorkout({
                             ...workout,
                             startDate: date as Date,
@@ -220,7 +220,7 @@ export const TodaysWorkout: React.FC<TodaysWorkoutProps> = () => {
                         showTimeSelect
                         timeIntervals={1}
                         timeFormat="HH:mm"
-                        className="block cursor-pointer text-right text-gray-800 bg-transparent  w-full outline-none"
+                        className="block cursor-pointer text-right text-gray-800 bg-transparent  w-full outline-hidden"
                       />
                     </div>
                   </div>
@@ -228,13 +228,13 @@ export const TodaysWorkout: React.FC<TodaysWorkoutProps> = () => {
                     <hr />
                   </div>
                   <div className="flex items-center">
-                    <div className="block border-l text-gray-800 bg-transparent py-3 px-4 w-full outline-none">
+                    <div className="block border-l text-gray-800 bg-transparent py-3 px-4 w-full outline-hidden">
                       <span>End Time:</span>
                     </div>
-                    <div className="block text-gray-800 bg-transparent py-3 px-4 w-full outline-none">
+                    <div className="block text-gray-800 bg-transparent py-3 px-4 w-full outline-hidden">
                       <ReactDatePicker
                         selected={workout.endDate}
-                        onChange={(date) =>
+                        onChange={(date: Date | null) =>
                           setWorkout({
                             ...workout,
                             endDate: date as Date,
@@ -245,7 +245,7 @@ export const TodaysWorkout: React.FC<TodaysWorkoutProps> = () => {
                         showTimeSelect
                         timeIntervals={1}
                         timeFormat="HH:mm"
-                        className="block cursor-pointer text-right text-gray-800 bg-transparent  w-full outline-none"
+                        className="block cursor-pointer text-right text-gray-800 bg-transparent  w-full outline-hidden"
                       />
                     </div>
                   </div>
@@ -253,7 +253,7 @@ export const TodaysWorkout: React.FC<TodaysWorkoutProps> = () => {
                     <hr />
                   </div>
                   <div className="flex items-center justify-between">
-                    <div className="block border-l text-gray-800 bg-transparent py-3 px-4 w-full outline-none">
+                    <div className="block border-l text-gray-800 bg-transparent py-3 px-4 w-full outline-hidden">
                       <span>Bodyweight</span>
                     </div>
                     <div className="flex items-center space-x-1 text-gray-800  py-3 px-4">
@@ -271,7 +271,7 @@ export const TodaysWorkout: React.FC<TodaysWorkoutProps> = () => {
                           //   }
                           // }}
                           onChange={handleUserInputChange}
-                          className="block text-right text-gray-800 bg-transparent outline-none"
+                          className="block text-right text-gray-800 bg-transparent outline-hidden"
                         />
                       </div>
                       <div className="flex items-center space-x-2">
@@ -294,7 +294,7 @@ export const TodaysWorkout: React.FC<TodaysWorkoutProps> = () => {
                     value={workout.notes}
                     name="notes"
                     onChange={handleUserInputChange}
-                    className="block  text-gray-800 border-b bg-transparent py-3 px-4 w-full outline-none"
+                    className="block  text-gray-800 border-b bg-transparent py-3 px-4 w-full outline-hidden"
                   />
                 </div>
               </section>
@@ -302,7 +302,7 @@ export const TodaysWorkout: React.FC<TodaysWorkoutProps> = () => {
               <div className="mx-3 mt-4">
                 <button
                   onClick={handleAddExercise}
-                  className="rounded w-full py-2 bg-gray-100 hover:bg-gray-200  text-gray-800 focus:shadow-outline focus:outline-none"
+                  className="rounded-sm w-full py-2 bg-gray-100 hover:bg-gray-200  text-gray-800 focus:shadow-outline focus:outline-hidden"
                 >
                   Add Exercise
                 </button>
@@ -318,14 +318,14 @@ export const TodaysWorkout: React.FC<TodaysWorkoutProps> = () => {
                     workout.name.length === 0 || workoutExercises.length === 0
                       ? 'opacity-50 cursor-not-allowed'
                       : ''
-                  } rounded px-5 py-1.5 bg-brand-green hover:bg-brand-green-hover text-white focus:shadow-outline focus:outline-none`}
+                  } rounded-sm px-5 py-1.5 bg-brand-green hover:bg-brand-green-hover text-white focus:shadow-outline focus:outline-hidden`}
                 >
                   Complete
                 </button>
                 <button
                   onClick={() => setIsAddWorkoutModalOpen(false)}
                   id="cancel"
-                  className="ml-3 rounded-sm px-3 hover:text-gray-600 focus:shadow-outline focus:outline-none"
+                  className="ml-3 rounded-xs px-3 hover:text-gray-600 focus:shadow-outline focus:outline-hidden"
                 >
                   Cancel
                 </button>
@@ -405,7 +405,7 @@ export const TodaysWorkout: React.FC<TodaysWorkoutProps> = () => {
                 <input
                   type="text"
                   id="searchExercises"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-brand-green focus:border-brand-green w-full pl-10 p-2.5"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-brand-green focus:border-brand-green w-full pl-10 p-2.5"
                   placeholder="Search"
                 />
               </div>

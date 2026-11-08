@@ -1,21 +1,22 @@
 import { useRouter } from 'next/router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   GetCurrentUserQuery,
   useGetCurrentUserQuery,
   useGoogleOauthHandlerMutation,
   useLoginUserWithEmailAndPasswordMutation,
 } from '../../graphql/generated/graphql';
-import { getGoogleOAuthURL } from '../../utils/getGoogleOAuthURL';
+import {
+  consumeGoogleOAuthCode,
+  getGoogleOAuthURL,
+  startGoogleOAuth,
+} from '../../utils/getGoogleOAuthURL';
 import styles from './Login.module.css';
 import SyncLoader from 'react-spinners/SyncLoader';
 
 interface LoginFormProps {}
 
 export const LoginForm: React.FC<LoginFormProps> = () => {
-  const [code, setCode] = useState<string | null>(null);
-  const processedCodeRef = useRef<string | null>(null);
-  const isInitialMountRef = useRef(true);
   const router = useRouter();
   const { refetch: refetchCurrentUser } =
     useGetCurrentUserQuery<GetCurrentUserQuery>();
@@ -26,7 +27,7 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
     router.push('/account/dashboard');
   }
 
-  const { mutate: loginUsingGoogleCredentials } = useGoogleOauthHandlerMutation(
+  const { mutate: loginUsingGoogleCredentials, isPending: isGoogleLoginPending } = useGoogleOauthHandlerMutation(
     {
       onSuccess: () => handleSuccessfulSignUp(),
       onError: (error) => {
@@ -69,33 +70,9 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
   useEffect(() => {
     if (!router.isReady) return;
 
-    const queryCode = router.query.code;
-    if (typeof queryCode === 'string') {
-      setCode(queryCode);
-    }
-  }, [router.isReady, router.query]);
-
-  // Handle OAuth code - using an approach that guarantees it runs only once
-  useEffect(() => {
-    // Skip the first render in development (React 18 StrictMode double invocation)
-    if (isInitialMountRef.current) {
-      isInitialMountRef.current = false;
-      return;
-    }
-
-    // Only attempt to login if we have a code and it's a string
-    // AND we haven't processed this exact code before
-    if (code && typeof code === 'string' && processedCodeRef.current !== code) {
-      // Mark this code as processed immediately to prevent duplicate calls
-      processedCodeRef.current = code;
-
-      // Use setTimeout to ensure this runs after the current JS execution cycle
-      // This helps avoid any duplicate calls during React's rendering phases
-      setTimeout(() => {
-        loginUsingGoogleCredentials({ code });
-      }, 0);
-    }
-  }, [code, loginUsingGoogleCredentials]);
+    const code = consumeGoogleOAuthCode(router.query.code, router.query.state);
+    if (code) loginUsingGoogleCredentials({ code });
+  }, [router.isReady, router.query.code, router.query.state, loginUsingGoogleCredentials]);
 
   return (
     <form onSubmit={onSubmit}>
@@ -113,7 +90,7 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
           placeholder="janedoe@example.com"
           value={user.email}
           onChange={handleUserInputChange}
-          className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
+          className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-blue-400 focus:ring-blue-400/40 focus:outline-hidden focus:ring-3"
         />
       </div>
 
@@ -131,13 +108,13 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
           placeholder="Your password"
           value={user.password}
           onChange={handleUserInputChange}
-          className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
+          className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-blue-400 focus:ring-blue-400/40 focus:outline-hidden focus:ring-3"
         />
       </div>
       <div className="mt-5">
         <button
           type="submit"
-          className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-brand-green hover:bg-brand-green-hover rounded-md focus:outline-none focus:bg-brand-green-hover focus:ring focus:ring-blue-300 focus:ring-opacity-50"
+          className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-brand-green hover:bg-brand-green-hover rounded-md focus:outline-hidden focus:bg-brand-green-hover focus:ring-3 focus:ring-blue-300/50"
         >
           Log in
         </button>
@@ -151,7 +128,8 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
         <div className=" mt-5 flex-col flex space-y-4">
           <a
             href={getGoogleOAuthURL()}
-            className="w-full justify-center bg-white border shadow-md hover:bg-gray-100 px-4 py-3 font-semibold inline-flex items-center space-x-2 rounded"
+            onClick={startGoogleOAuth}
+            className="w-full justify-center bg-white border shadow-md hover:bg-gray-100 px-4 py-3 font-semibold inline-flex items-center space-x-2 rounded-sm"
           >
             <svg
               viewBox="0 0 24 24"
@@ -179,7 +157,7 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
             </svg>
             <span className="font-semibold text-sm">Log in with Google</span>
           </a>
-          {/* <a className="w-full justify-center text-center cursor-pointer bg-blue-500 shadow-md hover:bg-blue-600 px-4 py-3 font-semibold text-white inline-flex items-center space-x-2 rounded">
+          {/* <a className="w-full justify-center text-center cursor-pointer bg-blue-500 shadow-md hover:bg-blue-600 px-4 py-3 font-semibold text-white inline-flex items-center space-x-2 rounded-sm">
             <svg
               className="w-5 h-5 fill-current"
               role="img"
@@ -192,7 +170,7 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
           </a> */}
         </div>
       </div>
-      {code && (
+      {isGoogleLoginPending && (
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <SyncLoader color={'#00CC99'} size={25} />
         </div>

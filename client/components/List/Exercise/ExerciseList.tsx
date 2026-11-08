@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FiMoreHorizontal } from 'react-icons/fi';
-import { Exercise } from '../../../graphql/generated/graphql';
+import type { Exercise } from '../../../graphql/generated/schema';
 import { useGlobalContext } from '../../../state/context/global.context';
 
 interface ExerciseListProps {}

@@ -6,8 +6,8 @@ import {
 } from 'react-icons/ai';
 import { BsBarChartLine } from 'react-icons/bs';
 import { FiMoreVertical } from 'react-icons/fi';
+import type { Exercise as IExercise } from '../../../graphql/generated/schema';
 import {
-  Exercise as IExercise,
   GetUsersWorkoutsQuery,
   useDeleteExerciseMutation,
   useGetUsersWorkoutsQuery,
@@ -232,7 +232,7 @@ export const Exercise: React.FC<ExerciseProps> = ({ exIndex, exercise }) => {
                           </div>
                           <div>
                             <input
-                              className="w-full bg-transparent text-gray-800 outline-none text-sm"
+                              className="w-full bg-transparent text-gray-800 outline-hidden text-sm"
                               type="number"
                               step="0.1"
                               name="weight"
@@ -253,7 +253,7 @@ export const Exercise: React.FC<ExerciseProps> = ({ exIndex, exercise }) => {
                           </div>
                           <div>
                             <input
-                              className="w-full bg-transparent text-gray-800 outline-none  text-sm "
+                              className="w-full bg-transparent text-gray-800 outline-hidden  text-sm "
                               type="number"
                               name="reps"
                               defaultValue={strengthSet.reps || ''}
@@ -284,7 +284,7 @@ export const Exercise: React.FC<ExerciseProps> = ({ exIndex, exercise }) => {
                                   e
                                 )
                               }
-                              className="w-full bg-transparent text-gray-800 text-sm outline-none"
+                              className="w-full bg-transparent text-gray-800 text-sm outline-hidden"
                               type="text"
                             />
                           </div>
@@ -326,7 +326,7 @@ export const Exercise: React.FC<ExerciseProps> = ({ exIndex, exercise }) => {
                               </div>
                               <div>
                                 <input
-                                  className="w-full bg-transparent text-gray-800 outline-none text-sm"
+                                  className="w-full bg-transparent text-gray-800 outline-hidden text-sm"
                                   type="number"
                                   value={cardioSet.minutes || ''}
                                   name="minutes"
@@ -348,7 +348,7 @@ export const Exercise: React.FC<ExerciseProps> = ({ exIndex, exercise }) => {
                               </div>
                               <div>
                                 <input
-                                  className="w-full bg-transparent text-gray-800 outline-none  text-sm "
+                                  className="w-full bg-transparent text-gray-800 outline-hidden  text-sm "
                                   type="number"
                                   value={cardioSet.seconds || ''}
                                   name="seconds"
@@ -370,7 +370,7 @@ export const Exercise: React.FC<ExerciseProps> = ({ exIndex, exercise }) => {
                               </div>
                               <div>
                                 <input
-                                  className="w-full bg-transparent text-gray-800 outline-none text-sm"
+                                  className="w-full bg-transparent text-gray-800 outline-hidden text-sm"
                                   type="number"
                                   step="0.1"
                                   value={cardioSet.distance || ''}
@@ -393,7 +393,7 @@ export const Exercise: React.FC<ExerciseProps> = ({ exIndex, exercise }) => {
                               </div>
                               <div>
                                 <input
-                                  className="w-full bg-transparent text-gray-800 outline-none  text-sm "
+                                  className="w-full bg-transparent text-gray-800 outline-hidden  text-sm "
                                   type="number"
                                   value={cardioSet.caloriesBurned || ''}
                                   name="caloriesBurned"
@@ -416,7 +416,7 @@ export const Exercise: React.FC<ExerciseProps> = ({ exIndex, exercise }) => {
                             </div>
                             <div>
                               <input
-                                className="w-full bg-transparent text-gray-800 text-sm outline-none"
+                                className="w-full bg-transparent text-gray-800 text-sm outline-hidden"
                                 type="text"
                                 value={cardioSet.notes || ''}
                                 name="notes"

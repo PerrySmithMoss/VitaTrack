@@ -42,3 +42,83 @@ assert.equal(profile.data.getCurrentUser.data?.id, userId);
 assert.deepEqual(profile.data.getCurrentUsersNutrition.data, []);
 assert.deepEqual(profile.data.getUsersWorkouts.data, []);
 console.log('GraphQL registration, sign-in, nutrition and activity reads passed');
+
+const currentUserQuery = '{ getCurrentUser { data { id } } }';
+const sessionCookies = Object.fromEntries(login.cookie.split('; ').map(cookie => cookie.split('=')));
+for (const [cookie, use] of [['accessToken', 'access'], ['refreshToken', 'refresh']]) {
+  const claims = JSON.parse(Buffer.from(sessionCookies[cookie].split('.')[1], 'base64url'));
+  assert.equal(claims.tokenUse, use);
+  assert.equal(claims.password, undefined);
+}
+const wrongToken = await graphql(currentUserQuery, {}, `accessToken=${sessionCookies.refreshToken}`);
+assert.equal(wrongToken.data.getCurrentUser, null, 'refresh token cannot authenticate an API request');
+const refreshed = await graphql(currentUserQuery, {}, `refreshToken=${sessionCookies.refreshToken}`);
+assert.equal(refreshed.data.getCurrentUser.data.id, userId);
+assert.match(refreshed.cookie, /^accessToken=/);
+
+const otherEmail = `release-smoke-other-${id}@example.invalid`;
+const otherRegistration = await graphql(
+  'mutation ($email: String!, $password: String!, $username: String!) { createUser(email: $email, password: $password, username: $username) { data { id } } }',
+  { email: otherEmail, password, username: `other-${username}` },
+);
+const otherUserId = otherRegistration.data.createUser.data?.id;
+assert.ok(otherUserId);
+
+const workoutInput = { name: 'Owner workout', time: new Date().toISOString() };
+const createWorkout = `mutation ($name: String!, $time: String!) {
+  createWorkout(name: $name, startTime: $time, endTime: $time,
+    exercises: [{name: "Squat", category: "Legs", exerciseType: "Strength", strengthSets: [{}]}]) {
+    data { id name exercises { id } }
+  }
+}`;
+const ownerWorkout = (await graphql(createWorkout, workoutInput, login.cookie)).data.createWorkout.data;
+const otherWorkout = (await graphql(createWorkout, workoutInput, otherRegistration.cookie)).data.createWorkout.data;
+assert.ok(ownerWorkout?.exercises[0]?.id);
+assert.ok(otherWorkout?.exercises[0]?.id);
+
+const editWorkout = `mutation ($workout: Float!, $exercise: Int!, $time: String!, $name: String!) {
+  editWorkout(workoutId: $workout, name: $name, startTime: $time, endTime: $time,
+    exercises: [{id: $exercise, name: "Squat", category: "Legs", exerciseType: "Strength", strengthSets: [{}]}]) {
+    data { id name }
+    errors { field }
+  }
+}`;
+const ownerIds = { workout: Number(ownerWorkout.id), exercise: Number(ownerWorkout.exercises[0].id), time: workoutInput.time, name: 'Edited' };
+assert.equal((await graphql(editWorkout, ownerIds, login.cookie)).data.editWorkout.data.name, 'Edited');
+assert.equal((await graphql(editWorkout, ownerIds, otherRegistration.cookie)).data.editWorkout.data, null);
+const crossExercise = { ...ownerIds, exercise: Number(otherWorkout.exercises[0].id), name: 'Unauthorized edit' };
+assert.equal((await graphql(editWorkout, crossExercise, login.cookie)).data.editWorkout.data, null);
+const deletes = `mutation ($workout: Float!, $exercise: Float!) {
+  deleteWorkout(workoutId: $workout)
+  deleteExercise(exerciseId: $exercise)
+}`;
+assert.deepEqual(
+  { ...(await graphql(deletes, ownerIds, otherRegistration.cookie)).data },
+  { deleteWorkout: false, deleteExercise: false },
+);
+const ownerWorkouts = await graphql('{ getUsersWorkouts { data { id name exercises { id } } } }', {}, login.cookie);
+assert.deepEqual(ownerWorkouts.data.getUsersWorkouts.data, [{ ...ownerWorkout, name: 'Edited' }]);
+
+const nutritionMutation = `mutation ($date: DateTime!) {
+  addNutritionWithFoods(foods: [], nutritionInput: {date: $date}) {
+    data { id userId }
+    errors { field }
+  }
+}`;
+const date = new Date().toISOString();
+const ownerNutrition = (await graphql(nutritionMutation, { date }, login.cookie)).data.addNutritionWithFoods.data;
+const otherNutrition = (await graphql(nutritionMutation, { date }, otherRegistration.cookie)).data.addNutritionWithFoods.data;
+assert.equal(ownerNutrition?.userId, userId);
+assert.equal(otherNutrition?.userId, otherUserId);
+assert.notEqual(ownerNutrition.id, otherNutrition.id);
+
+const addFood = `mutation ($nutrition: Int!, $date: DateTime!) {
+  addFood(nutritionId: $nutrition, date: $date, foodInput: {
+    name: "Test food", mealName: "Breakfast", numOfServings: 1, servingSize: "1 portion",
+    calories: 1, protein: 0, fat: 0, carbohydrate: 0, sugar: 0, sodium: 0
+  }) { data { id nutritionId } errors { field } }
+}`;
+const foodInput = { nutrition: Number(ownerNutrition.id), date };
+assert.ok((await graphql(addFood, foodInput, login.cookie)).data.addFood.data?.id);
+assert.equal((await graphql(addFood, foodInput, otherRegistration.cookie)).data.addFood.data, null);
+console.log('Token separation and workout, exercise, and nutrition ownership checks passed');

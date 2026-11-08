@@ -64,13 +64,13 @@ export const CaloriesGraph: React.FC<CaloriesGraphProps> = () => {
           <h3 className="text-2xl font-bold text-[#2b3042]">Calories</h3>
         </div>
         {/* <div>
-          <button className="px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded">
+          <button className="px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-sm">
             View all
           </button>
         </div> */}
       </div>
       <div
-        className="shadow mt-5 rounded-lg cursor-pointer pt-4 pr-4 flex-1 justify-center items-center bg-[#fafafa]"
+        className="shadow-sm mt-5 rounded-lg cursor-pointer pt-4 pr-4 flex-1 justify-center items-center bg-[#fafafa]"
         style={{ height: 240, width: '100%', display: 'block' }}
       >
         <ResponsiveContainer width="100%" height="100%">

@@ -2,18 +2,20 @@ schema: './graphql.schema.json'
 documents: 'graphql/**/*/*.graphql'
 overwrite: true
 generates:
-  graphql/generated/graphql.ts:
+  graphql/generated/schema.ts:
     plugins:
       - 'typescript'
+  graphql/generated/graphql.ts:
+    plugins:
       - 'typescript-operations'
       - 'typescript-react-query'
     config:
       pureMagicComment: true
+      legacyMode: false
+      reactQueryVersion: 5
+      importSchemaTypesFrom: './graphql/generated/schema.ts'
       exposeQueryKeys: true
       exposeDocument: true
       exposeFetcher: true
       fetcher:
         func: '../fetcher#customFetcher'
-  ./graphql.schema.json:
-    plugins:
-      - 'introspection'
