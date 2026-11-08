@@ -31,10 +31,26 @@ import { Drawer } from '../../Drawer/Drawer';
 import useDebounce from '../../../hooks/useDebounce';
 import { FiChevronLeft } from 'react-icons/fi';
 import { BasketItem } from './Basket/BasketItem';
+import {
+  readNutritionixSearchResponse,
+  type NutritionixSearchFood,
+  type NutritionixSearchResults,
+} from '../../../utils/nutritionixSearch';
 
 interface FoodDiaryProps {}
 
 const todaysDate = new Date();
+const nutritionixBaseUrl = process.env.NEXT_PUBLIC_NUTRITIONIX_API_URL;
+const nutritionixHeaders = {
+  'x-app-id': process.env.NEXT_PUBLIC_NUTRITIONIX_APP_ID as string,
+  'x-app-key': process.env.NEXT_PUBLIC_NUTRITIONIX_APP_KEY as string,
+  'x-remote-user-id': '0',
+};
+
+type FoodSearch = {
+  query: string;
+  results: NutritionixSearchResults | null;
+};
 
 type mealNames =
   | 'Breakfast'
@@ -52,9 +68,12 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
   const [mealNameToEdit, setMealNameToEdit] = useState<mealNames>(undefined);
 
   const [searchInput, setSearchInput] = useState('');
-  const debouncedSearchTerm = useDebounce(searchInput, 1000);
-  const [isSearching, setIsSearching] = useState<boolean>(false);
-  const [foods, setFoods] = useState<any>([]);
+  const searchTerm = searchInput.trim();
+  const debouncedSearchTerm = useDebounce(searchTerm, 1000);
+  const [foodSearch, setFoodSearch] = useState<FoodSearch | null>(null);
+  const currentSearch = foodSearch?.query === searchTerm ? foodSearch : null;
+  const foods = currentSearch?.results;
+  const [foodDetailsUnavailable, setFoodDetailsUnavailable] = useState(false);
   const [selectedFoods, setSelectedFoods] = useState<any[]>([]);
 
   const { data: usersGoals, refetch: refetchUsersGoals } =
@@ -136,24 +155,6 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
     return sum;
   }
 
-  async function getFoods() {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_NUTRITIONIX_API_URL}/search/instant?query=${debouncedSearchTerm}`,
-      {
-        headers: {
-          'x-app-id': process.env.NEXT_PUBLIC_NUTRITIONIX_APP_ID as string,
-          'x-app-KEY': process.env.NEXT_PUBLIC_NUTRITIONIX_APP_KEY as string,
-          'x-remote-user-id': '0',
-        },
-      }
-    );
-
-    const foodsJSON = await res.json();
-
-    setFoods(foodsJSON ?? []);
-    setIsSearching(false);
-  }
-
   const handleChangeDate = (date: Date) => {
     setSelectedDate(date);
   };
@@ -192,22 +193,33 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
     }
   };
 
-  const handleSelectFood = async (food: any, type: 'branded' | 'common') => {
-    if (type === 'branded') {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_NUTRITIONIX_API_URL}/search/item?nix_item_id=${food.nix_item_id}`,
-        {
-          headers: {
-            'x-app-id': process.env.NEXT_PUBLIC_NUTRITIONIX_APP_ID as string,
-            'x-app-KEY': process.env.NEXT_PUBLIC_NUTRITIONIX_APP_KEY as string,
-            'x-remote-user-id': '0',
-          },
-        }
-      );
+  const handleSelectFood = async (
+    food: NutritionixSearchFood,
+    type: 'branded' | 'common'
+  ) => {
+    setFoodDetailsUnavailable(false);
+    try {
+      const res =
+        type === 'branded'
+          ? await fetch(
+              `${nutritionixBaseUrl}/search/item?nix_item_id=${encodeURIComponent(food.nix_item_id ?? '')}`,
+              { headers: nutritionixHeaders }
+            )
+          : await fetch(`${nutritionixBaseUrl}/natural/nutrients`, {
+              method: 'POST',
+              headers: { ...nutritionixHeaders, 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                query: food.food_name,
+                timezone: 'Europe/London',
+              }),
+            });
+      if (!res.ok) throw new Error('Food details request failed');
 
       const foodJSON = await res.json();
-      const foodItem = foodJSON.foods[0];
-
+      const foodItem = Array.isArray(foodJSON?.foods) ? foodJSON.foods[0] : null;
+      if (!foodItem || typeof foodItem.food_name !== 'string') {
+        throw new Error('Food details response did not include a food');
+      }
       const defaultFoodItem = {
         ...foodItem,
         userMeasurements: {
@@ -223,48 +235,12 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
         },
       };
 
-      setSelectedFoods((prevState: any) => [...prevState, defaultFoodItem]);
-    } else {
-      const body = {
-        query: food['food_name'],
-        timezone: 'Europe/London',
-      };
-
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_NUTRITIONIX_API_URL}/natural/nutrients`,
-        {
-          method: 'POST',
-          body: JSON.stringify(body),
-          headers: {
-            'x-app-id': process.env.NEXT_PUBLIC_NUTRITIONIX_APP_ID as string,
-            'x-app-KEY': process.env.NEXT_PUBLIC_NUTRITIONIX_APP_KEY as string,
-            'x-remote-user-id': '0',
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-
-      const foodJSON = await res.json();
-      const foodItem = foodJSON.foods[0];
-
-      const defaultFoodItem = {
-        ...foodItem,
-        userMeasurements: {
-          quantity: foodItem.serving_qty,
-          measure: foodItem.serving_unit,
-          servingWeight: foodItem.serving_weight_grams,
-          calories: Math.round(foodItem.nf_calories),
-          carbs: Math.round(foodItem.nf_total_carbohydrate),
-          protein: Math.round(foodItem.nf_protein),
-          fat: Math.round(foodItem.nf_total_fat),
-          sodium: Math.round(foodItem.nf_sodium),
-          sugar: Math.round(foodItem.nf_sugars),
-        },
-      };
-
-      setSelectedFoods((prevState: any) => [...prevState, defaultFoodItem]);
+      setSelectedFoods((previous) => [...previous, defaultFoodItem]);
+      setSearchInput('');
+      setFoodSearch(null);
+    } catch {
+      setFoodDetailsUnavailable(true);
     }
-    setSearchInput('');
   };
 
   const handleLogFoods = () => {
@@ -334,27 +310,28 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
   };
 
   useEffect(() => {
-    if (debouncedSearchTerm.length === 0) {
-      setIsSearching(false);
-      return;
-    }
+    if (!searchTerm || debouncedSearchTerm !== searchTerm) return;
 
-    setIsSearching(true);
+    const controller = new AbortController();
+    const query = new URLSearchParams({ query: searchTerm });
+    fetch(`${nutritionixBaseUrl}/search/instant?${query}`, {
+      headers: nutritionixHeaders,
+      signal: controller.signal,
+    })
+      .then(readNutritionixSearchResponse)
+      .then((results) => {
+        if (!controller.signal.aborted) {
+          setFoodSearch({ query: searchTerm, results });
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setFoodSearch({ query: searchTerm, results: null });
+        }
+      });
 
-    // @TODO: Change this so that it only searches after
-    // the user has typed a minimum of 3 characters.
-    getFoods();
-  }, [debouncedSearchTerm]);
-
-  useEffect(() => {
-    if (searchInput.length === 0) {
-      setIsSearching(false);
-
-      return;
-    }
-
-    setIsSearching(true);
-  }, [searchInput]);
+    return () => controller.abort();
+  }, [debouncedSearchTerm, searchTerm]);
 
   return (
     <div className="mt-0">
@@ -2419,7 +2396,13 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
                     type="text"
                     id="searchExercises"
                     value={searchInput}
-                    onChange={(e) => setSearchInput(e.target.value)}
+                    onChange={(e) => {
+                      if (e.target.value.trim() !== searchTerm) {
+                        setFoodSearch(null);
+                        setFoodDetailsUnavailable(false);
+                      }
+                      setSearchInput(e.target.value);
+                    }}
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-brand-green focus:border-brand-green w-full pl-3 p-2.5"
                     placeholder="Search"
                   />
@@ -2439,83 +2422,90 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
                       </svg>
                     </div>
                   </div>
-                  {!isSearching && debouncedSearchTerm.length > 0 && foods && (
+                  {currentSearch && !foods && (
+                    <p role="status" className="mt-2 text-sm text-gray-700">
+                      Food search is unavailable right now. Please try again later.
+                    </p>
+                  )}
+                  {foodDetailsUnavailable && (
+                    <p role="status" className="mt-2 text-sm text-gray-700">
+                      Could not load nutrition details for this food. Please try again.
+                    </p>
+                  )}
+                  {foods && foods.common.length === 0 && foods.branded.length === 0 && (
+                    <p role="status" className="mt-2 text-sm text-gray-700">
+                      No foods found.
+                    </p>
+                  )}
+                  {foods && (foods.common.length > 0 || foods.branded.length > 0) && (
                     <div
                       className={`border rounded-bl rounded-br absolute ${styles.foodChoicesList}`}
                     >
                       <div>
                         <p className="text-gray-500 font-semibold py-1  text-sm mt-2 pl-3 border-b">
-                          Common Foods {`(${foods['common'].length})`}
+                          Common Foods {`(${foods.common.length})`}
                         </p>
-                        {!isSearching &&
-                          debouncedSearchTerm.length > 0 &&
-                          foods &&
-                          Object.keys(foods).length > 0 && (
-                            <div>
-                              {foods['common'].slice(0, 5).map((food: any) => (
-                                <div
-                                  key={food.food_name}
-                                  onClick={() =>
-                                    handleSelectFood(food, 'common')
-                                  }
-                                  className="border-b px-4 p-1 flex items-center space-x-2 hover:bg-gray-100 cursor-pointer"
-                                >
-                                  <div>
-                                    <Image
-                                      src={food['photo']['thumb']}
-                                      height={30}
-                                      width={30}
-                                      alt={food.food_name}
-                                    />
-                                  </div>
-                                  <div>
-                                    <p>{food.food_name}</p>
-                                  </div>
-                                </div>
-                              ))}
+                        <div>
+                          {foods.common.slice(0, 5).map((food) => (
+                            <div
+                              key={food.food_name}
+                              onClick={() =>
+                                handleSelectFood(food, 'common')
+                              }
+                              className="border-b px-4 p-1 flex items-center space-x-2 hover:bg-gray-100 cursor-pointer"
+                            >
+                              {typeof food.photo?.thumb === 'string' && food.photo.thumb && (
+                                <Image
+                                  src={food.photo.thumb}
+                                  height={30}
+                                  width={30}
+                                  alt={food.food_name}
+                                />
+                              )}
+                              <div>
+                                <p>{food.food_name}</p>
+                              </div>
                             </div>
-                          )}
+                          ))}
+                        </div>
                       </div>
                       <div className="mt-3">
                         <p className="text-gray-500 font-semibold py-1  text-sm mt-1 pl-3 border-b">
-                          Branded Foods {`(${foods['branded'].length})`}
+                          Branded Foods {`(${foods.branded.length})`}
                         </p>
-                        {!isSearching &&
-                          debouncedSearchTerm.length > 0 &&
-                          foods &&
-                          Object.keys(foods).length > 0 && (
-                            <div>
-                              {foods['branded'].slice(0, 5).map((food: any) => (
-                                <div
-                                  key={food.food_name}
-                                  onClick={() =>
-                                    handleSelectFood(food, 'branded')
-                                  }
-                                  className="border-b px-4 p-1 flex items-center justify-between space-x-2 hover:bg-gray-100 cursor-pointer"
-                                >
-                                  <div className="flex items-center space-x-2 ">
-                                    <div>
-                                      <Image
-                                        src={food['photo']['thumb']}
-                                        height={30}
-                                        width={30}
-                                        alt={food.food_name}
-                                      />
-                                    </div>
-                                    <div>
-                                      <p>{food.food_name}</p>
-                                    </div>
-                                  </div>
-                                  <div className="flex flex-col items-center pr-1">
-                                    <div className="font-medium text-green-500">
-                                      {Math.round(food.nf_calories)}
-                                    </div>
-                                    <div>cal</div>
-                                  </div>
+                        <div>
+                          {foods.branded.slice(0, 5).map((food) => (
+                            <div
+                              key={food.nix_item_id}
+                              onClick={() =>
+                                handleSelectFood(food, 'branded')
+                              }
+                              className="border-b px-4 p-1 flex items-center justify-between space-x-2 hover:bg-gray-100 cursor-pointer"
+                            >
+                              <div className="flex items-center space-x-2 ">
+                                {typeof food.photo?.thumb === 'string' && food.photo.thumb && (
+                                  <Image
+                                    src={food.photo.thumb}
+                                    height={30}
+                                    width={30}
+                                    alt={food.food_name}
+                                  />
+                                )}
+                                <div>
+                                  <p>{food.food_name}</p>
                                 </div>
-                              ))}
+                              </div>
+                              {typeof food.nf_calories === 'number' && (
+                                <div className="flex flex-col items-center pr-1">
+                                  <div className="font-medium text-green-500">
+                                    {Math.round(food.nf_calories)}
+                                  </div>
+                                  <div>cal</div>
+                                </div>
+                              )}
                             </div>
-                          )}
+                          ))}
+                        </div>
                       </div>
                     </div>
                   )}
