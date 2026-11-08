@@ -19,6 +19,7 @@ services:
     deploy:
       labels:
         - "traefik.enable=true"
+        - "traefik.swarm.lbswarm=true"
         - "traefik.http.services.vita-track-api.loadbalancer.server.port=5500"
         - "traefik.http.routers.vita-track-api.rule=Host(`vita-track-api.perrysmithmoss.com`)"
         - "traefik.http.routers.vita-track-api.entrypoints=websecure"
