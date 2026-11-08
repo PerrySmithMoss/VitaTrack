@@ -70,4 +70,8 @@ ENTRYPOINT ["/usr/bin/tini", "--"]
 
 EXPOSE 5500
 
+COPY scripts/healthcheck.mjs ./healthcheck.mjs
+HEALTHCHECK --interval=10s --timeout=3s --start-period=30s --start-interval=1s --retries=3 \
+  CMD ["node", "/app/healthcheck.mjs"]
+
 CMD ["/deployment-entry.sh"]
