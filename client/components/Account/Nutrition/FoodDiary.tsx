@@ -40,12 +40,19 @@ import {
 interface FoodDiaryProps {}
 
 const todaysDate = new Date();
-const nutritionixBaseUrl = process.env.NEXT_PUBLIC_NUTRITIONIX_API_URL;
-const nutritionixHeaders = {
-  'x-app-id': process.env.NEXT_PUBLIC_NUTRITIONIX_APP_ID as string,
-  'x-app-key': process.env.NEXT_PUBLIC_NUTRITIONIX_APP_KEY as string,
-  'x-remote-user-id': '0',
-};
+
+function lookupFood(
+  action: 'search' | 'branded' | 'common',
+  value: string,
+  signal?: AbortSignal
+) {
+  return fetch('/api/nutritionix', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action, value }),
+    signal,
+  });
+}
 
 type FoodSearch = {
   query: string;
@@ -199,20 +206,8 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
   ) => {
     setFoodDetailsUnavailable(false);
     try {
-      const res =
-        type === 'branded'
-          ? await fetch(
-              `${nutritionixBaseUrl}/search/item?nix_item_id=${encodeURIComponent(food.nix_item_id ?? '')}`,
-              { headers: nutritionixHeaders }
-            )
-          : await fetch(`${nutritionixBaseUrl}/natural/nutrients`, {
-              method: 'POST',
-              headers: { ...nutritionixHeaders, 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                query: food.food_name,
-                timezone: 'Europe/London',
-              }),
-            });
+      const value = type === 'branded' ? food.nix_item_id ?? '' : food.food_name;
+      const res = await lookupFood(type, value);
       if (!res.ok) throw new Error('Food details request failed');
 
       const foodJSON = await res.json();
@@ -313,11 +308,7 @@ export const FoodDiary: React.FC<FoodDiaryProps> = () => {
     if (!searchTerm || debouncedSearchTerm !== searchTerm) return;
 
     const controller = new AbortController();
-    const query = new URLSearchParams({ query: searchTerm });
-    fetch(`${nutritionixBaseUrl}/search/instant?${query}`, {
-      headers: nutritionixHeaders,
-      signal: controller.signal,
-    })
+    lookupFood('search', searchTerm, controller.signal)
       .then(readNutritionixSearchResponse)
       .then((results) => {
         if (!controller.signal.aborted) {
