@@ -42,8 +42,11 @@ RUN yarn install --production --frozen-lockfile
 # Stage 3: Final image
 FROM ${NODE_IMAGE} AS runner
 
-# Install tini (smallest init system to handle signals properly)
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates openssl tini && rm -rf /var/lib/apt/lists/*
+# Install tini for signal handling and require the DSA-6613-1 zlib fix.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates openssl tini zlib1g \
+    && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' zlib1g)" ge '1:1.3.dfsg+really1.3.1-1+deb13u1' \
+    && rm -rf /var/lib/apt/lists/*
 
 # Runtime and Prisma migrations only need Node, not package installers.
 RUN rm -rf /usr/local/lib/node_modules /opt/yarn-* \
