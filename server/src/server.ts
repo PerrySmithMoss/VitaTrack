@@ -40,6 +40,11 @@ const corsOptions = {
 async function startServer() {
   try {
     app.use(cors(corsOptions));
+    // Public process liveness, outside GraphQL and its auth/CSRF middleware.
+    // Listen starts only after Apollo initialization; no DB query per health hit.
+    app.get("/healthz", (_req, res) => {
+      res.status(200).set("Cache-Control", "no-store").json({ status: "ok" });
+    });
     app.use(cookieParser());
     app.post("/food-data", express.json({ limit: "2kb" }), foodData);
 

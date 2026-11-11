@@ -53,3 +53,14 @@ from this repository. An administrator owns the existing Swarm service
 configuration. See the
 [portfolio release runbook](https://github.com/PerrySmithMoss/perry-infra/blob/main/deploy/portfolio/README.md)
 for installation, production checks and rollback by digest and revision.
+
+### Public health endpoint
+
+`GET /healthz` returns `200` with `{ "status": "ok" }`. `HEAD /healthz` returns
+the same status without a body. Both use `Cache-Control: no-store`, require no
+cookies or credentials, and perform no database queries. This is process liveness,
+not a continuous database-readiness check. It is outside GraphQL; GraphQL CSRF
+protection, authentication, and the existing Docker GraphQL probe remain in place.
+
+Use `https://vita-track-api.perrysmithmoss.com/healthz` for the five-minute
+UptimeRobot Free HTTP check, with owner email alerts.

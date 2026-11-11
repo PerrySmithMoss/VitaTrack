@@ -23,6 +23,30 @@ async function graphql(query, variables = {}, cookie = '') {
   };
 }
 
+// The public health route must be independent of GraphQL headers and sessions.
+for (const headers of [{}, { cookie: 'accessToken=invalid; refreshToken=invalid' }]) {
+  const health = await fetch(new URL('/healthz', origin), {
+    headers, redirect: 'manual', signal: AbortSignal.timeout(10000),
+  });
+  assert.equal(health.status, 200);
+  assert.match(health.headers.get('content-type'), /^application\/json/);
+  assert.equal(health.headers.get('cache-control'), 'no-store');
+  assert.equal(health.headers.get('set-cookie'), null);
+  assert.deepEqual(await health.json(), { status: 'ok' });
+}
+const head = await fetch(new URL('/healthz', origin), {
+  method: 'HEAD', redirect: 'manual', signal: AbortSignal.timeout(10000),
+});
+assert.equal(head.status, 200);
+assert.equal(head.headers.get('cache-control'), 'no-store');
+assert.equal(await head.text(), '');
+// Adding a public route must not weaken Apollo's existing CSRF protection.
+const csrf = await fetch(new URL('/graphql?query=%7B__typename%7D', origin), {
+  redirect: 'manual', signal: AbortSignal.timeout(10000),
+});
+assert.equal(csrf.status, 400);
+console.log('Public GET/HEAD health checks and GraphQL CSRF protection passed');
+
 assert.equal((await graphql('{ __typename }')).data.__typename, 'Query');
 const registration = await graphql(
   'mutation ($email: String!, $password: String!, $username: String!) { createUser(email: $email, password: $password, username: $username) { data { id } } }',
