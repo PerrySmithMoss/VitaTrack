@@ -16,22 +16,24 @@ services:
       - vita-track_jwt_secret
       - vita-track_usda_fdc_api_key
     networks:
-      - portfolio_network
+      - vita_track_ingress
+      - vita_track_database
     deploy:
       labels:
         - "traefik.enable=true"
         - "traefik.swarm.lbswarm=true"
+        - "traefik.swarm.network=vita_track_ingress"
         - "traefik.http.services.vita-track-api.loadbalancer.server.port=5500"
         - "traefik.http.routers.vita-track-api.rule=Host(`vita-track-api.perrysmithmoss.com`)"
         - "traefik.http.routers.vita-track-api.entrypoints=websecure"
         - "traefik.http.routers.vita-track-api.tls.certresolver=myresolver"
       update_config:
         order: start-first
-    depends_on:
-      - postgres
 
 networks:
-  portfolio_network:
+  vita_track_ingress:
+    external: true
+  vita_track_database:
     external: true
 
 secrets:
